@@ -10,6 +10,7 @@ export type Post = {
   date: string
   description: string
   cover: string
+  category: string
   content: string
 }
 
@@ -36,6 +37,7 @@ export async function getAllPosts(): Promise<Post[]> {
       date: safeString(data.date, new Date().toISOString().slice(0, 10)),
       description: safeString(data.description, 'Sin descripción'),
       cover: safeString(data.cover, '/images/default-cover.jpg'),
+      category: safeString(data.category, 'NOTICIAS'),
       content,
     }
   })
@@ -59,6 +61,7 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
     date: safeString(data.date, new Date().toISOString().slice(0, 10)),
     description: safeString(data.description, 'Sin descripción'),
     cover: safeString(data.cover, '/images/default-cover.jpg'),
+    category: safeString(data.category, 'NOTICIAS'),
     content,
   }
 }
