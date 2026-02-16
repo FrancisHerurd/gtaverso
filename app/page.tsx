@@ -1,6 +1,7 @@
 import Link from "next/link"
 import Image from "next/image"
-import { getAllPosts } from "@/lib/posts"
+import { getAllPosts, type Post } from "@/lib/posts"
+import SearchBar from "@/components/SearchBar"
 
 function Badge({ children }: { children: string }) {
   return (
@@ -13,6 +14,20 @@ function Badge({ children }: { children: string }) {
   )
 }
 
+function toPublicSrc(p?: string) {
+  if (!p) return "/images/default-cover.jpg"
+  return p.startsWith("/") ? p : `/${p}`
+}
+
+function postHref(p: Post) {
+  return `/${p.game}/${p.type}/${p.slug}`
+}
+
+function postBadge(p: Post) {
+  // Si quieres solo type: return p.type.toUpperCase()
+  return `${p.game.toUpperCase()} · ${p.type.toUpperCase()}`
+}
+
 export default async function Page() {
   const posts = await getAllPosts()
   const featured = posts.slice(0, 3)
@@ -23,6 +38,22 @@ export default async function Page() {
 
   return (
     <div className="min-h-screen">
+      {/* HERO (textos + buscador) */}
+      <section className="relative">
+        <div className="mx-auto max-w-[var(--container)] px-4 pt-10 pb-6 sm:px-6 lg:px-8">
+          <h1 className="text-4xl font-extrabold text-white sm:text-5xl">
+            GTAVerso
+          </h1>
+          <p className="mt-3 max-w-3xl text-sm text-white/70 sm:text-base">
+            Noticias, guías, análisis y trucos de la saga GTA (tema oscuro, verde neón).
+          </p>
+
+          <div className="mt-6">
+            <SearchBar />
+          </div>
+        </div>
+      </section>
+
       {/* DESTACADOS */}
       <section className="relative">
         <div className="mx-auto max-w-[var(--container)] px-4 py-8 sm:px-6 lg:px-8">
@@ -33,13 +64,13 @@ export default async function Page() {
 
           {main && (
             <Link
-              href={`/${main.slug}`}
+              href={postHref(main)}
               className="group relative mb-8 block overflow-hidden rounded-2xl border border-white/10 bg-white/5"
             >
               {/* Figma: 1216 x 384 */}
               <div className="relative h-[384px] w-full">
                 <Image
-                  src={main.cover || "/images/default-cover.jpg"}
+                  src={toPublicSrc(main.cover)}
                   alt={main.title}
                   fill
                   sizes="(max-width: 1280px) 100vw, 1216px"
@@ -51,7 +82,7 @@ export default async function Page() {
 
               {/* Badge overlay (arriba-izquierda) */}
               <div className="absolute left-6 top-6">
-                <Badge>{main.category ?? "NOTICIAS"}</Badge>
+                <Badge>{postBadge(main)}</Badge>
               </div>
 
               <div className="absolute bottom-0 w-full p-6">
@@ -74,14 +105,14 @@ export default async function Page() {
               {small.map((p) => (
                 <Link
                   key={p.slug}
-                  href={`/${p.slug}`}
+                  href={postHref(p)}
                   className="group overflow-hidden rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10"
                 >
                   <div className="relative w-full">
                     {/* Figma: Card 596 x 192 (imagen 192px alto) */}
                     <div className="relative h-[192px] w-full">
                       <Image
-                        src={p.cover || "/images/default-cover.jpg"}
+                        src={toPublicSrc(p.cover)}
                         alt={p.title}
                         fill
                         sizes="(max-width: 768px) 100vw, 596px"
@@ -92,7 +123,7 @@ export default async function Page() {
 
                     {/* Badge overlay (arriba-izquierda) */}
                     <div className="absolute left-5 top-5">
-                      <Badge>{p.category ?? "GUÍAS"}</Badge>
+                      <Badge>{postBadge(p)}</Badge>
                     </div>
                   </div>
 
@@ -119,14 +150,14 @@ export default async function Page() {
             {latest.map((p) => (
               <Link
                 key={p.slug}
-                href={`/${p.slug}`}
+                href={postHref(p)}
                 className="group block overflow-hidden rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10"
               >
                 <div className="relative">
                   {/* Imagen */}
                   <div className="relative h-[192px] w-full">
                     <Image
-                      src={p.cover || "/images/default-cover.jpg"}
+                      src={toPublicSrc(p.cover)}
                       alt={p.title}
                       fill
                       sizes="(max-width: 1024px) 100vw, 400px"
@@ -137,7 +168,7 @@ export default async function Page() {
 
                   {/* Badge overlay (arriba-izquierda) */}
                   <div className="absolute left-5 top-5">
-                    <Badge>{p.category ?? "NOTICIAS"}</Badge>
+                    <Badge>{postBadge(p)}</Badge>
                   </div>
                 </div>
 
