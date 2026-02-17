@@ -32,6 +32,7 @@ export type Post = {
   description: string;
   cover: string;
   content: string;
+  readingTime?: string;  // ← AÑADIDO: opcional para PostCard
 };
 
 function safeString(v: unknown, fallback: string): string {
@@ -74,6 +75,7 @@ export async function getAllPosts(): Promise<Post[]> {
       description: safeString(data.description, "Sin descripción"),
       cover: safeString(data.cover, "images/default-cover.jpg"),
       content,
+      readingTime: safeString(data.readingTime, "5 min"),  // ← AÑADIDO: fallback
     };
   });
 
