@@ -120,6 +120,15 @@ export default function Footer() {
                   GTA 5
                 </Link>
               </li>
+              {/* GTA 4 AÑADIDO AQUÍ */}
+              <li>
+                <Link
+                  href="/gta-4"
+                  className="text-gray-400 transition-colors hover:text-[#00FF41]"
+                >
+                  GTA 4
+                </Link>
+              </li>
               <li>
                 <Link
                   href="/gta-san-andreas"
@@ -147,7 +156,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Enlaces Legales (ACTUALIZADO) */}
+          {/* Enlaces Legales */}
           <div>
             <h4 className="mb-4 font-bold uppercase tracking-wide text-[#00FF41]">
               Legal

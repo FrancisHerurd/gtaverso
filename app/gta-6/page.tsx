@@ -41,7 +41,7 @@ function GTA6Countdown() {
           { label: "MIN", value: timeLeft.minutes },
           { label: "SEG", value: timeLeft.seconds },
         ].map((item, idx) => (
-          <div key={idx} className="flex min-w-[70px] flex-col items-center rounded-lg bg-black/40 p-3 shadow-lg ring-1 ring-white/10">
+          <div key={idx} className="flex min-w-17.5 flex-col items-center rounded-lg bg-black/40 p-3 shadow-lg ring-1 ring-white/10">
             <span className="text-3xl font-black text-white sm:text-4xl">{item.value}</span>
             <span className="text-[10px] font-bold text-gray-400">{item.label}</span>
           </div>

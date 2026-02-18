@@ -10,6 +10,7 @@ const NAV_GAMES = [
   { slug: "noticias", label: "Noticias" },
   { slug: "gta-6", label: "GTA 6" },
   { slug: "gta-5", label: "GTA 5" },
+  { slug: "gta-4", label: "GTA 4" },
   { slug: "gta-san-andreas", label: "San Andreas" },
   { slug: "gta-vice-city", label: "Vice City" },
   { slug: "gta-3", label: "GTA 3" },
