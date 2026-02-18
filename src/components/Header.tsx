@@ -7,6 +7,7 @@ import { Menu, Search, X } from "lucide-react";
 import { useState } from "react";
 
 const NAV_GAMES = [
+  { slug: "noticias", label: "Noticias" },
   { slug: "gta-6", label: "GTA 6" },
   { slug: "gta-5", label: "GTA 5" },
   { slug: "gta-san-andreas", label: "San Andreas" },

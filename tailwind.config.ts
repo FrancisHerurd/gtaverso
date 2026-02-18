@@ -10,46 +10,33 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Colores basados en tu diseño Figma (ACTUALIZA estos valores con los de tu diseño)
+        // 🔥 GTA VERDE NEÓN (tu Figma)
+        'gta-green': {
+          DEFAULT: '#00FF41',
+          500: '#00FF41',
+          400: '#33ff66',
+          300: '#66ff99',
+          dark: '#00cc34',
+        },
+        // Tus colores originales (mantengo)
         primary: {
-          DEFAULT: '#3B82F6', // Azul principal
+          DEFAULT: '#3B82F6',
           dark: '#2563EB',
           light: '#60A5FA',
-        },
-        secondary: {
-          DEFAULT: '#10B981', // Verde
-          dark: '#059669',
-          light: '#34D399',
-        },
-        accent: {
-          DEFAULT: '#F59E0B', // Naranja/Amarillo
-          dark: '#D97706',
-          light: '#FBBF24',
         },
         dark: {
           DEFAULT: '#1F2937',
           800: '#111827',
           700: '#374151',
         },
-        light: {
-          DEFAULT: '#F9FAFB',
-          100: '#F3F4F6',
-          200: '#E5E7EB',
-        },
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        heading: ['Poppins', 'Inter', 'sans-serif'],
-      },
-      spacing: {
-        '128': '32rem',
-        '144': '36rem',
-      },
-      borderRadius: {
-        '4xl': '2rem',
+        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
     },
   },
   plugins: [],
+  darkMode: 'class', // ← Dark mode por class="dark"
 }
+
 export default config

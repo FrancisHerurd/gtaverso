@@ -1,9 +1,10 @@
-// app/layout.tsx
+// Tu EXACTO original + 2 líneas
 import type { Metadata } from "next";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ScrollTopButton from "@/components/ScrollTopButton";
+import CookieConsent from "@/components/CookieConsent/CookieConsent"; // ← SOLO ESTO
 
 export const metadata: Metadata = {
   title: "GTAVerso",
@@ -22,6 +23,7 @@ export default function RootLayout({
         <main>{children}</main>
         <Footer />
         <ScrollTopButton />
+        <CookieConsent /> {/* ← SOLO ESTO */}
       </body>
     </html>
   );
