@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Política de Cookies | GTAVerso",
   description: "Uso de cookies en GTAVerso.",
+  robots: "noindex, nofollow",
 };
 
 export default function CookiesPage() {

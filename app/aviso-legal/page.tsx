@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Aviso Legal | GTAVerso",
   description: "Información legal y titularidad del sitio web GTAVerso.",
+  robots: "noindex, nofollow",
 };
 
 export default function LegalNoticePage() {

@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Política de Privacidad | GTAVerso",
   description: "Política de privacidad y protección de datos de GTAVerso.",
+  robots: "noindex, nofollow",
 };
 
 export default function PrivacyPage() {
