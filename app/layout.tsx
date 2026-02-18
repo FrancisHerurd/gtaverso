@@ -1,14 +1,17 @@
-// Tu EXACTO original + 2 líneas
 import type { Metadata } from "next";
 import "./globals.css";
+
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ScrollTopButton from "@/components/ScrollTopButton";
-import CookieConsent from "@/components/CookieConsent/CookieConsent"; // ← SOLO ESTO
 
 export const metadata: Metadata = {
-  title: "GTAVerso",
-  description: "Noticias, guías y trucos de GTA",
+  title: {
+    default: "GTAVerso",
+    template: "%s | GTAVerso",
+  },
+  description: "Noticias, guías, trucos y leaks de GTA 6, GTA 5 Online y toda la saga GTA.",
+  keywords: ["GTA 6", "GTA Online", "GTA 5", "noticias GTA", "guías GTA", "leaks GTA"],
 };
 
 export default function RootLayout({
@@ -17,13 +20,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es" className="dark">
-      <body className="min-h-screen">
+    <html lang="es" className="dark" suppressHydrationWarning>
+      <body className="min-h-screen bg-gray-950 text-white antialiased">
         <Header />
         <main>{children}</main>
         <Footer />
         <ScrollTopButton />
-        <CookieConsent /> {/* ← SOLO ESTO */}
       </body>
     </html>
   );

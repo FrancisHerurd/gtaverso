@@ -10,7 +10,6 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // 🔥 GTA VERDE NEÓN (tu Figma)
         'gta-green': {
           DEFAULT: '#00FF41',
           500: '#00FF41',
@@ -18,25 +17,17 @@ const config: Config = {
           300: '#66ff99',
           dark: '#00cc34',
         },
-        // Tus colores originales (mantengo)
-        primary: {
-          DEFAULT: '#3B82F6',
-          dark: '#2563EB',
-          light: '#60A5FA',
-        },
-        dark: {
-          DEFAULT: '#1F2937',
-          800: '#111827',
-          700: '#374151',
-        },
       },
       fontFamily: {
         sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
+      maxWidth: {
+        '(--container)': '1216px',
+      },
     },
   },
   plugins: [],
-  darkMode: 'class', // ← Dark mode por class="dark"
+  darkMode: 'class',
 }
 
 export default config

@@ -1,79 +1,93 @@
 @import "tailwindcss";
 
-/* Tokens originales + GTA fixes */
+/* Variables GTA */
 :root {
   --font-size: 16px;
-  --background: #111827;           /* ← NEGRO GTA */
-  --foreground: #f9fafb;           /* ← BLANCO */
+  --background: #0a0a0a;
+  --foreground: #f9fafb;
   --card: #1f2937;
   --card-foreground: #f9fafb;
-  --popover: #1f2937;
-  --popover-foreground: #f9fafb;
-  --primary: #00FF41;              /* ← GTA VERDE */
-  --primary-foreground: #000;
-  --secondary: #374151;
-  --secondary-foreground: #f9fafb;
-  --muted: #374151;
-  --muted-foreground: #9ca3af;
-  --accent: #1f2937;
-  --accent-foreground: #f9fafb;
-  --destructive: #ef4444;
-  --destructive-foreground: #fefefe;
-  --border: rgba(0, 255, 65, 0.2); /* ← VERDE SUTIL */
-  --input: #1f2937;
-  --input-background: #374151;
-  --switch-background: #4b5563;
-  --font-weight-medium: 500;
-  --font-weight-normal: 400;
+  --primary: #00FF41;
+  --gta-green: #00FF41;
+  --gta-green-dark: #00cc34;
+  --container: 1216px;
+  --border: rgba(0, 255, 65, 0.2);
   --ring: rgba(0, 255, 65, 0.5);
   --radius: 0.625rem;
-  --container: 1216px;             /* ← FIGMA */
-  --gta-green: #00FF41;            /* ← GLOBAL */
 }
 
-/* Dark mode (forzado negro) */
+/* Dark mode forzado */
 .dark {
-  --background: #111827 !important;
-  --foreground: #f9fafb !important;
-  --card: #1f2937 !important;
-  --card-foreground: #f9fafb !important;
+  --background: #0a0a0a;
+  --foreground: #f9fafb;
 }
 
-/* Base */
 html {
   font-size: var(--font-size);
-  scroll-behavior: smooth;         /* ← SCROLL SUAVE */
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px;
 }
 
 body {
-  background: var(--background) !important;
-  color: var(--foreground) !important;
-  font-family: Inter, Arial, sans-serif; /* ← INTER */
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Container Figma perfecto */
+/* Container Figma 1216px */
 .container {
   max-width: var(--container);
   margin: 0 auto;
   padding: 0 1rem;
 }
 
-@media (min-width: 640px) { .container { padding: 0 1.5rem; } }
-@media (min-width: 1216px) { .container { padding: 0 2rem; } }
+@media (min-width: 640px) {
+  .container {
+    padding: 0 1.5rem;
+  }
+}
 
-/* Neón selección GTA */
+@media (min-width: 1216px) {
+  .container {
+    padding: 0 2rem;
+  }
+}
+
+/* Selección neón GTA */
 ::selection {
-  background: var(--gta-green) !important;
-  color: #000 !important;
+  background: var(--gta-green);
+  color: #000;
+  text-shadow: none;
 }
 
 ::-moz-selection {
-  background: var(--gta-green) !important;
-  color: #000 !important;
+  background: var(--gta-green);
+  color: #000;
+  text-shadow: none;
 }
 
 /* Focus accesible */
 *:focus-visible {
   outline: 2px solid var(--gta-green);
   outline-offset: 2px;
+}
+
+/* Animaciones GPU */
+@media (prefers-reduced-motion: no-preference) {
+  *,
+  *::before,
+  *::after {
+    will-change: transform, opacity;
+  }
+}
+
+/* Inputs y botones limpios */
+input,
+textarea,
+button {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
 }

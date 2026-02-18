@@ -15,17 +15,17 @@ export default function SearchBar() {
   }
 
   return (
-    <form onSubmit={onSubmit}>
-      <div className="relative">
+    <form onSubmit={onSubmit} className="w-full">
+      <div className="relative flex items-center">
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Buscar noticias, guías, trucos..."
-          className="w-full rounded-full border border-white/10 bg-white/5 px-6 py-4 text-white outline-none focus:border-[var(--gta-green)]"
+          className="w-full rounded-full bg-transparent px-6 py-4 text-white placeholder:text-gray-400 focus:outline-none sm:text-lg"
         />
         <button
           type="submit"
-          className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-[var(--gta-green)] px-5 py-2 font-semibold text-black"
+          className="absolute right-2 top-2 bottom-2 rounded-full bg-(--gta-green) px-6 font-bold text-black transition hover:bg-[#00cc34] hover:shadow-[0_0_15px_rgba(0,255,65,0.4)]"
         >
           Buscar
         </button>

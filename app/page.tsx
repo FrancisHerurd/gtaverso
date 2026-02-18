@@ -1,12 +1,12 @@
+import Image from "next/image";
 import { getAllPosts } from "@/lib/posts";
 import PostCard from "@/components/PostCard";
 import SearchBar from "@/components/SearchBar";
-import SEO from "@/components/SEO/SEO";
-import { WebsiteStructuredData } from "@/components/SEO/WebsiteStructuredData";
 
 export const metadata = {
   title: "GTAVerso - Noticias GTA 6, GTA 5 Online, Guías y Leaks",
-  description: "Últimas noticias, guías, trucos y análisis de GTA 6, GTA Online y toda la saga GTA. Tema oscuro neón verde.",
+  description:
+    "Últimas noticias, guías, trucos y análisis de GTA 6, GTA Online y toda la saga GTA.",
 };
 
 export default async function Page() {
@@ -18,72 +18,105 @@ export default async function Page() {
   const small = featured.slice(1);
 
   return (
-    <>
-      {/* SEO INVISIBLE */}
-      <SEO 
-        title="GTAVerso - Noticias GTA 6, GTA 5 Online, Guías y Leaks"
-        description="Últimas noticias, guías, trucos y análisis de GTA 6, GTA Online y toda la saga GTA. Tema oscuro neón verde."
-        image="/images/og-home.jpg" // Añade esta imagen 1216x630px
-        type="website"
-        url="https://gtaverso.com"
-      />
-      <WebsiteStructuredData />
+    <div className="min-h-screen bg-gray-950">
+      {/* HERO OPTIMIZADO: Clases estándar aplicadas (min-h-125 y min-h-150) */}
+      <section className="relative flex min-h-125 flex-col justify-center overflow-hidden border-b border-white/8 bg-gray-950 sm:min-h-150">
+        
+        {/* IMAGEN DE FONDO */}
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/images/hero-bg.jpg"
+            alt="Fondo Vice City GTA 6"
+            fill
+            className="object-cover opacity-80"
+            style={{ objectPosition: 'center 30%' }}
+            priority
+            sizes="100vw"
+          />
+          {/* Overlay oscuro */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.3)_0%,rgba(0,0,0,0.8)_100%)]" />
+          
+          {/* Degradado inferior */}
+          <div className="absolute bottom-0 left-0 right-0 h-40 bg-linear-to-b from-transparent to-gray-950" />
+        </div>
 
-      <div className="min-h-screen">
-        {/* HERO (textos + buscador) */}
-        <section className="relative">
-          <div className="mx-auto max-w-[var(--container)] px-4 pt-10 pb-6 sm:px-6 lg:px-8">
-            <h1 className="text-4xl font-extrabold text-white sm:text-5xl">
-              GTAVerso
-            </h1>
-            <p className="mt-3 max-w-3xl text-sm text-white/70 sm:text-base">
-              Noticias, guías, análisis y trucos de la saga GTA (tema oscuro, verde neón).
-            </p>
+        {/* CONTENIDO */}
+        <div className="relative z-10 mx-auto flex w-full max-w-(--container) flex-col items-center px-4 text-center sm:px-6 lg:px-8">
+          
+          {/* H1: Corregido lg:leading-[1] -> lg:leading-none */}
+          <h1 className="text-5xl font-extrabold tracking-tight text-white drop-shadow-2xl sm:text-6xl lg:text-[5rem] lg:leading-none">
+            GTAVerso
+          </h1>
 
-            <div className="mt-6">
-              <SearchBar />
+          {/* TEXTO */}
+          <p className="mt-6 max-w-2xl text-lg font-medium text-gray-100 drop-shadow-lg sm:text-xl">
+            Noticias, guías, análisis y trucos de la saga GTA
+          </p>
+
+          {/* BUSCADOR */}
+          <div className="mt-10 w-full max-w-xl">
+            <div className="relative rounded-full bg-black/40 backdrop-blur-md shadow-2xl ring-1 ring-white/10 transition-all hover:bg-black/60 hover:ring-(--gta-green)/50">
+               <SearchBar />
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* DESTACADOS */}
-        <section className="relative">
-          <div className="mx-auto max-w-[var(--container)] px-4 py-8 sm:px-6 lg:px-8">
-            <div className="mb-6 flex items-center gap-2">
-              <span className="text-[var(--gta-green)]">🔥</span>
-              <h2 className="text-2xl font-bold text-white">Destacados</h2>
-            </div>
-
-            {/* Card grande featured */}
-            {main && <PostCard post={main} featured />}
-
-            {/* 2 cards pequeñas */}
-            {small.length > 0 && (
-              <div className="mb-12 grid grid-cols-1 gap-6 md:grid-cols-2">
-                {small.map((post) => (
-                  <PostCard key={post.slug} post={post} />
-                ))}
-              </div>
-            )}
+      {/* DESTACADOS */}
+      <section
+        aria-labelledby="home-featured-heading"
+        className="relative border-b border-white/8 bg-gray-950"
+      >
+        <div className="mx-auto max-w-(--container) px-4 py-8 sm:px-6 lg:px-8">
+          <div className="mb-6 flex items-center gap-2">
+            <span className="h-5 w-1 rounded-full bg-(--gta-green)" />
+            <h2
+              id="home-featured-heading"
+              className="text-2xl font-bold text-white"
+            >
+              Destacados
+            </h2>
           </div>
-        </section>
 
-        {/* ÚLTIMAS NOTICIAS */}
-        <section className="relative">
-          <div className="mx-auto max-w-[var(--container)] px-4 py-8 sm:px-6 lg:px-8">
-            <div className="mb-6 flex items-center gap-2">
-              <span className="text-[var(--gta-green)]">📈</span>
-              <h2 className="text-2xl font-bold text-white">Últimas Noticias</h2>
+          {main && (
+            <div className="mb-6">
+              <PostCard post={main} featured />
             </div>
+          )}
 
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {latest.map((post) => (
+          {small.length > 0 && (
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              {small.map((post) => (
                 <PostCard key={post.slug} post={post} />
               ))}
             </div>
+          )}
+        </div>
+      </section>
+
+      {/* ÚLTIMAS NOTICIAS */}
+      <section
+        aria-labelledby="home-latest-heading"
+        className="relative bg-gray-950"
+      >
+        <div className="mx-auto max-w-(--container) px-4 py-8 sm:px-6 lg:px-8">
+          <div className="mb-6 flex items-center gap-2">
+            <span className="h-5 w-1 rounded-full bg-(--gta-green)" />
+            <h2
+              id="home-latest-heading"
+              className="text-2xl font-bold text-white"
+            >
+              Últimas Noticias
+            </h2>
           </div>
-        </section>
-      </div>
-    </>
+
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {latest.map((post) => (
+              <PostCard key={post.slug} post={post} />
+            ))}
+          </div>
+        </div>
+      </section>
+    </div>
   );
 }

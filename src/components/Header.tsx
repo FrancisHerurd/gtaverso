@@ -39,7 +39,7 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-[#00FF41]/20 bg-black/95 backdrop-blur-sm">
       {/* Top bar con logo y acciones */}
-      <div className="mx-auto max-w-[var(--container)] px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-(--container) px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2 group">
@@ -80,16 +80,7 @@ export default function Header() {
                 </Link>
               );
             })}
-            <Link
-              href="/mapa-del-sitio"
-              className={`text-sm tracking-wide transition-colors ${
-                isActive(pathname, "/mapa-del-sitio")
-                  ? "text-[#00FF41]"
-                  : "text-gray-300 hover:text-[#00FF41]"
-              }`}
-            >
-              Mapa del sitio
-            </Link>
+            {/* AQUÍ ANTES ESTABA "MAPA DEL SITIO" HARDCODEADO - ELIMINADO */}
           </nav>
 
           {/* Actions */}
@@ -162,13 +153,7 @@ export default function Header() {
                 {game.label}
               </Link>
             ))}
-            <Link
-              href="/mapa-del-sitio"
-              className="block rounded-lg px-4 py-3 text-gray-300 hover:bg-[#00FF41]/10 hover:text-[#00FF41] transition-colors"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Mapa del sitio
-            </Link>
+            {/* AQUÍ ANTES ESTABA "MAPA DEL SITIO" HARDCODEADO - ELIMINADO */}
           </nav>
         </div>
       )}

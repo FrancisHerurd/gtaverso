@@ -3,7 +3,19 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Twitter, Instagram, Mail } from "lucide-react";
+import { Instagram, Mail } from "lucide-react";
+
+// Icono X (Twitter) personalizado
+const XIcon = ({ className }: { className?: string }) => (
+  <svg
+    viewBox="0 0 24 24"
+    aria-hidden="true"
+    className={className}
+    fill="currentColor"
+  >
+    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+  </svg>
+);
 
 export default function Footer() {
   const [email, setEmail] = useState("");
@@ -14,16 +26,13 @@ export default function Footer() {
     e.preventDefault();
 
     if (!email || !email.includes("@")) {
-      // Aquí luego puedes integrar tu sistema real de toasts
       alert("Por favor, introduce un email válido");
       return;
     }
 
     setIsSubmitting(true);
-
-    // Simulación de suscripción (luego se sustituirá por backend real)
+    // Simulación
     await new Promise((resolve) => setTimeout(resolve, 800));
-
     setIsSubmitting(false);
     setEmail("");
     alert("¡Suscripción registrada! (demo)");
@@ -32,8 +41,8 @@ export default function Footer() {
   return (
     <footer className="bg-black border-t border-[#00FF41]/20">
       {/* Newsletter */}
-      <div className="border-b border-[#00FF41]/20 bg-gradient-to-r from-black via-gray-900 to-black">
-        <div className="mx-auto max-w-[var(--container)] px-4 py-10 sm:px-6 lg:px-8">
+      <div className="border-b border-[#00FF41]/20 bg-linear-to-r from-black via-gray-900 to-black">
+        <div className="mx-auto max-w-(--container) px-4 py-10 sm:px-6 lg:px-8">
           <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
             <div className="text-center md:text-left">
               <h3 className="mb-2 text-2xl font-bold text-white">
@@ -68,7 +77,7 @@ export default function Footer() {
       </div>
 
       {/* Contenido principal */}
-      <div className="mx-auto max-w-[var(--container)] px-4 py-12 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-(--container) px-4 py-12 sm:px-6 lg:px-8">
         <div className="mb-8 grid grid-cols-1 gap-8 md:grid-cols-4">
           {/* Sobre nosotros */}
           <div>
@@ -81,12 +90,20 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* Juegos / secciones rápidas */}
+          {/* Juegos */}
           <div>
             <h4 className="mb-4 font-bold uppercase tracking-wide text-[#00FF41]">
               Juegos
             </h4>
             <ul className="space-y-2 text-sm">
+              <li>
+                <Link
+                  href="/noticias"
+                  className="text-gray-400 transition-colors hover:text-[#00FF41]"
+                >
+                  Noticias
+                </Link>
+              </li>
               <li>
                 <Link
                   href="/gta-6"
@@ -130,18 +147,18 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Enlaces rápidos */}
+          {/* Enlaces Legales (ACTUALIZADO) */}
           <div>
             <h4 className="mb-4 font-bold uppercase tracking-wide text-[#00FF41]">
-              Enlaces Rápidos
+              Legal
             </h4>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
-                  href="/mapa-del-sitio"
+                  href="/aviso-legal"
                   className="text-gray-400 transition-colors hover:text-[#00FF41]"
                 >
-                  Mapa del sitio
+                  Aviso Legal
                 </Link>
               </li>
               <li>
@@ -149,7 +166,15 @@ export default function Footer() {
                   href="/politica-de-privacidad"
                   className="text-gray-400 transition-colors hover:text-[#00FF41]"
                 >
-                  Política de privacidad
+                  Política de Privacidad
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/politica-de-cookies"
+                  className="text-gray-400 transition-colors hover:text-[#00FF41]"
+                >
+                  Política de Cookies
                 </Link>
               </li>
               <li>
@@ -157,7 +182,7 @@ export default function Footer() {
                   href="/terminos-de-uso"
                   className="text-gray-400 transition-colors hover:text-[#00FF41]"
                 >
-                  Términos de uso
+                  Términos de Uso
                 </Link>
               </li>
               <li>
@@ -171,23 +196,26 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Social (sin YouTube ni Facebook) */}
+          {/* Redes Sociales */}
           <div>
             <h4 className="mb-4 font-bold uppercase tracking-wide text-[#00FF41]">
               Síguenos
             </h4>
             <div className="flex gap-3">
+              {/* X (Twitter) */}
               <a
-                href="https://twitter.com"
+                href="https://x.com/GTA_Verso"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-900 text-gray-400 transition-colors hover:bg-[#00FF41]/10 hover:text-[#00FF41]"
-                aria-label="Twitter"
+                aria-label="X (Twitter)"
               >
-                <Twitter className="h-5 w-5" />
+                <XIcon className="h-5 w-5" />
               </a>
+
+              {/* Instagram */}
               <a
-                href="https://instagram.com"
+                href="https://instagram.com/gta_verso"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-900 text-gray-400 transition-colors hover:bg-[#00FF41]/10 hover:text-[#00FF41]"
@@ -195,6 +223,8 @@ export default function Footer() {
               >
                 <Instagram className="h-5 w-5" />
               </a>
+
+              {/* Email */}
               <a
                 href="mailto:contacto@gtaverso.com"
                 className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-900 text-gray-400 transition-colors hover:bg-[#00FF41]/10 hover:text-[#00FF41]"
@@ -206,14 +236,12 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Barra inferior */}
+        {/* Copyright */}
         <div className="border-t border-[#00FF41]/20 pt-6">
           <div className="flex flex-col items-center justify-between gap-3 text-center text-sm text-gray-500 md:flex-row md:text-left">
             <p>© {currentYear} GTAVerso. Todos los derechos reservados. GTAVerso es un proyecto fan no oficial y no está afiliado,
               patrocinado ni respaldado por Rockstar Games.</p>
-                 
-            
-                  </div>
+          </div>
         </div>
       </div>
     </footer>
