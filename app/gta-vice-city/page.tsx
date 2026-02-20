@@ -8,7 +8,7 @@ export default function ViceCityPage() {
     <GameHub
       title="Grand Theft Auto: Vice City"
       color="#00E5FF" // Cian Vice City (Estilo 80s)
-      heroImage="/images/vice-city-hero.jpg" // ⚠️ Pon tu imagen aquí (Tommy Vercetti)
+      heroImage="/images/vice-city-hero.webp" // ⚠️ Pon tu imagen aquí (Tommy Vercetti)
       
       description={`Bienvenido a los años 80. De la década de los cardados imposibles, los excesos y los trajes color pastel llega la historia de un hombre que asciende a lo más alto del escalafón criminal.
 
@@ -22,28 +22,28 @@ Ahora Tommy debe recuperar lo que es suyo, enfrentándose a bandas de motociclis
           description: "Novedades sobre la Definitive Edition, parches y mods gráficos.",
           href: "/gta-vice-city/noticias",
           icon: Newspaper,
-          image: "/images/vc-news.jpg",
+          image: "/images/vc-news.webp",
         },
         {
           title: "Guías de Misiones",
           description: "Cómo completar el 100%, paquetes ocultos, saltos únicos y propiedades.",
           href: "/gta-vice-city/guias",
           icon: BookOpen,
-          image: "/images/vc-guides.jpg",
+          image: "/images/vc-guides.webp",
         },
         {
           title: "Códigos de Trucos",
           description: "PANZER, ASPIRINE y todas las claves para PC, PlayStation y Xbox.",
           href: "/gta-vice-city/trucos",
           icon: Gamepad2,
-          image: "/images/vc-cheats.jpg",
+          image: "/images/vc-cheats.webp",
         },
         {
           title: "Medios y Galería",
           description: "Tráilers originales, capturas de pantalla y la inolvidable banda sonora.",
           href: "/gta-vice-city/media",
           icon: Video,
-          image: "/images/vc-media.jpg",
+          image: "/images/vc-media.webp",
         },
       ]}
 

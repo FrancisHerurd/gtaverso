@@ -8,8 +8,7 @@ interface GameSection {
   description: string;
   href: string;
   icon: React.ElementType;
-  image: string; // Se mantiene por si acaso, aunque en la imagen que pasaste parece que no usan imagen de fondo, sino color solido. 
-                 // Pero dejaremos la opción de imagen con overlay muy oscuro para que se vea premium.
+  image: string; 
 }
 
 interface GameInfo {
@@ -89,7 +88,7 @@ export default function GameHub({
             </p>
         </div>
 
-        {/* 2. GRID DE TARJETAS (ESTILO EXACTO IMAGEN "asasssas.jpg" CON MEJORA DE GRADIENTE) */}
+        {/* 2. GRID DE TARJETAS (CORREGIDO: Sin opacidad ni overlays oscuros) */}
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-24">
           {sections.map((section) => (
             <Link 
@@ -97,9 +96,9 @@ export default function GameHub({
                 href={section.href}
                 className="group flex flex-col overflow-hidden rounded-xl bg-[#0a0b14] border border-[#1a1b26] transition-all hover:border-[#2a2b36] hover:bg-[#0f101a]"
             >
-                                {/* Parte Superior: Imagen Oscura + Icono */}
+                {/* Parte Superior: Imagen (FULL COLOR) + Icono */}
                 <div className="relative h-48 w-full bg-[#050508]">
-                    {/* Imagen de fondo (SIN OPACIDAD, 100% COLOR) */}
+                    {/* Imagen de fondo (SIN OPACIDAD, 100% VISIBLE) */}
                     <Image 
                         src={section.image} 
                         alt="" 
@@ -107,13 +106,10 @@ export default function GameHub({
                         className="object-cover transition-transform duration-700 group-hover:scale-105" 
                     />
                     
-                    {/* Gradiente SOLO en la parte inferior para que el texto no corte brusco */}
-                    <div className="absolute inset-x-0 bottom-0 h-24 bg-linear-to-t from-[#0e0f1a] to-transparent opacity-90" />
-                    
-                    {/* Icono Flotante (Naranja/Acento) */}
+                    {/* Icono Flotante (Naranja/Acento) con sombra para legibilidad */}
                     <div className="absolute bottom-4 left-4 z-10 drop-shadow-md">
                          <section.icon 
-                            className="h-8 w-8 text-white" 
+                            className="h-8 w-8 text-white drop-shadow-md" 
                             style={{ color: color }} 
                          />
                     </div>

@@ -8,7 +8,7 @@ export default function GTA4Page() {
     <GameHub
       title="Grand Theft Auto IV"
       color="#FBBF24" // Ámbar/Dorado (Estilo Logo GTA IV)
-      heroImage="/images/gta4-hero.jpg" // ⚠️ Niko Bellic
+      heroImage="/images/gta4-hero.webp" // ⚠️ Niko Bellic
       
       description={`¿Qué significa el Sueño Americano hoy en día?
 
@@ -22,35 +22,35 @@ A medida que se endeudan y son arrastrados a un inframundo criminal por una seri
           description: "Parches de la Complete Edition, mods gráficos (iCEnhancer) y aniversario.",
           href: "/gta-4/noticias",
           icon: Newspaper,
-          image: "/images/gta4-news.jpg",
+          image: "/images/gta4-news.webp",
         },
         {
           title: "Guías de Misiones",
           description: "Decisiones de historia (Venganza o Dinero), palomas ocultas y saltos únicos.",
           href: "/gta-4/guias",
           icon: BookOpen,
-          image: "/images/gta4-guides.jpg",
+          image: "/images/gta4-guides.webp",
         },
         {
           title: "Códigos de Trucos",
           description: "362-555-0100 (Salud y Armas), Annihilator y todos los números del móvil.",
           href: "/gta-4/trucos",
           icon: Gamepad2,
-          image: "/images/gta4-cheats.jpg",
+          image: "/images/gta4-cheats.webp",
         },
         {
           title: "Mapas y Secretos",
           description: "Ubicaciones del corazón de la estatua, coches ocultos y easter eggs.",
           href: "/gta-4/mapa",
           icon: Map,
-          image: "/images/gta4-map.jpg",
+          image: "/images/gta4-map.webp",
         },
         {
-          title: "Episodes from Liberty City",
+          title: "DLC: Episodios de Liberty City",
           description: "Guías de 'The Lost and Damned' y 'The Ballad of Gay Tony'.",
           href: "/gta-4/episodios",
           icon: Video, // O otro icono representativo
-          image: "/images/gta4-dlc.jpg",
+          image: "/images/gta4-dlc.webp",
         },
       ]}
 

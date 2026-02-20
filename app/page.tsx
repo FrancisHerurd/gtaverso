@@ -25,8 +25,8 @@ export default async function Page() {
         {/* IMAGEN DE FONDO */}
         <div className="absolute inset-0 z-0">
           <Image
-            src="/images/hero-bg.jpg"
-            alt="Fondo Vice City GTA 6"
+            src="/images/hero-bg.webp"
+            alt="GTA Noticias"
             fill
             className="object-cover opacity-80"
             style={{ objectPosition: 'center 30%' }}

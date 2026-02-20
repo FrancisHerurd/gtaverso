@@ -19,7 +19,7 @@ Su madre ha sido asesinada, los Families de Grove Street han perdido su poder y 
 
 Incriminado por un crimen que no cometió nada más pisar el asfalto, CJ emprenderá una odisea brutal a través de todo el estado de San Andreas —desde los guetos de Los Santos hasta los casinos de Las Venturas— en una misión desesperada: limpiar su nombre, vengar a su familia y recuperar el control de las calles, cueste lo que cueste.`}
       
-      heroImage="/images/sa-hero.jpg"
+      heroImage="/images/sa-hero.webp"
       color="#FFA500" // Naranja
       
       // 2. SECCIONES (Tus tarjetas actuales)
@@ -29,35 +29,35 @@ Incriminado por un crimen que no cometió nada más pisar el asfalto, CJ emprend
           description: "Novedades sobre la Definitive Edition, parches y mods destacados.",
           href: "/gta-san-andreas/noticias",
           icon: Newspaper,
-          image: "/images/sa-news.jpg",
+          image: "/images/sa-news.webp",
         },
         {
           title: "Guías de Misiones",
           description: "Cómo completar el 100%, grafitis, ostras, herraduras y saltos únicos.",
           href: "/gta-san-andreas/guias",
           icon: BookOpen,
-          image: "/images/sa-guides.jpg",
+          image: "/images/sa-guides.webp",
         },
         {
           title: "Códigos de Trucos",
           description: "HESOYAM, AEZAKMI y todos los claves para PC, PlayStation y Xbox.",
           href: "/gta-san-andreas/trucos",
           icon: Hash,
-          image: "/images/sa-cheats.jpg",
+          image: "/images/sa-cheats.webp",
         },
         {
-          title: "Vehículos y Armas",
+          title: "Bse de datos",
           description: "Base de datos completa de coches, aviones, jetpack y arsenal.",
-          href: "/gta-san-andreas/vehiculos",
+          href: "/gta-san-andreas/base-de-datos",
           icon: Gamepad2,
-          image: "/images/sa-vehicles.jpg",
+          image: "/images/sa-database.webp",
         },
         {
           title: "Galería Multimedia",
           description: "Screenshots originales, artworks y trailers oficiales.",
           href: "/gta-san-andreas/media",
           icon: Video,
-          image: "/images/sa-media.jpg",
+          image: "/images/sa-media.webp",
         },
       ]}
 

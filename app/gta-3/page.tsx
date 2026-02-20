@@ -8,7 +8,7 @@ export default function GTA3Page() {
     <GameHub
       title="Grand Theft Auto III"
       color="#E5E7EB" // Gris Metalizado Liberty City
-      heroImage="/images/gta3-hero.jpg" // ⚠️ Claude Speed bajo la lluvia
+      heroImage="/images/gta3-hero.webp" // ⚠️ Claude Speed bajo la lluvia
       
       description={`Liberty City, EE. UU. El peor lugar de América.
 
@@ -22,28 +22,28 @@ Grand Theft Auto III puso el mundo oscuro e intrigante del crimen a tu alcance. 
           description: "Parches de la Definitive Edition, mods clásicos y aniversario.",
           href: "/gta-3/noticias",
           icon: Newspaper,
-          image: "/images/gta3-news.jpg",
+          image: "/images/gta3-news.webp",
         },
         {
           title: "Guías de Misiones",
           description: "Cómo completar el 100%, paquetes ocultos, saltos únicos y masacres.",
           href: "/gta-3/guias",
           icon: BookOpen,
-          image: "/images/gta3-guides.jpg",
+          image: "/images/gta3-guides.webp",
         },
         {
           title: "Códigos de Trucos",
           description: "GUNSGUNSGUNS, GESUNDHEIT y todas las claves para PC y Consolas.",
           href: "/gta-3/trucos",
           icon: Gamepad2,
-          image: "/images/gta3-cheats.jpg",
+          image: "/images/gta3-cheats.webp",
         },
         {
           title: "Medios y Galería",
           description: "Arte conceptual original, tráilers de 2001 y banda sonora.",
           href: "/gta-3/media",
           icon: Video,
-          image: "/images/gta3-media.jpg",
+          image: "/images/gta3-media.webp",
         },
       ]}
 

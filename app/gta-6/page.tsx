@@ -59,7 +59,7 @@ export default function GTA6Page() {
     <GameHub
       title="Grand Theft Auto VI"
       color="#FF00FF"
-      heroImage="/images/gta6-hero.jpg" // ⚠️ Pon tu imagen aquí
+      heroImage="/images/gta6-hero.webp" // ⚠️ Pon tu imagen aquí
       
       // DESCRIPCIÓN: Contador PRIMERO, luego texto
       description={
@@ -85,35 +85,35 @@ export default function GTA6Page() {
           description: "Últimas novedades oficiales de Rockstar, análisis de tráilers y filtraciones verificadas.",
           href: "/gta-6/noticias",
           icon: Newspaper,
-          image: "/images/gta6-news.jpg",
+          image: "/images/gta6-news.webp",
         },
         {
           title: "Capturas de Pantalla",
           description: "Galería 4K de Leonida, los pantanos, Vice City Beach y los interiores detallados.",
           href: "/gta-6/capturas",
           icon: ImageIcon,
-          image: "/images/gta6-screens.jpg",
+          image: "/images/gta6-screens.webp",
         },
         {
           title: "Vídeos y Tráilers",
           description: "Tráiler 1, clips filtrados del desarrollo y análisis frame a frame.",
           href: "/gta-6/videos",
           icon: Video,
-          image: "/images/gta6-videos.jpg",
+          image: "/images/gta6-videos.webp",
         },
         {
           title: "Arte y Fondos",
           description: "Key art oficial, fan arts de la comunidad y wallpapers para móvil/PC.",
           href: "/gta-6/arte",
           icon: Palette,
-          image: "/images/gta6-art.jpg",
+          image: "/images/gta6-art.webp",
         },
         {
           title: "Banda Sonora",
           description: "Canciones confirmadas (Tom Petty, etc.) y radios esperadas en Vice City.",
           href: "/gta-6/musica",
           icon: Music,
-          image: "/images/gta6-music.jpg",
+          image: "/images/gta6-music.webp",
         },
       ]}
 

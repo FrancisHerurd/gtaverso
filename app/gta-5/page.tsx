@@ -8,7 +8,7 @@ export default function GTA5Page() {
     <GameHub
       title="Grand Theft Auto V"
       color="#569446" // Verde GTA 5
-      heroImage="/images/gta5-hero.jpg" // ⚠️ Pon tu imagen aquí (Michael, Trevor, Franklin)
+      heroImage="/images/gta5-hero.webp" // ⚠️ Pon tu imagen aquí (Michael, Trevor, Franklin)
       
       description={`Los Santos: una extensa y soleada metrópolis llena de gurús de autoayuda, aspirantes a estrellas y famosos en decadencia, en su día la envidia del mundo occidental, ahora lucha por mantenerse a flote en una época de incertidumbre económica y "reality shows" baratos.
 
@@ -22,42 +22,42 @@ Sin opciones, la tripulación lo arriesga todo en una serie de atracos audaces y
           description: "Actualizaciones semanales de GTA Online, nuevos DLCs y eventos.",
           href: "/gta-5/noticias",
           icon: Newspaper,
-          image: "/images/gta5-news.jpg",
+          image: "/images/gta5-news.webp",
         },
         {
           title: "Guías GTA 5 (Historia)",
           description: "Cómo conseguir el 100%, coleccionables, misterios y finales.",
           href: "/gta-5/guias",
           icon: BookOpen,
-          image: "/images/gta5-guides.jpg",
+          image: "/images/gta5-guides.webp",
         },
         {
           title: "Guías GTA Online",
           description: "Mejores negocios, golpes (Heists), coches más rápidos y cómo ganar dinero.",
           href: "/gta-5/online",
           icon: Users, // Icono de multijugador
-          image: "/images/gta5-online.jpg",
+          image: "/images/gta5-online.webp",
         },
         {
           title: "Códigos de Trucos",
           description: "Invencibilidad, armas, paracaídas y todos los números de teléfono.",
           href: "/gta-5/trucos",
           icon: Gamepad2,
-          image: "/images/gta5-cheats.jpg",
+          image: "/images/gta5-cheats.webp",
         },
         {
           title: "Medios y Galería",
           description: "Tráilers oficiales, capturas de pantalla 4K y arte conceptual.",
           href: "/gta-5/media",
           icon: Video,
-          image: "/images/gta5-media.jpg",
+          image: "/images/gta5-media.webp",
         },
         {
           title: "Ediciones y Versiones",
           description: "Diferencias entre PS3, PS4, PC y la versión Expandida y Mejorada (E&E).",
           href: "/gta-5/ediciones",
           icon: Package,
-          image: "/images/gta5-editions.jpg",
+          image: "/images/gta5-editions.webp",
         },
       ]}
 
