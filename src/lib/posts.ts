@@ -8,16 +8,25 @@ const contentDir = path.join(process.cwd(), "content");
 export const GAMES = [
   "gta-6",
   "gta-5",
+  "gta-4",
   "gta-san-andreas",
   "gta-vice-city",
   "gta-3",
 ] as const;
 
+// FIX: Añadidas las nuevas subpáginas de GTA 5
 export const TYPES = [
   "noticias",
   "guias",
   "analisis",
   "trucos",
+  "guias-historia",
+  "guias-online",
+  "medios",
+  "ediciones",
+  "mapa",
+  "episodios",
+  "base-de-datos",
 ] as const;
 
 export type Game = (typeof GAMES)[number];
@@ -32,7 +41,7 @@ export type Post = {
   description: string;
   cover: string;
   content: string;
-  readingTime?: string;  // ← AÑADIDO: opcional para PostCard
+  readingTime?: string;  // opcional para PostCard
 };
 
 function safeString(v: unknown, fallback: string): string {
@@ -75,7 +84,7 @@ export async function getAllPosts(): Promise<Post[]> {
       description: safeString(data.description, "Sin descripción"),
       cover: safeString(data.cover, "images/default-cover.jpg"),
       content,
-      readingTime: safeString(data.readingTime, "5 min"),  // ← AÑADIDO: fallback
+      readingTime: safeString(data.readingTime, "5 min"),  // fallback
     };
   });
 
@@ -88,7 +97,7 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
 }
 
 /* -----------------------------
-   Helpers nuevos game/type
+    Helpers nuevos game/type
 -------------------------------- */
 
 export async function getPostsByGame(game: Game): Promise<Post[]> {

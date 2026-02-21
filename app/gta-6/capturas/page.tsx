@@ -1,5 +1,17 @@
+import { Metadata } from "next"; // Importación añadida para tipar la metadata
 import GameSubHeader from "@/components/GameSubHeader";
 import Image from "next/image";
+
+// --- BLOQUE NOINDEX AÑADIDO ---
+export const metadata: Metadata = {
+  title: "Capturas de Pantalla Oficiales GTA VI - GTAVerso",
+  description: "Galería de imágenes y capturas de pantalla oficiales de GTA 6 en alta calidad.",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
+// ------------------------------
 
 // Mock de imágenes (Reemplaza con tus rutas reales en /public/images/)
 const screenshots = [

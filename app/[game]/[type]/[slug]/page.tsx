@@ -117,7 +117,7 @@ export default async function PostPage({ params }: PageProps) {
         ]}
       />
 
-      <div className="relative w-full h-[400px] md:h-[500px] rounded-2xl overflow-hidden">
+      <div className="h-100 md:h-125">
         <Image
           src={publicSrc(post.cover)}
           alt={post.title}

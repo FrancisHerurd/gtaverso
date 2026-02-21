@@ -27,14 +27,14 @@ Sin opciones, la tripulación lo arriesga todo en una serie de atracos audaces y
         {
           title: "Guías GTA 5 (Historia)",
           description: "Cómo conseguir el 100%, coleccionables, misterios y finales.",
-          href: "/gta-5/guias",
+          href: "/gta-5/guias-historia",
           icon: BookOpen,
           image: "/images/gta5-guides.webp",
         },
         {
           title: "Guías GTA Online",
           description: "Mejores negocios, golpes (Heists), coches más rápidos y cómo ganar dinero.",
-          href: "/gta-5/online",
+          href: "/gta-5/guias-online",
           icon: Users, // Icono de multijugador
           image: "/images/gta5-online.webp",
         },

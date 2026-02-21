@@ -1,10 +1,22 @@
+import { Metadata } from "next"; // Añadido para tipar la metadata
 import GameSubHeader from "@/components/GameSubHeader";
 import Image from "next/image";
 import { Download } from "lucide-react";
 
+// --- BLOQUE NOINDEX AÑADIDO ---
+export const metadata: Metadata = {
+  title: "Arte y Fondos de Pantalla GTA VI - GTAVerso",
+  description: "Descarga fondos de pantalla y arte oficial de GTA 6.",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
+// ------------------------------
+
 const artworks = [
   { src: "/images/gta6-hero.jpg", title: "Lucía y Jason (Key Art)", resolution: "4K" },
-  { src: "/images/gta6-art.jpg", title: "Vice City Sunset", resolution: "4K" }, // Asegúrate de tener estas imágenes
+  { src: "/images/gta6-art.jpg", title: "Vice City Sunset", resolution: "4K" },
   { src: "/images/gta6-screens.jpg", title: "Leonida Wilds", resolution: "1080p" },
 ];
 

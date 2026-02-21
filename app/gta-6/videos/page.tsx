@@ -1,7 +1,19 @@
+import { Metadata } from "next"; // Añadido para tipar la metadata
 import GameSubHeader from "@/components/GameSubHeader";
 import Image from "next/image";
-import Link from "next/link";
+// Eliminado el import de Link porque no se usaba en este archivo (usas una etiqueta <a> nativa)
 import { Play } from "lucide-react";
+
+// --- BLOQUE NOINDEX AÑADIDO ---
+export const metadata: Metadata = {
+  title: "Vídeos y Tráilers GTA VI - GTAVerso",
+  description: "Tráilers oficiales, análisis y gameplays de Grand Theft Auto 6.",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
+// ------------------------------
 
 const videos = [
   {

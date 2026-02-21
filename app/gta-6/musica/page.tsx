@@ -1,5 +1,17 @@
+import { Metadata } from "next"; // Añadido para tipar la metadata
 import GameSubHeader from "@/components/GameSubHeader";
 import { Play, Music } from "lucide-react";
+
+// --- BLOQUE NOINDEX AÑADIDO ---
+export const metadata: Metadata = {
+  title: "Banda Sonora y Radios GTA VI - GTAVerso",
+  description: "Lista completa de canciones, artistas y estaciones de radio confirmadas y rumoreadas para GTA 6.",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
+// ------------------------------
 
 const tracks = [
   { artist: "Tom Petty", song: "Love Is A Long Road", radio: "Tráiler 1", verified: true },

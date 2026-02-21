@@ -1,6 +1,8 @@
 import { Metadata } from "next";
 import GameSubHeader from "@/components/GameSubHeader";
+// FIX 1: Importar con llaves y traer el tipo Post
 import { getAllPosts } from "@/lib/posts";
+import type { Post } from "@/lib/posts"; 
 import PostCard from "@/components/PostCard";
 
 export const metadata: Metadata = {
@@ -14,9 +16,9 @@ export const metadata: Metadata = {
 export default async function GTA5NewsPage() {
   const allPosts = await getAllPosts();
   
-  // Filtrado real: solo posts que pertenezcan a GTA 5 y sean del tipo noticias
+  // FIX 2: Asignar explícitamente el tipo (post: Post)
   const posts = allPosts.filter(
-    (post) => post.game === "gta-5" && post.type === "noticias"
+    (post: Post) => post.game === "gta-5" && post.type === "noticias"
   ); 
 
   return (
@@ -32,7 +34,8 @@ export default async function GTA5NewsPage() {
 
         {posts.length > 0 ? (
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {posts.map((post) => (
+            {/* FIX 3: Asignar explícitamente el tipo (post: Post) */}
+            {posts.map((post: Post) => (
               <PostCard key={post.slug} post={post} />
             ))}
           </div>
