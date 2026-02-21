@@ -18,7 +18,7 @@ function toPublicSrc(p?: string) {
 }
 
 function postHref(post: Post) {
-  return `/${post.game}/${post.type}/${post.slug}`;
+   return `/juegos/${post.game}/${post.type}/${post.slug}`;
 }
 
 function formattedDate(date: string) {

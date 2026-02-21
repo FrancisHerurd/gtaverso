@@ -105,49 +105,54 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
+                {/* FIX: Se añade /juegos/ a la ruta */}
                 <Link
-                  href="/gta-6"
+                  href="/juegos/gta-6"
                   className="text-gray-400 transition-colors hover:text-[#00FF41]"
                 >
                   GTA 6
                 </Link>
               </li>
               <li>
+                {/* FIX: Se añade /juegos/ a la ruta */}
                 <Link
-                  href="/gta-5"
+                  href="/juegos/gta-5"
                   className="text-gray-400 transition-colors hover:text-[#00FF41]"
                 >
                   GTA 5
                 </Link>
               </li>
-              {/* GTA 4 AÑADIDO AQUÍ */}
               <li>
+                {/* FIX: Se añade /juegos/ a la ruta */}
                 <Link
-                  href="/gta-4"
+                  href="/juegos/gta-4"
                   className="text-gray-400 transition-colors hover:text-[#00FF41]"
                 >
                   GTA 4
                 </Link>
               </li>
               <li>
+                {/* FIX: Se añade /juegos/ a la ruta */}
                 <Link
-                  href="/gta-san-andreas"
+                  href="/juegos/gta-san-andreas"
                   className="text-gray-400 transition-colors hover:text-[#00FF41]"
                 >
                   GTA San Andreas
                 </Link>
               </li>
               <li>
+                {/* FIX: Se añade /juegos/ a la ruta */}
                 <Link
-                  href="/gta-vice-city"
+                  href="/juegos/gta-vice-city"
                   className="text-gray-400 transition-colors hover:text-[#00FF41]"
                 >
                   GTA Vice City
                 </Link>
               </li>
               <li>
+                {/* FIX: Se añade /juegos/ a la ruta */}
                 <Link
-                  href="/gta-3"
+                  href="/juegos/gta-3"
                   className="text-gray-400 transition-colors hover:text-[#00FF41]"
                 >
                   GTA 3

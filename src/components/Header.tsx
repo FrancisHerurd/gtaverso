@@ -65,7 +65,8 @@ export default function Header() {
               Inicio
             </Link>
             {NAV_GAMES.map((game) => {
-              const href = `/${game.slug}`;
+              // FIX: Se añade /juegos/ a todos los juegos, excepto a "noticias"
+              const href = game.slug === "noticias" ? "/noticias" : `/juegos/${game.slug}`;
               const active = isActive(pathname, href);
               return (
                 <Link
@@ -81,7 +82,6 @@ export default function Header() {
                 </Link>
               );
             })}
-            {/* AQUÍ ANTES ESTABA "MAPA DEL SITIO" HARDCODEADO - ELIMINADO */}
           </nav>
 
           {/* Actions */}
@@ -144,17 +144,20 @@ export default function Header() {
             >
               Inicio
             </Link>
-            {NAV_GAMES.map((game) => (
-              <Link
-                key={game.slug}
-                href={`/${game.slug}`}
-                className="block rounded-lg px-4 py-3 text-gray-300 hover:bg-[#00FF41]/10 hover:text-[#00FF41] transition-colors uppercase tracking-wide"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                {game.label}
-              </Link>
-            ))}
-            {/* AQUÍ ANTES ESTABA "MAPA DEL SITIO" HARDCODEADO - ELIMINADO */}
+            {NAV_GAMES.map((game) => {
+              // FIX: Exactamente la misma lógica para el menú móvil
+              const href = game.slug === "noticias" ? "/noticias" : `/juegos/${game.slug}`;
+              return (
+                <Link
+                  key={game.slug}
+                  href={href}
+                  className="block rounded-lg px-4 py-3 text-gray-300 hover:bg-[#00FF41]/10 hover:text-[#00FF41] transition-colors uppercase tracking-wide"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  {game.label}
+                </Link>
+              );
+            })}
           </nav>
         </div>
       )}
