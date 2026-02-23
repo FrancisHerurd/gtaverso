@@ -4,19 +4,19 @@ import { getAllPosts } from "@/lib/posts";
 import PostCard from "@/components/PostCard";
 
 export const metadata: Metadata = {
-  title: "Noticias de GTA 5 - GTAVerso",
-  description: "Últimas noticias, actualizaciones y novedades de Grand Theft Auto V y GTA Online.",
+  title: "Noticias de GTA 6 - GTAVerso",
+  description: "Últimas noticias, actualizaciones y novedades de Grand Theft Auto VI y GTA Online.",
   alternates: {
-    canonical: "https://gtaverso.com/juegos/gta-5/noticias",
+    canonical: "https://gtaverso.com/juegos/gta-6/noticias",
   },
 };
 
-export default async function GTA5NewsPage() {
+export default async function GTA6NewsPage() {
   const allPosts = await getAllPosts();
   
-  // Filtrado real: solo posts que pertenezcan a GTA 5 y sean del tipo noticias
+  // Filtrado real: solo posts que pertenezcan a GTA 6 y sean del tipo noticias
   const posts = allPosts.filter(
-    (post) => post.game === "gta-5" && post.type === "noticias"
+    (post) => post.game === "gta-6" && post.type === "noticias"
   ); 
 
   return (
@@ -25,8 +25,8 @@ export default async function GTA5NewsPage() {
         
         <GameSubHeader 
           title="Noticias y Actualizaciones" 
-          gameTitle="GTA V" 
-          gameLink="/juegos/gta-5" 
+          gameTitle="GTA VI" 
+          gameLink="/juegos/gta-6" 
           color="#00FF41" 
         />
 
