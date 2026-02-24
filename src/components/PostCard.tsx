@@ -1,3 +1,4 @@
+// src/components/PostCard.tsx
 "use client";
 
 import Link from "next/link";
@@ -14,6 +15,7 @@ type PostCardProps = {
 
 function toPublicSrc(p?: string) {
   if (!p) return "/images/default-cover.jpg";
+  if (p.startsWith("http")) return p;
   return p.startsWith("/") ? p : `/${p}`;
 }
 
@@ -22,7 +24,11 @@ function postHref(post: Post) {
 }
 
 function formattedDate(date: string) {
-  return format(new Date(date), "d 'de' MMMM 'de' yyyy", { locale: es });
+  try {
+    return format(new Date(date), "d 'de' MMMM 'de' yyyy", { locale: es });
+  } catch (e) {
+    return date;
+  }
 }
 
 function CategoryBadge({ post }: { post: Post }) {
@@ -44,7 +50,6 @@ export default function PostCard({ post, featured = false }: PostCardProps) {
         href={href}
         className="group relative block h-full overflow-hidden rounded-xl border border-white/10 bg-gray-900 transition-all hover:scale-[1.01] hover:border-(--gta-green)/30 hover:shadow-[0_0_40px_rgba(0,255,65,0.15)]"
       >
-        {/* Imagen */}
         <div className="relative h-64 overflow-hidden md:h-96">
           <Image
             src={coverSrc}
@@ -55,14 +60,11 @@ export default function PostCard({ post, featured = false }: PostCardProps) {
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
           <div className="absolute inset-0 bg-linear-to-t from-black via-black/40 to-transparent" />
-
-          {/* Badge categoría */}
           <div className="absolute left-4 top-4">
             <CategoryBadge post={post} />
           </div>
         </div>
 
-        {/* Contenido superpuesto */}
         <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
           <div className="mb-3 flex items-center gap-4 text-sm text-gray-400">
             <span className="flex items-center gap-1">
@@ -72,15 +74,12 @@ export default function PostCard({ post, featured = false }: PostCardProps) {
             <span>•</span>
             <span>{formattedDate(post.date)}</span>
           </div>
-
           <h2 className="mb-3 line-clamp-2 text-2xl font-bold text-white transition-colors group-hover:text-(--gta-green) md:text-3xl">
             {post.title}
           </h2>
-
           <p className="mb-4 line-clamp-2 text-gray-300">
             {post.description}
           </p>
-
           <div className="flex items-center gap-2 font-semibold text-(--gta-green)">
             Leer más
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -90,14 +89,12 @@ export default function PostCard({ post, featured = false }: PostCardProps) {
     );
   }
 
-  // Variante normal (grid)
   return (
     <Link
       href={href}
       className="group flex h-full flex-col overflow-hidden rounded-xl border border-white/10 bg-gray-900 transition-all hover:border-(--gta-green)/30 hover:shadow-[0_0_30px_rgba(0,255,65,0.12)]"
     >
-      {/* Imagen */}
-      <div className="relative h-48 overflow-hidden">
+      <div className="relative h-48 overflow-hidden bg-[#0a0b14]">
         <Image
           src={coverSrc}
           alt={post.title}
@@ -109,8 +106,6 @@ export default function PostCard({ post, featured = false }: PostCardProps) {
           <CategoryBadge post={post} />
         </div>
       </div>
-
-      {/* Contenido */}
       <div className="flex flex-1 flex-col p-5">
         <div className="mb-3 flex items-center gap-3 text-xs text-gray-400">
           <span className="flex items-center gap-1">
@@ -120,15 +115,12 @@ export default function PostCard({ post, featured = false }: PostCardProps) {
           <span>•</span>
           <span>{formattedDate(post.date)}</span>
         </div>
-
         <h3 className="mb-2 line-clamp-2 text-lg font-bold text-white transition-colors group-hover:text-(--gta-green)">
           {post.title}
         </h3>
-
         <p className="mb-4 flex-1 text-sm text-gray-400 line-clamp-3">
           {post.description}
         </p>
-
         <div className="mt-auto flex items-center gap-2 text-sm font-semibold text-(--gta-green)">
           Leer más
           <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />

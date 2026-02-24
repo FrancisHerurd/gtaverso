@@ -10,19 +10,17 @@ const TITLES: Record<string, { label: string; color: string }> = {
   'gta-online': { label: 'GTA Online', color: '#FFA500' },
 };
 
-async function getNewsByGame(game: string) {
+async function getNewsByGame(gameSlug: string) {
   const endpoint = process.env.NEXT_PUBLIC_WORDPRESS_API_URL!;
 
-  // 🔑 Usamos categoryName para filtrar por juego.
-  // Crea en WordPress la categoría "gta-6", "gta-5", etc. (con ese slug)
-  // y asígnala a cada noticia.
+  // 🔑 Usamos categoryName con el slug exacto de la URL (gta-6, gta-5...)
   const res = await fetch(endpoint, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       query: `
-        query GetNewsByGame($game: String!) {
-          posts(first: 20, where: { categoryName: $game, orderby: { field: DATE, order: DESC } }) {
+        query GetNewsByGame($gameSlug: String!) {
+          posts(first: 20, where: { categoryName: $gameSlug, orderby: { field: DATE, order: DESC } }) {
             nodes {
               title
               slug
@@ -38,42 +36,17 @@ async function getNewsByGame(game: string) {
           }
         }
       `,
-      variables: { game },
+      variables: { gameSlug },
     }),
     next: { revalidate: 60 },
   });
 
   const json = await res.json();
 
-  // Si no tiene la categoría creada aún, devolvemos todos los posts
-  if (json.errors || !json.data?.posts?.nodes?.length) {
-    const fallback = await fetch(endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        query: `
-          query AllPosts {
-            posts(first: 20, where: { orderby: { field: DATE, order: DESC } }) {
-              nodes {
-                title
-                slug
-                excerpt
-                date
-                featuredImage {
-                  node {
-                    sourceUrl
-                    altText
-                  }
-                }
-              }
-            }
-          }
-        `,
-      }),
-      next: { revalidate: 60 },
-    });
-    const fallbackJson = await fallback.json();
-    return fallbackJson.data?.posts?.nodes ?? [];
+  // Si hay error en la query o no hay noticias para ESA categoría exacta, devolvemos un array vacío.
+  // ❌ HEMOS QUITADO EL FALLBACK QUE MEZCLABA LAS NOTICIAS.
+  if (json.errors || !json.data?.posts?.nodes) {
+    return [];
   }
 
   return json.data.posts.nodes as Array<{
@@ -123,9 +96,11 @@ export default async function GameNewsPage(
         </header>
 
         {posts.length === 0 ? (
-          <p className="text-gray-500 text-lg mt-8">
-            Todavía no hay noticias publicadas para {meta.label}.
-          </p>
+          <div className="py-12 border-t border-white/10 mt-8">
+            <p className="text-gray-400 text-lg">
+              Todavía no hay noticias publicadas para <strong className="text-white">{meta.label}</strong>.
+            </p>
+          </div>
         ) : (
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
             {posts.map((post) => {
@@ -142,11 +117,11 @@ export default async function GameNewsPage(
                   className="group flex flex-col bg-[#0a0b14] border border-[#1a1b26] rounded-xl overflow-hidden hover:border-white/20 transition-colors"
                 >
                   {cover ? (
-                    <div className="aspect-video w-full overflow-hidden">
+                    <div className="aspect-video w-full overflow-hidden relative">
                       <img
                         src={cover}
                         alt={altText}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 absolute inset-0"
                       />
                     </div>
                   ) : (

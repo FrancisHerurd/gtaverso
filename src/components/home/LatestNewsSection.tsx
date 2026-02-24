@@ -1,5 +1,6 @@
+// src/components/home/LatestNewsSection.tsx
 import PostCard from "@/components/PostCard";
-import getAllPosts from "@/lib/posts";
+import { getAllPosts } from "@/lib/posts";
 
 type Props = {
   title?: string;
@@ -12,7 +13,6 @@ export default async function LatestNewsSection({
 }: Props) {
   const posts = await getAllPosts();
 
-  // Por si acaso, orden defensivo (si tu loader ya ordena, no hace daño).
   const latest = [...posts]
     .sort((a: any, b: any) => {
       const da = new Date(a?.date ?? 0).getTime();
@@ -23,9 +23,9 @@ export default async function LatestNewsSection({
 
   return (
     <section aria-labelledby="latest-news-title" className="relative">
-      <div className="mx-auto max-w-[var(--container)] px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-(--container) px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-6 flex items-center gap-2">
-          <span className="h-2 w-2 rounded-full bg-[var(--gta-green)]" aria-hidden="true" />
+          <span className="h-2 w-2 rounded-full bg-(--gta-green)" aria-hidden="true" />
           <h2 id="latest-news-title" className="text-2xl font-bold text-white">
             {title}
           </h2>
