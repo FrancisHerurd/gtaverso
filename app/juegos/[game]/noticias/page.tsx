@@ -1,201 +1,192 @@
-import type { Metadata } from 'next'
-import Link from 'next/link'
-import Image from 'next/image'
-import { fetchAPI } from '@/lib/api'
+// app/juegos/[game]/noticias/page.tsx
+import { Metadata } from 'next';
+import Link from 'next/link';
 
-// ─── Tipos ───────────────────────────────────────────────────────────────────
-type PageProps = {
-  params: Promise<{ game: string }>
-}
+export const revalidate = 60;
 
-type NoticiaNode = {
-  title: string
-  slug: string
-  excerpt: string
-  date: string
-  featuredImage?: { node?: { sourceUrl?: string; altText?: string } }
-  juegos?: { nodes?: Array<{ slug?: string; name?: string }> }
-}
+const TITLES: Record<string, { label: string; color: string }> = {
+  'gta-6':      { label: 'GTA 6',      color: '#00FF41' },
+  'gta-5':      { label: 'GTA 5',      color: '#FF00FF' },
+  'gta-online': { label: 'GTA Online', color: '#FFA500' },
+};
 
-// ─── Query ───────────────────────────────────────────────────────────────────
-async function getNoticiasForGame(game: string): Promise<NoticiaNode[]> {
-  const data = await fetchAPI(
-    `
-    query GetNoticias {
-      posts(first: 100, where: { orderby: { field: DATE, order: DESC } }) {
-        nodes {
-          title
-          slug
-          excerpt
-          date
-          featuredImage {
-            node {
-              sourceUrl
-              altText
-            }
-          }
-          juegos {
+async function getNewsByGame(game: string) {
+  const endpoint = process.env.NEXT_PUBLIC_WORDPRESS_API_URL!;
+
+  // 🔑 Usamos categoryName para filtrar por juego.
+  // Crea en WordPress la categoría "gta-6", "gta-5", etc. (con ese slug)
+  // y asígnala a cada noticia.
+  const res = await fetch(endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      query: `
+        query GetNewsByGame($game: String!) {
+          posts(first: 20, where: { categoryName: $game, orderby: { field: DATE, order: DESC } }) {
             nodes {
+              title
               slug
-              name
+              excerpt
+              date
+              featuredImage {
+                node {
+                  sourceUrl
+                  altText
+                }
+              }
             }
           }
         }
-      }
-    }
-    `
-  )
+      `,
+      variables: { game },
+    }),
+    next: { revalidate: 60 },
+  });
 
-  const allPosts = (data?.posts?.nodes || []) as NoticiaNode[]
+  const json = await res.json();
 
-  // Filtramos para asegurarnos de que la noticia pertenece al juego de la URL
-  return allPosts.filter((post) => {
-    const juegoSlugs = post.juegos?.nodes?.map((j) => j.slug).filter(Boolean) || []
-    return juegoSlugs.includes(game)
-  })
+  // Si no tiene la categoría creada aún, devolvemos todos los posts
+  if (json.errors || !json.data?.posts?.nodes?.length) {
+    const fallback = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        query: `
+          query AllPosts {
+            posts(first: 20, where: { orderby: { field: DATE, order: DESC } }) {
+              nodes {
+                title
+                slug
+                excerpt
+                date
+                featuredImage {
+                  node {
+                    sourceUrl
+                    altText
+                  }
+                }
+              }
+            }
+          }
+        `,
+      }),
+      next: { revalidate: 60 },
+    });
+    const fallbackJson = await fallback.json();
+    return fallbackJson.data?.posts?.nodes ?? [];
+  }
+
+  return json.data.posts.nodes as Array<{
+    title: string;
+    slug: string;
+    excerpt: string;
+    date: string;
+    featuredImage?: { node: { sourceUrl: string; altText: string } };
+  }>;
 }
 
-// ─── Metadata dinámica ───────────────────────────────────────────────────────
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { game } = await params
-  const gameName = game.replace(/-/g, ' ').toUpperCase()
-  const canonical = `https://www.gtaverso.com/juegos/${game}/noticias`
-
+export async function generateMetadata(
+  { params }: { params: Promise<{ game: string }> }
+): Promise<Metadata> {
+  const { game } = await params;
+  const meta = TITLES[game] ?? { label: game.toUpperCase(), color: '#00FF41' };
   return {
-    title: `Noticias de ${gameName} · GTAVerso`,
-    description: `Últimas noticias, actualizaciones, filtraciones y novedades sobre ${gameName}.`,
-    alternates: { canonical },
-    openGraph: {
-      title: `Noticias de ${gameName}`,
-      description: `Últimas noticias, actualizaciones, filtraciones y novedades sobre ${gameName}.`,
-      url: canonical,
-      type: 'website',
-    },
-  }
+    title: `Noticias de ${meta.label} - GTAVerso`,
+    description: `Últimas noticias y novedades de ${meta.label}.`,
+    alternates: { canonical: `https://gtaverso.com/juegos/${game}/noticias` },
+  };
 }
 
-// ─── Componente principal ─────────────────────────────────────────────────────
-export default async function NoticiasIndexPage({ params }: PageProps) {
-  const { game } = await params
-  const noticias = await getNoticiasForGame(game)
-  const gameName = game.replace(/-/g, ' ').toUpperCase()
-
-  // JSON-LD (Structured Data) para Breadcrumbs
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Juegos', item: 'https://www.gtaverso.com/juegos' },
-      { '@type': 'ListItem', position: 2, name: gameName, item: `https://www.gtaverso.com/juegos/${game}` },
-      { '@type': 'ListItem', position: 3, name: 'Noticias', item: `https://www.gtaverso.com/juegos/${game}/noticias` }
-    ]
-  }
+export default async function GameNewsPage(
+  { params }: { params: Promise<{ game: string }> }
+) {
+  const { game } = await params;
+  const posts = await getNewsByGame(game);
+  const meta = TITLES[game] ?? { label: game.toUpperCase().replace('-', ' '), color: '#00FF41' };
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 py-12 lg:py-20 min-h-screen bg-[#050508] text-white">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+    <main className="min-h-screen bg-[#050508] pt-24 pb-20 text-white">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
 
-      {/* Migas de pan (Breadcrumbs) */}
-      <nav aria-label="Breadcrumb" className="mb-8 text-sm text-white/60">
-        <ol className="flex flex-wrap items-center gap-2">
-          <li><Link href="/juegos" className="hover:text-[#00FF41] transition">Juegos</Link></li>
-          <li><span className="px-1">/</span></li>
-          <li><Link href={`/juegos/${game}`} className="hover:text-[#00FF41] transition capitalize">{game.replace(/-/g, ' ')}</Link></li>
-          <li><span className="px-1">/</span></li>
-          <li className="text-white/90" aria-current="page">Noticias</li>
-        </ol>
-      </nav>
+        <header className="mb-10">
+          <p className="text-sm font-medium text-gray-500 mb-2 uppercase tracking-widest">
+            <Link href={`/juegos/${game}`} className="hover:text-white transition-colors">
+              {meta.label}
+            </Link>
+          </p>
+          <h1
+            className="text-4xl sm:text-5xl font-extrabold tracking-tight"
+            style={{ color: meta.color }}
+          >
+            Noticias
+          </h1>
+        </header>
 
-      {/* Cabecera de sección */}
-      <header className="mb-12 border-b border-white/10 pb-8">
-        <h1 className="text-balance text-4xl font-extrabold text-white sm:text-5xl mb-4 tracking-tight">
-          Noticias de <span className="text-[#00FF41]">{gameName}</span>
-        </h1>
-        <p className="max-w-2xl text-lg text-white/70">
-          Mantente al día con las últimas novedades, actualizaciones y rumores oficiales.
-        </p>
-      </header>
+        {posts.length === 0 ? (
+          <p className="text-gray-500 text-lg mt-8">
+            Todavía no hay noticias publicadas para {meta.label}.
+          </p>
+        ) : (
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+            {posts.map((post) => {
+              const cover = post.featuredImage?.node?.sourceUrl;
+              const altText = post.featuredImage?.node?.altText || post.title;
+              const excerpt = post.excerpt?.replace(/<[^>]+>/g, '') ?? '';
+              const fecha = new Date(post.date).toLocaleDateString('es-ES', {
+                day: 'numeric', month: 'long', year: 'numeric',
+              });
 
-      {/* Grid de Noticias */}
-      {noticias.length === 0 ? (
-        <section className="rounded-2xl border border-white/10 bg-white/5 p-12 text-center">
-          <h2 className="text-xl font-semibold text-white">Aún no hay noticias publicadas</h2>
-          <p className="mt-2 text-white/60">Publica tu primera noticia en WordPress asignándole el juego "{gameName}" para que aparezca aquí.</p>
-        </section>
-      ) : (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {noticias.map((noticia) => {
-            const href = `/juegos/${game}/noticias/${noticia.slug}`
-            const imageUrl = noticia.featuredImage?.node?.sourceUrl
-            const imageAlt = noticia.featuredImage?.node?.altText || `Imagen de ${noticia.title}`
-            const plainExcerpt = noticia.excerpt?.replace(/<[^>]+>/g, '').trim() || ''
-            
-            const formattedDate = new Date(noticia.date).toLocaleDateString('es-ES', {
-              day: 'numeric',
-              month: 'short',
-              year: 'numeric'
-            })
-
-            return (
-              <article 
-                key={noticia.slug} 
-                className="group flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#0A0A0E] transition duration-300 hover:border-[#00FF41]/50 hover:bg-white/5"
-              >
-                {/* Imagen de la tarjeta */}
-                <Link href={href} className="relative aspect-[16/9] w-full overflow-hidden border-b border-white/10">
-                  {imageUrl ? (
-                    <Image
-                      src={imageUrl}
-                      alt={imageAlt}
-                      fill
-                      className="object-cover transition duration-500 group-hover:scale-105"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    />
+              return (
+                <article
+                  key={post.slug}
+                  className="group flex flex-col bg-[#0a0b14] border border-[#1a1b26] rounded-xl overflow-hidden hover:border-white/20 transition-colors"
+                >
+                  {cover ? (
+                    <div className="aspect-video w-full overflow-hidden">
+                      <img
+                        src={cover}
+                        alt={altText}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
                   ) : (
-                    <div className="flex h-full w-full items-center justify-center bg-white/5">
-                      <span className="text-white/20 text-sm">Sin imagen</span>
+                    <div
+                      className="aspect-video w-full flex items-center justify-center text-3xl font-black"
+                      style={{ background: '#0a0b14', color: meta.color }}
+                    >
+                      GTV
                     </div>
                   )}
-                </Link>
 
-                {/* Contenido de la tarjeta */}
-                <div className="flex flex-1 flex-col p-6">
-                  <div className="mb-3 flex items-center justify-between text-xs font-medium uppercase tracking-wide text-white/50">
-                    <time dateTime={noticia.date}>{formattedDate}</time>
-                    <span className="rounded-full bg-[#00FF41]/10 px-2.5 py-0.5 text-[#00FF41]">
-                      Noticia
-                    </span>
-                  </div>
-                  
-                  <h2 className="mb-3 text-xl font-bold text-white transition duration-300 group-hover:text-[#00FF41]">
-                    <Link href={href} className="line-clamp-2">
-                      {noticia.title}
-                    </Link>
-                  </h2>
-                  
-                  {plainExcerpt && (
-                    <p className="mb-6 line-clamp-3 text-sm text-white/60 leading-relaxed">
-                      {plainExcerpt}
-                    </p>
-                  )}
-                  
-                  <div className="mt-auto pt-4 border-t border-white/10">
-                    <Link 
-                      href={href} 
-                      className="inline-flex items-center text-sm font-semibold text-[#00FF41] hover:text-white transition duration-300"
+                  <div className="flex flex-col flex-1 p-5">
+                    <time
+                      dateTime={post.date}
+                      className="text-xs text-gray-500 mb-2"
                     >
-                      Leer artículo
-                      <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
+                      {fecha}
+                    </time>
+                    <h2 className="text-lg font-bold text-white mb-2 leading-snug">
+                      {post.title}
+                    </h2>
+                    {excerpt && (
+                      <p className="text-sm text-gray-400 line-clamp-3 mb-4 flex-1">
+                        {excerpt}
+                      </p>
+                    )}
+                    <Link
+                      href={`/juegos/${game}/noticias/${post.slug}`}
+                      className="text-sm font-semibold mt-auto"
+                      style={{ color: meta.color }}
+                    >
+                      Leer más →
                     </Link>
                   </div>
-                </div>
-              </article>
-            )
-          })}
-        </div>
-      )}
+                </article>
+              );
+            })}
+          </div>
+        )}
+      </div>
     </main>
-  )
+  );
 }

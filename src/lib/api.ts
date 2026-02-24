@@ -18,10 +18,14 @@ export async function fetchAPI(query: string, variables?: Record<string, unknown
   });
 
   const json = await res.json();
-
-  if (json?.errors) {
-    console.error("WPGraphQL Error:", json.errors);
-    throw new Error("Error en la API de WPGraphQL");
+  
+  if (json.errors) {
+    // 🔥 Forzamos que se imprima enorme y claro en la terminal
+    console.log("====================================");
+    console.log("❌ ERROR DEVUELTO POR WORDPRESS:");
+    console.log(JSON.stringify(json.errors, null, 2));
+    console.log("====================================");
+    throw new Error("WPGraphQL devolvió un error (mira arriba en la terminal)");
   }
 
   return json.data;
