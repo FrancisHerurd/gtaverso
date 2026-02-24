@@ -36,7 +36,7 @@ function publicSrc(path: string) {
 
 export async function generateStaticParams() {
   const posts = await getAllPosts();
-  return posts.map((p) => ({
+  return posts.map((p: any) => ({ // Novedad: tipado any para evitar error TS
     game: p.game,
     type: p.type,
     slug: p.slug,
@@ -52,6 +52,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!post) return {};
 
   const canonical = `https://gtaverso.com/${game}/${type}/${slug}`;
+  const imageUrl = `https://gtaverso.com${publicSrc(post.cover)}`; // Novedad: URL absoluta para RRSS
 
   return {
     title: post.title,
@@ -61,7 +62,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       type: "article",
       title: post.title,
       description: post.description,
-      images: [{ url: publicSrc(post.cover) }],
+      images: [{ url: imageUrl }], // Novedad: Facebook necesita URL con https://
+    },
+    // Novedad: Objeto completo de Twitter para la Card grande
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.description,
+      images: [imageUrl],
     },
   };
 }
@@ -81,25 +89,57 @@ export default async function PostPage({ params }: PageProps) {
   const absoluteCover = `https://gtaverso.com${publicSrc(post.cover)}`;
   const canonical = `https://gtaverso.com/${game}/${type}/${slug}`;
 
+  // --- INICIO NOVEDAD SEO (JSON-LD Dinámico) ---
+  
+  // Determinamos el tipo de Schema exacto según tu sección
+  let schemaType = "Article";
+  if (type === "noticias") {
+    schemaType = "NewsArticle"; // Vital para aparecer en Google Discover y Top Stories
+  } else if (type === "guias" || type === "trucos") {
+    schemaType = "TechArticle"; // Schema optimizado para guías de juegos
+  }
+
+  // Nombres bonitos para el schema del juego
+  const gameNames: Record<string, string> = {
+    "gta-5": "Grand Theft Auto V",
+    "gta-6": "Grand Theft Auto VI",
+    "gta-online": "Grand Theft Auto Online",
+  };
+  const exactGameName = gameNames[game] || "Grand Theft Auto";
+
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "Article",
+    "@type": schemaType, // Magia: Cambia dinámicamente a NewsArticle o TechArticle
     headline: post.title,
     description: post.description,
     image: absoluteCover,
     datePublished: post.date,
-    dateModified: post.date,
-    author: { "@type": "Organization", name: "GTAVerso" },
+    dateModified: post.date, // Puedes cambiarlo a la fecha de hoy si actualizas el artículo
+    author: { 
+      "@type": "Organization", 
+      name: "GTAVerso",
+      url: "https://gtaverso.com"
+    },
     publisher: {
       "@type": "Organization",
       name: "GTAVerso",
       logo: {
         "@type": "ImageObject",
-        url: "https://gtaverso.com/images/logo.svg",
+        url: "https://gtaverso.com/images/logo.svg", // Asegúrate de tener este logo cuadrado en public/images/
       },
     },
-    mainEntityOfPage: canonical,
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": canonical
+    },
+    // El toque SEO Experto: Enlazar el artículo con la entidad del videojuego real
+    about: {
+      "@type": "VideoGame",
+      name: exactGameName,
+      applicationCategory: "Game"
+    }
   };
+  // --- FIN NOVEDAD SEO ---
 
   return (
     <article className="container-custom py-8">
@@ -117,13 +157,15 @@ export default async function PostPage({ params }: PageProps) {
         ]}
       />
 
-      <div className="h-100 md:h-125">
+      {/* Novedad: relative añadido al div para que 'fill' funcione correctamente */}
+      <div className="h-100 md:h-125 relative">
         <Image
           src={publicSrc(post.cover)}
           alt={post.title}
           fill
           className="object-cover"
           priority
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 1200px" // Novedad: Optimización para móvil/PC
         />
       </div>
 
