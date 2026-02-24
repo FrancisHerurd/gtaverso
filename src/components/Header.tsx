@@ -1,4 +1,4 @@
-// src/components/Header.tsx
+// components/Header.tsx
 "use client";
 
 import Link from "next/link";
@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Menu, Search, X } from "lucide-react";
 import { useState } from "react";
 
+// Menú principal de la web
 const NAV_GAMES = [
   { slug: "noticias", label: "Noticias" },
   { slug: "gta-6", label: "GTA 6" },
@@ -18,6 +19,7 @@ const NAV_GAMES = [
 
 function isActive(pathname: string, href: string) {
   if (href === "/") return pathname === "/";
+  // Evita que "Noticias" se marque activo cuando estás en GTA 6 Noticias, por ejemplo.
   return pathname === href || pathname.startsWith(href + "/");
 }
 
@@ -39,24 +41,26 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-[#00FF41]/20 bg-black/95 backdrop-blur-sm">
-      {/* Top bar con logo y acciones */}
-      <div className="mx-auto max-w-(--container) px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        
+        {/* FILA PRINCIPAL: LOGO Y NAVEGACIÓN */}
         <div className="flex h-16 items-center justify-between">
-          {/* Logo */}
+          
+          {/* LOGO NEÓN GTAVERSO */}
           <Link href="/" className="flex items-center space-x-2 group">
             <div className="relative">
               <div className="absolute inset-0 bg-[#00FF41] blur-lg opacity-50 group-hover:opacity-75 transition-opacity" />
-              <span className="relative text-2xl font-bold text-[#00FF41] tracking-tighter">
+              <span className="relative text-2xl font-black text-[#00FF41] tracking-tighter uppercase">
                 GTA<span className="text-white">VERSO</span>
               </span>
             </div>
           </Link>
 
-          {/* Navigation - Desktop */}
+          {/* NAVEGACIÓN DESKTOP */}
           <nav className="hidden items-center space-x-6 md:flex">
             <Link
               href="/"
-              className={`text-sm uppercase tracking-wide transition-colors ${
+              className={`text-sm uppercase font-semibold tracking-wide transition-colors ${
                 isActive(pathname, "/")
                   ? "text-[#00FF41]"
                   : "text-gray-300 hover:text-[#00FF41]"
@@ -64,15 +68,17 @@ export default function Header() {
             >
               Inicio
             </Link>
+            
             {NAV_GAMES.map((game) => {
-              // FIX: Se añade /juegos/ a todos los juegos, excepto a "noticias"
+              // Si es "noticias", va a /noticias. Si es un juego, va a /juegos/[slug]
               const href = game.slug === "noticias" ? "/noticias" : `/juegos/${game.slug}`;
               const active = isActive(pathname, href);
+              
               return (
                 <Link
                   key={game.slug}
                   href={href}
-                  className={`text-sm uppercase tracking-wide transition-colors ${
+                  className={`text-sm uppercase font-semibold tracking-wide transition-colors ${
                     active
                       ? "text-[#00FF41]"
                       : "text-gray-300 hover:text-[#00FF41]"
@@ -84,47 +90,44 @@ export default function Header() {
             })}
           </nav>
 
-          {/* Actions */}
+          {/* BOTONES DERECHA (BUSCAR Y MENÚ HAMBURGUESA) */}
           <div className="flex items-center space-x-2">
-            {/* Search button */}
+            
+            {/* Botón Lupa */}
             <button
               type="button"
               onClick={() => setSearchOpen((v) => !v)}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-300 hover:bg-[#00FF41]/10 hover:text-[#00FF41]"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-300 hover:bg-[#00FF41]/10 hover:text-[#00FF41] transition-colors"
             >
               <Search className="h-5 w-5" />
             </button>
 
-            {/* Mobile menu button */}
+            {/* Menú Hamburguesa (Solo Móvil) */}
             <button
               type="button"
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-300 hover:bg-[#00FF41]/10 hover:text-[#00FF41] md:hidden"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-300 hover:bg-[#00FF41]/10 hover:text-[#00FF41] md:hidden transition-colors"
               onClick={() => setMobileMenuOpen((v) => !v)}
             >
-              {mobileMenuOpen ? (
-                <X className="h-5 w-5" />
-              ) : (
-                <Menu className="h-5 w-5" />
-              )}
+              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
           </div>
         </div>
 
-        {/* Search bar */}
+        {/* BARRA DE BÚSQUEDA DESPLEGABLE */}
         {searchOpen && (
-          <div className="border-t border-[#00FF41]/20 py-3">
-            <form onSubmit={handleSearch} className="relative">
+          <div className="border-t border-[#00FF41]/20 py-3 animate-in fade-in slide-in-from-top-2">
+            <form onSubmit={handleSearch} className="relative mx-auto max-w-lg">
               <input
                 type="search"
                 placeholder="Buscar noticias, guías, trucos..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-lg border border-[#00FF41]/30 bg-gray-900/50 pr-10 px-3 py-2 text-sm text-white placeholder:text-gray-500 outline-none focus:border-[#00FF41]"
+                className="w-full rounded-full border border-[#00FF41]/30 bg-gray-900/80 pr-10 px-4 py-2.5 text-sm text-white placeholder:text-gray-500 outline-none focus:border-[#00FF41] focus:ring-1 focus:ring-[#00FF41]/50 transition-all"
                 autoFocus
               />
               <button
                 type="submit"
-                className="absolute right-2 top-1/2 -translate-y-1/2 inline-flex h-7 w-7 items-center justify-center rounded-full text-[#00FF41] hover:bg-[#00FF41]/10"
+                className="absolute right-2 top-1/2 -translate-y-1/2 inline-flex h-8 w-8 items-center justify-center rounded-full text-[#00FF41] hover:bg-[#00FF41]/10 transition-colors"
               >
                 <Search className="h-4 w-4" />
               </button>
@@ -133,25 +136,24 @@ export default function Header() {
         )}
       </div>
 
-      {/* Mobile menu */}
+      {/* MENÚ MÓVIL DESPLEGABLE */}
       {mobileMenuOpen && (
-        <div className="bg-black/98 border-t border-[#00FF41]/20 md:hidden">
-          <nav className="space-y-2 px-4 py-4">
+        <div className="bg-black/98 border-t border-[#00FF41]/20 md:hidden animate-in fade-in slide-in-from-top-2">
+          <nav className="flex flex-col space-y-1 px-4 py-4">
             <Link
               href="/"
-              className="block rounded-lg px-4 py-3 text-gray-300 hover:bg-[#00FF41]/10 hover:text-[#00FF41] transition-colors"
+              className="block rounded-lg px-4 py-3 text-sm font-semibold tracking-wide text-gray-300 hover:bg-[#00FF41]/10 hover:text-[#00FF41] uppercase transition-colors"
               onClick={() => setMobileMenuOpen(false)}
             >
               Inicio
             </Link>
             {NAV_GAMES.map((game) => {
-              // FIX: Exactamente la misma lógica para el menú móvil
               const href = game.slug === "noticias" ? "/noticias" : `/juegos/${game.slug}`;
               return (
                 <Link
                   key={game.slug}
                   href={href}
-                  className="block rounded-lg px-4 py-3 text-gray-300 hover:bg-[#00FF41]/10 hover:text-[#00FF41] transition-colors uppercase tracking-wide"
+                  className="block rounded-lg px-4 py-3 text-sm font-semibold tracking-wide text-gray-300 hover:bg-[#00FF41]/10 hover:text-[#00FF41] uppercase transition-colors"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {game.label}
