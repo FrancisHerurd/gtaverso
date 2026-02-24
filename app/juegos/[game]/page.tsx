@@ -2,15 +2,15 @@
 import GameHub from "@/components/GameHub";
 import { Newspaper, Image as ImageIcon, Video, Music, Palette } from "lucide-react";
 import { notFound } from "next/navigation";
-import { fetchAPI } from "@/lib/api"; // Asegúrate de tener esto exportado en lib/api.ts
+import { fetchAPI } from "@/lib/api";
 
 // --- DICCIONARIO DE DATOS POR JUEGO ---
-// Aquí guardamos la configuración visual y textos de cada juego.
 const gameDataDictionary: Record<string, any> = {
   "gta-6": {
     title: "Grand Theft Auto VI",
     color: "#FF00FF",
     heroImage: "/images/gta6-hero.webp",
+    imgPrefix: "gta6", // ← ESTO ES LO QUE ARREGLA LAS FOTOS
     description: (
       <div className="space-y-4 text-center sm:text-justify">
         <p>Grand Theft Auto VI nos lleva de vuelta al estado de Leonida, hogar de las calles empapadas de neón de Vice City y más allá, en la evolución más grande e inmersiva de la serie Grand Theft Auto hasta la fecha.</p>
@@ -33,8 +33,9 @@ const gameDataDictionary: Record<string, any> = {
   },
   "gta-5": {
     title: "Grand Theft Auto V",
-    color: "#00FF41", // Verde clásico
+    color: "#00FF41",
     heroImage: "/images/gta5-hero.webp",
+    imgPrefix: "gta5", // ← ESTO ES LO QUE ARREGLA LAS FOTOS
     description: (
       <div className="space-y-4 text-center sm:text-justify">
         <p>Cuando un joven estafador callejero, un ladrón de bancos retirado y un psicópata aterrador se ven involucrados con lo peor de la mafia, el gobierno y la industria del entretenimiento, tendrán que llevar a cabo una serie de peligrosos atracos para sobrevivir.</p>
@@ -54,12 +55,9 @@ const gameDataDictionary: Record<string, any> = {
       { date: "14 de abril de 2015", platforms: [{ name: "PC", color: "dark" }], notes: "Lanzamiento en PC" },
     ],
   }
-  // Puedes ir añadiendo "gta-san-andreas", "gta-4", etc., copiando este mismo bloque.
 };
 
-// --- SSG: GENERACIÓN ESTÁTICA PARA SEO (100/100 Velocidad) ---
 export async function generateStaticParams() {
-  // Le pedimos a WordPress todos los slugs de la taxonomía "juego"
   const data = await fetchAPI(`
     query TodosLosJuegos {
       juegos {
@@ -77,14 +75,10 @@ export async function generateStaticParams() {
   }));
 }
 
-// --- PÁGINA PRINCIPAL DINÁMICA ---
 export default async function GamePage({ params }: { params: Promise<{ game: string }> }) {
   const { game } = await params;
-  
-  // Buscamos los datos visuales de este juego en nuestro diccionario
   const gameData = gameDataDictionary[game];
 
-  // Si alguien escribe /juegos/inventado y no existe ni en WP ni en nuestro diccionario, devolvemos 404
   if (!gameData) {
     notFound();
   }
@@ -96,21 +90,21 @@ export default async function GamePage({ params }: { params: Promise<{ game: str
       description: `Últimas novedades, parches y filtraciones sobre ${gameData.title}.`,
       href: `/juegos/${game}/noticias`,
       icon: Newspaper,
-      image: `/images/${game}-news.webp`,
+      image: `/images/${gameData.imgPrefix}-news.webp`, // ← AQUÍ USAMOS EL PREFIJO
     },
     {
       title: "Guías y Trucos",
       description: "Supera todas las misiones, consigue dinero infinito y descubre secretos.",
-      href: `/juegos/${game}/guias`, // ¡Aquí enlaza con la página de guías que hicimos antes!
-      icon: ImageIcon, // O el icono que prefieras
-      image: `/images/${game}-guides.webp`,
+      href: `/juegos/${game}/guias`, 
+      icon: ImageIcon, 
+      image: `/images/${gameData.imgPrefix}-guides.webp`, // ← AQUÍ USAMOS EL PREFIJO
     },
     {
       title: "Vídeos",
       description: "Tráilers oficiales y gameplay.",
       href: `/juegos/${game}/videos`,
       icon: Video,
-      image: `/images/${game}-videos.webp`,
+      image: `/images/${gameData.imgPrefix}-videos.webp`, // ← AQUÍ USAMOS EL PREFIJO
     }
   ];
 
