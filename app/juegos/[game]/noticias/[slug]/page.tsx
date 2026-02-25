@@ -5,7 +5,31 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { fetchAPI } from '@/lib/api'
 
-// ─── Tipos ───────────────────────────────────────────────────────────────────
+// ─── Configuración ISR ────────────────────────────────────────────────
+export const revalidate = 600;
+
+// ─── Generación estática de rutas ─────────────────────────────────────
+export async function generateStaticParams() {
+  const data = await fetchAPI(`
+    query RecentPosts {
+      posts(first: 50, where: { orderby: { field: DATE, order: DESC } }) {
+        nodes {
+          slug
+          juegos { nodes { slug } }
+        }
+      }
+    }
+  `);
+
+  const posts = data?.posts?.nodes || [];
+
+  return posts.map((post: any) => ({
+    game: post.juegos?.nodes?.[0]?.slug || 'gta-6',
+    slug: post.slug,
+  }));
+}
+
+// ─── Tipos ────────────────────────────────────────────────────────────
 type PageProps = {
   params: Promise<{ game: string; slug: string }>
 }
@@ -21,12 +45,13 @@ type SingleNoticia = {
 }
 
 const GAME_COLORS: Record<string, string> = {
-  'gta-6': '#00FF41',
-  'gta-5': '#FF00FF',
+  'gta-6': '#FF00FF',
+  'gta-5': '#569446',
+  'gta-4': '#FBBF24',
   'gta-online': '#FFA500',
 }
 
-// ─── Query ───────────────────────────────────────────────────────────────────
+// ─── Query ────────────────────────────────────────────────────────────
 async function getNoticiaBySlug(slug: string): Promise<SingleNoticia | null> {
   const data = await fetchAPI(
     `
@@ -42,13 +67,13 @@ async function getNoticiaBySlug(slug: string): Promise<SingleNoticia | null> {
       }
     }
   `,
-    { id: slug } 
+    { id: slug } // ✅ Ahora pasa variables como segundo parámetro
   )
 
   return data?.post || null
 }
 
-// ─── Metadata dinámica ───────────────────────────────────────────────────────
+// ─── Metadata dinámica ────────────────────────────────────────────────
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { game, slug } = await params
   const noticia = await getNoticiaBySlug(slug)
@@ -81,7 +106,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 }
 
-// ─── Componente principal ─────────────────────────────────────────────────────
+// ─── Componente principal ─────────────────────────────────────────────
 export default async function NoticiaDetailPage({ params }: PageProps) {
   const { game, slug } = await params
   const noticia = await getNoticiaBySlug(slug)
@@ -100,7 +125,6 @@ export default async function NoticiaDetailPage({ params }: PageProps) {
     year: 'numeric',
   })
 
-  // ─── JSON-LD (Structured Data) ──────────────────────────────────────────────
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -127,7 +151,6 @@ export default async function NoticiaDetailPage({ params }: PageProps) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
 
-      {/* Migas de pan (Breadcrumbs) */}
       <nav aria-label="Breadcrumb" className="mb-10 text-sm font-medium text-white/50 tracking-wide uppercase">
         <ol className="flex flex-wrap items-center gap-2">
           <li><Link href="/" className="hover:text-white transition">Inicio</Link></li>
@@ -139,7 +162,6 @@ export default async function NoticiaDetailPage({ params }: PageProps) {
       </nav>
 
       <article>
-        {/* Cabecera del artículo */}
         <header className="mb-12">
           <h1 className="text-balance text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl md:text-6xl mb-6">
             {noticia.title}
@@ -159,7 +181,6 @@ export default async function NoticiaDetailPage({ params }: PageProps) {
           </div>
         </header>
 
-        {/* Imagen Destacada Principal (Above the fold) */}
         {imageUrl && (
           <figure className="relative aspect-video w-full overflow-hidden rounded-2xl mb-14 border border-white/10 bg-[#0A0A0E] shadow-2xl">
             <Image
@@ -173,16 +194,15 @@ export default async function NoticiaDetailPage({ params }: PageProps) {
           </figure>
         )}
 
-        {/* Contenido HTML inyectado desde WordPress */}
         <div 
           className="prose prose-invert prose-lg md:prose-xl max-w-none 
-          prose-a:text-(--gta-green) hover:prose-a:text-white prose-a:transition-colors
+          prose-a:text-[#00FF41] hover:prose-a:text-white prose-a:transition-colors
           prose-img:rounded-xl prose-img:border prose-img:border-white/10
           prose-headings:font-bold prose-headings:tracking-tight
           prose-h2:text-3xl prose-h2:mt-12 prose-h2:mb-6 prose-h2:border-b prose-h2:border-white/10 prose-h2:pb-4
           prose-p:text-gray-300 prose-p:leading-relaxed
           prose-strong:text-white
-          prose-ul:text-gray-300 prose-li:marker:text-(--gta-green)"
+          prose-ul:text-gray-300 prose-li:marker:text-[#00FF41]"
           dangerouslySetInnerHTML={{ __html: noticia.content }}
         />
       </article>

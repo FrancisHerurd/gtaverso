@@ -1,17 +1,15 @@
 // src/components/CategoryHero/CategoryHero.tsx
-import Image from 'next/image'
-import Link from 'next/link'
-import { Calendar, ArrowRight } from 'lucide-react'
-
-// Quitamos la importación del Type antiguo
-// import type { Post } from '@/types/posts'
+import Image from 'next/image';
+import Link from 'next/link';
+import { Calendar, ArrowRight } from 'lucide-react';
+import type { WPPost } from '@/types/wordpress';
 
 interface LatestNewsSectionProps {
-  posts: any[] // Temporalmente a any[] para evitar errores de Build
-  game: string
-  gameLabel: string
-  accentColor?: string
-  className?: string
+  posts: WPPost[];
+  game: string;
+  gameLabel: string;
+  accentColor?: string;
+  className?: string;
 }
 
 export default function LatestNewsSection({
@@ -21,10 +19,10 @@ export default function LatestNewsSection({
   accentColor = '#00FF41',
   className = '',
 }: LatestNewsSectionProps) {
-  if (!posts || posts.length === 0) return null
+  if (!posts || posts.length === 0) return null;
 
-  const mainPost = posts[0]
-  const sidePosts = posts.slice(1, 5)
+  const mainPost = posts[0];
+  const sidePosts = posts.slice(1, 5);
 
   return (
     <section className={`w-full ${className}`}>
@@ -60,7 +58,7 @@ export default function LatestNewsSection({
             className="object-cover transition-transform duration-700 group-hover:scale-105"
             priority
           />
-          <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
           
           <div className="relative p-6 sm:p-8">
             <span 
@@ -72,9 +70,9 @@ export default function LatestNewsSection({
             <h3 className="mb-3 text-2xl font-bold leading-tight text-white sm:text-3xl lg:text-4xl">
               {mainPost.title}
             </h3>
-            {mainPost.excerpt && (
+            {(mainPost.excerpt || mainPost.description) && (
               <p className="mb-4 line-clamp-2 max-w-2xl text-sm text-gray-300 sm:text-base">
-                {mainPost.excerpt}
+                {mainPost.excerpt || mainPost.description}
               </p>
             )}
             <div className="flex items-center gap-2 text-sm text-gray-400">
@@ -125,5 +123,5 @@ export default function LatestNewsSection({
         </div>
       </div>
     </section>
-  )
+  );
 }

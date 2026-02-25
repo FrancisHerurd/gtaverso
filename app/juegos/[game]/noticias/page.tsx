@@ -4,10 +4,12 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { fetchAPI } from '@/lib/api';
 
+// ─── Configuración ISR ────────────────────────────────────────────────
 export const revalidate = 60;
+export const dynamic = 'force-static';
 
 const TITLES: Record<string, { label: string; color: string }> = {
-  'gta-6': { label: 'GTA 6', color: '#FF00FF' }, // Color ajustado a magenta
+  'gta-6': { label: 'GTA 6', color: '#FF00FF' },
   'gta-5': { label: 'GTA 5', color: '#569446' },
   'gta-4': { label: 'GTA 4', color: '#FBBF24' },
   'gta-san-andreas': { label: 'GTA San Andreas', color: '#FFA500' },
@@ -16,7 +18,8 @@ const TITLES: Record<string, { label: string; color: string }> = {
 };
 
 async function getNewsByGame(gameSlug: string) {
-  const data = await fetchAPI(`
+  const data = await fetchAPI(
+    `
     query GetNewsByGame($gameSlug: String!) {
       posts(first: 20, where: { categoryName: $gameSlug, orderby: { field: DATE, order: DESC } }) {
         nodes {
@@ -33,7 +36,9 @@ async function getNewsByGame(gameSlug: string) {
         }
       }
     }
-  `, { gameSlug });
+  `,
+    { gameSlug }
+  );
 
   if (!data?.posts?.nodes) {
     return [];
@@ -63,7 +68,7 @@ export default async function GameNewsPage(
 
   return (
     <main className="min-h-screen bg-[#050508] pt-24 pb-20 text-white">
-      <div className="mx-auto max-w-(--container) px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
         <header className="mb-10">
           <p className="text-sm font-medium text-gray-500 mb-2 uppercase tracking-widest">

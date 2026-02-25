@@ -1,131 +1,109 @@
 // src/components/PostCard.tsx
-"use client";
-
 import Link from "next/link";
 import Image from "next/image";
-import { Clock, ArrowRight } from "lucide-react";
-import { format } from "date-fns";
-import { es } from "date-fns/locale";
-import type { Post } from "@/lib/posts";
+import { Calendar } from "lucide-react";
+import type { WPPost } from "@/types/wordpress";
 
-type PostCardProps = {
-  post: Post;
-  featured?: boolean;
+interface PostCardProps {
+  post: WPPost;
+  priority?: boolean;
+}
+
+const GAME_COLORS: Record<string, string> = {
+  "gta-6": "#FF00FF",
+  "gta-5": "#569446",
+  "gta-4": "#FBBF24",
+  "gta-online": "#FFA500",
+  "gta-san-andreas": "#FFA500",
+  "gta-vice-city": "#00E5FF",
+  "gta-3": "#E5E7EB",
 };
 
-function toPublicSrc(p?: string) {
-  if (!p) return "/images/default-cover.jpg";
-  if (p.startsWith("http")) return p;
-  return p.startsWith("/") ? p : `/${p}`;
-}
+const GAME_LABELS: Record<string, string> = {
+  "gta-6": "GTA 6",
+  "gta-5": "GTA 5",
+  "gta-4": "GTA 4",
+  "gta-online": "GTA Online",
+  "gta-san-andreas": "GTA San Andreas",
+  "gta-vice-city": "GTA Vice City",
+  "gta-3": "GTA 3",
+};
 
-function postHref(post: Post) {
-   return `/juegos/${post.game}/${post.type}/${post.slug}`;
-}
+export default function PostCard({ post, priority = false }: PostCardProps) {
+  const gameColor = GAME_COLORS[post.game || "gta-6"] || "#00FF41";
+  const gameLabel = GAME_LABELS[post.game || "gta-6"] || "GTA";
+  const typeLabel = post.type === "guias" ? "Guía" : "Noticia";
 
-function formattedDate(date: string) {
-  try {
-    return format(new Date(date), "d 'de' MMMM 'de' yyyy", { locale: es });
-  } catch (e) {
-    return date;
-  }
-}
+  const formattedDate = new Date(post.date).toLocaleDateString("es-ES", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
 
-function CategoryBadge({ post }: { post: Post }) {
-  const text = `${post.game.toUpperCase()} · ${post.type.toUpperCase()}`;
-  return (
-    <span className="inline-flex items-center rounded-full bg-(--gta-green) px-3 py-1 text-xs font-bold uppercase tracking-wide text-black">
-      {text}
-    </span>
-  );
-}
-
-export default function PostCard({ post, featured = false }: PostCardProps) {
-  const href = postHref(post);
-  const coverSrc = toPublicSrc(post.cover);
-
-  if (featured) {
-    return (
-      <Link
-        href={href}
-        className="group relative block h-full overflow-hidden rounded-xl border border-white/10 bg-gray-900 transition-all hover:scale-[1.01] hover:border-(--gta-green)/30 hover:shadow-[0_0_40px_rgba(0,255,65,0.15)]"
-      >
-        <div className="relative h-64 overflow-hidden md:h-96">
-          <Image
-            src={coverSrc}
-            alt={post.title}
-            fill
-            priority
-            sizes="(max-width: 1024px) 100vw, 1216px"
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-          />
-          <div className="absolute inset-0 bg-linear-to-t from-black via-black/40 to-transparent" />
-          <div className="absolute left-4 top-4">
-            <CategoryBadge post={post} />
-          </div>
-        </div>
-
-        <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
-          <div className="mb-3 flex items-center gap-4 text-sm text-gray-400">
-            <span className="flex items-center gap-1">
-              <Clock className="h-4 w-4" />
-              {post.readingTime ?? "5 min"}
-            </span>
-            <span>•</span>
-            <span>{formattedDate(post.date)}</span>
-          </div>
-          <h2 className="mb-3 line-clamp-2 text-2xl font-bold text-white transition-colors group-hover:text-(--gta-green) md:text-3xl">
-            {post.title}
-          </h2>
-          <p className="mb-4 line-clamp-2 text-gray-300">
-            {post.description}
-          </p>
-          <div className="flex items-center gap-2 font-semibold text-(--gta-green)">
-            Leer más
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-          </div>
-        </div>
-      </Link>
-    );
-  }
+  // Construimos la URL del post
+  const postUrl = `/juegos/${post.game}/${post.type}/${post.slug}`;
 
   return (
-    <Link
-      href={href}
-      className="group flex h-full flex-col overflow-hidden rounded-xl border border-white/10 bg-gray-900 transition-all hover:border-(--gta-green)/30 hover:shadow-[0_0_30px_rgba(0,255,65,0.12)]"
-    >
-      <div className="relative h-48 overflow-hidden bg-[#0a0b14]">
+    <article className="group relative flex flex-col overflow-hidden rounded-2xl bg-white/3 border border-white/8 transition-all duration-300 hover:bg-white/5 hover:border-white/20 hover:shadow-2xl hover:shadow-black/20">
+      {/* Imagen destacada */}
+      <Link href={postUrl} className="relative aspect-video w-full overflow-hidden">
         <Image
-          src={coverSrc}
+          src={post.cover || "/images/default-cover.jpg"}
           alt={post.title}
           fill
-          sizes="(max-width: 1024px) 100vw, 400px"
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
+          priority={priority}
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
-        <div className="absolute left-3 top-3">
-          <CategoryBadge post={post} />
-        </div>
-      </div>
-      <div className="flex flex-1 flex-col p-5">
-        <div className="mb-3 flex items-center gap-3 text-xs text-gray-400">
-          <span className="flex items-center gap-1">
-            <Clock className="h-3 w-3" />
-            {post.readingTime ?? "5 min"}
+        
+        {/* Badge del juego */}
+        <div className="absolute top-4 left-4">
+          <span
+            className="inline-block rounded-md px-3 py-1 text-xs font-bold uppercase tracking-wider text-black shadow-lg"
+            style={{ backgroundColor: gameColor }}
+          >
+            {gameLabel}
           </span>
-          <span>•</span>
-          <span>{formattedDate(post.date)}</span>
         </div>
-        <h3 className="mb-2 line-clamp-2 text-lg font-bold text-white transition-colors group-hover:text-(--gta-green)">
-          {post.title}
-        </h3>
-        <p className="mb-4 flex-1 text-sm text-gray-400 line-clamp-3">
-          {post.description}
-        </p>
-        <div className="mt-auto flex items-center gap-2 text-sm font-semibold text-(--gta-green)">
-          Leer más
-          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+
+        {/* Badge del tipo (Noticia/Guía) */}
+        <div className="absolute top-4 right-4">
+          <span className="inline-block rounded-md bg-black/60 backdrop-blur-sm px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white">
+            {typeLabel}
+          </span>
+        </div>
+      </Link>
+
+      {/* Contenido */}
+      <div className="flex flex-1 flex-col p-5 sm:p-6">
+        <Link href={postUrl}>
+          <h3 className="mb-3 text-xl font-bold leading-tight text-white transition-colors group-hover:text-gray-200 sm:text-2xl">
+            {post.title}
+          </h3>
+        </Link>
+
+        {(post.excerpt || post.description) && (
+          <p className="mb-4 flex-1 line-clamp-3 text-sm text-gray-400 sm:text-base">
+            {post.excerpt || post.description}
+          </p>
+        )}
+
+        <div className="flex items-center justify-between border-t border-white/8 pt-4">
+          <div className="flex items-center gap-2 text-sm text-gray-500">
+            <Calendar className="h-4 w-4" />
+            <time dateTime={post.date}>{formattedDate}</time>
+          </div>
+
+          <Link
+            href={postUrl}
+            className="text-sm font-semibold transition-colors"
+            style={{ color: gameColor }}
+            aria-label={`Leer más sobre ${post.title}`}
+          >
+            Leer más →
+          </Link>
         </div>
       </div>
-    </Link>
+    </article>
   );
 }

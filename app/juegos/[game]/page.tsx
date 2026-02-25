@@ -1,6 +1,6 @@
 // app/juegos/[game]/page.tsx
 import GameHub from '@/components/GameHub';
-import { Newspaper, Image as ImageIcon, Video, Gamepad2, Palette } from 'lucide-react';
+import { Newspaper, BookOpen, Gamepad2, Video, Palette, Map, Car, Sword, Users, PawPrint, Music } from 'lucide-react';
 import { notFound } from 'next/navigation';
 
 const gameDataDictionary: Record<string, any> = {
@@ -114,7 +114,6 @@ const gameDataDictionary: Record<string, any> = {
 };
 
 export function generateStaticParams() {
-  // Genera dinámicamente las rutas basándose en las claves del diccionario local.
   return Object.keys(gameDataDictionary).map((gameSlug) => ({
     game: gameSlug,
   }));
@@ -126,8 +125,9 @@ export default async function GamePage({ params }: { params: Promise<{ game: str
 
   if (!gameData) return notFound();
 
-  const prefix = gameData.assetPrefix; // Usamos el prefijo limpio (ej: gta6) en lugar de la ruta (gta-6)
+  const prefix = gameData.assetPrefix;
 
+  // Secciones base para todos los juegos
   const sections = [
     {
       title: 'Noticias',
@@ -140,7 +140,7 @@ export default async function GamePage({ params }: { params: Promise<{ game: str
       title: 'Guías',
       description: 'Misiones, coleccionables y 100%.',
       href: `/juegos/${game}/guias`,
-      icon: ImageIcon,
+      icon: BookOpen,
       image: `/images/${prefix}-guides.webp`,
     },
     {
@@ -151,7 +151,7 @@ export default async function GamePage({ params }: { params: Promise<{ game: str
       image: `/images/${prefix}-cheats.webp`,
     },
     {
-      title: 'Vídeos',
+      title: 'Vídeos y trailers',
       description: 'Tráilers y gameplays oficiales.',
       href: `/juegos/${game}/videos`,
       icon: Video,
@@ -159,14 +159,66 @@ export default async function GamePage({ params }: { params: Promise<{ game: str
     },
   ];
 
+  // Secciones exclusivas para GTA 6
   if (game === 'gta-6') {
-    sections.push({
-      title: 'Imágenes',
-      description: 'Galería oficial y capturas.',
-      href: `/juegos/${game}/imagenes`,
-      icon: Palette,
-      image: `/images/${prefix}-art.webp`,
-    });
+    sections.push(
+      {
+        title: 'Últimas noticias',
+        description: 'Lo más reciente sobre GTA VI.',
+        href: `/juegos/${game}/ultimas-noticias`,
+        icon: Newspaper,
+        image: `/images/${prefix}-latest.webp`,
+      },
+      {
+        title: 'Mapa y ubicaciones',
+        description: 'Explora el estado de Leonida.',
+        href: `/juegos/${game}/mapa`,
+        icon: Map,
+        image: `/images/${prefix}-map.webp`,
+      },
+      {
+        title: 'Vehículos',
+        description: 'Coches, motos y barcos confirmados.',
+        href: `/juegos/${game}/vehiculos`,
+        icon: Car,
+        image: `/images/${prefix}-vehicles.webp`,
+      },
+      {
+        title: 'Armas',
+        description: 'Arsenal completo del juego.',
+        href: `/juegos/${game}/armas`,
+        icon: Sword,
+        image: `/images/${prefix}-weapons.webp`,
+      },
+      {
+        title: 'Personajes',
+        description: 'Lucia, Jason y más protagonistas.',
+        href: `/juegos/${game}/personajes`,
+        icon: Users,
+        image: `/images/${prefix}-characters.webp`,
+      },
+      {
+        title: 'Animales',
+        description: 'Fauna del estado de Leonida.',
+        href: `/juegos/${game}/animales`,
+        icon: PawPrint,
+        image: `/images/${prefix}-animals.webp`,
+      },
+      {
+        title: 'Banda sonora',
+        description: 'Emisoras de radio y música.',
+        href: `/juegos/${game}/banda-sonora`,
+        icon: Music,
+        image: `/images/${prefix}-soundtrack.webp`,
+      },
+      {
+        title: 'Imágenes',
+        description: 'Galería oficial y capturas.',
+        href: `/juegos/${game}/imagenes`,
+        icon: Palette,
+        image: `/images/${prefix}-art.webp`,
+      }
+    );
   }
 
   return (
