@@ -1,185 +1,123 @@
 // app/juegos/[game]/page.tsx
-import GameHub from "@/components/GameHub";
-import { Newspaper, Gamepad2, Video, Database, Music, Image as ImageIcon } from "lucide-react";
-import { notFound } from "next/navigation";
-import { fetchAPI } from "@/lib/api";
+import GameHub from '@/components/GameHub';
+import { Newspaper, Image as ImageIcon, Video, Gamepad2, Palette } from 'lucide-react';
+import { notFound } from 'next/navigation';
+import { fetchAPI } from '@/lib/api';
 
-// --- DICCIONARIO DE DATOS POR JUEGO ---
 const gameDataDictionary: Record<string, any> = {
-  "gta-6": {
-    title: "Grand Theft Auto VI",
-    color: "#FF00FF",
-    heroImage: "/images/gta6-hero.webp",
+  'gta-6': {
+    title: 'Grand Theft Auto VI',
+    assetPrefix: 'gta6', // <--- Prefijo exacto para las imágenes de tarjetas
+    color: '#FF00FF',
+    heroImage: '/images/gta6-hero.webp',
     description: (
       <div className="space-y-4 text-center sm:text-justify">
-        <p>Grand Theft Auto VI nos lleva de vuelta al estado de Leonida, hogar de las calles empapadas de neón de Vice City y más allá, en la evolución más grande e inmersiva de la serie Grand Theft Auto hasta la fecha.</p>
-        <p>Protagonizada por Lucía y Jason, vivirás una historia de crimen, confianza y traición al estilo Bonnie & Clyde moderno en un mundo abierto sin precedentes.</p>
+        <p>Grand Theft Auto VI nos lleva de vuelta al estado de Leonida, hogar de las calles empapadas de neón de Vice City.</p>
+        <p>Protagonizada por Lucia y Jason, vivirás una historia de crimen y confianza en el mundo abierto más inmersivo hasta la fecha.</p>
       </div>
     ),
     gameInfo: {
-      developer: "Rockstar North",
-      publisher: "Rockstar Games",
-      releaseDate: "19 de noviembre de 2026",
-      setting: "Actualidad (2025-2026)",
-      location: "Estado de Leonida (Florida)",
-      platforms: ["PS5", "Xbox Series X|S"],
-      multiplayer: "GTA Online 2 (Confirmado)",
+      developer: 'Rockstar North',
+      publisher: 'Rockstar Games',
+      releaseDate: 'Otoño 2025',
+      platforms: 'PS5, Xbox Series X|S',
     },
     releaseTimeline: [
-      { date: "4 de diciembre de 2023", platforms: [], notes: "Tráiler de Revelación Oficial" },
-      { date: "19 de noviembre de 2026", platforms: [{ name: "PS5", color: "blue" }, { name: "Xbox Series X|S", color: "green" }], notes: "Lanzamiento Consolas" },
-    ],
-    // ❌ GTA 6 NO TIENE GUÍAS (AÚN)
-    customSections: [
-      { title: "Noticias y Rumores", description: "Últimas novedades, filtraciones y análisis de GTA 6.", href: "/juegos/gta-6/noticias", icon: Newspaper, image: "/images/gta6-news.webp" },
-      { title: "Tráilers y Vídeos", description: "Análisis de tráilers oficiales e imágenes promocionales.", href: "/juegos/gta-6/videos", icon: Video, image: "/images/gta6-videos.webp" },
-      { title: "Imágenes y Arte", description: "Capturas de pantalla, arte oficial y wallpapers.", href: "/juegos/gta-6/imagenes", icon: ImageIcon, image: "/images/gta6-screens.webp" }
+      { date: '4 Dic 2023', platforms: [], notes: 'Tráiler 1 Oficial' },
+      { date: 'Otoño 2025', platforms: [{ name: 'PS5', color: 'blue' }, { name: 'Xbox Series X|S', color: 'green' }], notes: 'Lanzamiento Previsto' }
     ]
   },
-  "gta-5": {
-    title: "Grand Theft Auto V",
-    color: "#00FF41",
-    heroImage: "/images/gta5-hero.webp",
+  'gta-5': {
+    title: 'Grand Theft Auto V',
+    assetPrefix: 'gta5',
+    color: '#569446',
+    heroImage: '/images/gta5-hero.webp',
     description: (
       <div className="space-y-4 text-center sm:text-justify">
-        <p>Cuando un joven estafador callejero, un ladrón de bancos retirado y un psicópata aterrador se ven involucrados con lo peor de la mafia, el gobierno y la industria del entretenimiento, tendrán que llevar a cabo una serie de peligrosos atracos para sobrevivir.</p>
+        <p>Un joven estafador callejero, un ladrón de bancos retirado y un psicópata aterrador se ven involucrados con lo peor del mundo criminal.</p>
       </div>
     ),
     gameInfo: {
-      developer: "Rockstar North",
-      publisher: "Rockstar Games",
-      releaseDate: "17 de septiembre de 2013",
-      setting: "2013",
-      location: "Los Santos y Blaine County",
-      platforms: ["PS5", "PS4", "PS3", "Xbox Series X|S", "Xbox One", "Xbox 360", "PC"],
-      multiplayer: "GTA Online",
+      developer: 'Rockstar North',
+      releaseDate: '17 Sept 2013',
+      platforms: 'PS3, PS4, PS5, Xbox, PC',
     },
     releaseTimeline: [
-      { date: "17 de septiembre de 2013", platforms: [], notes: "Lanzamiento Original (PS3/X360)" },
-      { date: "14 de abril de 2015", platforms: [{ name: "PC", color: "dark" }], notes: "Lanzamiento en PC" },
-    ],
-    // ✅ GTA 5 SÍ TIENE GUÍAS
-    customSections: [
-      { title: "Noticias y Novedades", description: "Actualizaciones semanales y parches.", href: "/juegos/gta-5/noticias", icon: Newspaper, image: "/images/gta5-news.webp" },
-      { title: "Guías y Misiones", description: "Guía completa del modo historia y secretos.", href: "/juegos/gta-5/guias", icon: Gamepad2, image: "/images/gta5-guides.webp" },
-      { title: "Trucos (Cheats)", description: "Todos los códigos y números de teléfono.", href: "/juegos/gta-5/trucos", icon: Database, image: "/images/gta5-cheats.webp" }
+      { date: '17 Sept 2013', platforms: [{ name: 'PS3', color: 'blue' }, { name: 'Xbox 360', color: 'green' }], notes: 'Lanzamiento Original' },
+      { date: '14 Abr 2015', platforms: [{ name: 'PC', color: 'dark' }], notes: 'Lanzamiento en PC' },
+      { date: '15 Mar 2022', platforms: [{ name: 'PS5', color: 'blue' }, { name: 'Xbox Series X|S', color: 'green' }], notes: 'Versión Next-Gen' }
     ]
   },
-  "gta-4": {
-    title: "Grand Theft Auto IV",
-    color: "#00BFFF",
-    heroImage: "/images/gta4-hero.webp",
+  'gta-4': {
+    title: 'Grand Theft Auto IV',
+    assetPrefix: 'gta4',
+    color: '#FBBF24',
+    heroImage: '/images/gta4-hero.webp',
     description: (
       <div className="space-y-4 text-center sm:text-justify">
-        <p>¿Qué significa el sueño americano hoy en día? Para Niko Bellic, recién llegado en barco desde Europa, es la esperanza de que puede escapar de su pasado. Para su primo Roman, es la visión de que juntos pueden hacer fortuna en Liberty City.</p>
+        <p>Niko Bellic llega a Liberty City para escapar de su pasado, pero descubre que el sueño americano es solo una pesadilla de codicia.</p>
       </div>
     ),
-    gameInfo: {
-      developer: "Rockstar North",
-      publisher: "Rockstar Games",
-      releaseDate: "29 de abril de 2008",
-      setting: "2008",
-      location: "Liberty City",
-      platforms: ["PS3", "Xbox 360", "PC"],
-      multiplayer: "GTA IV Multiplayer",
-    },
+    gameInfo: { developer: 'Rockstar North', releaseDate: '29 Abr 2008', platforms: 'PS3, Xbox 360, PC' },
     releaseTimeline: [
-      { date: "29 de abril de 2008", platforms: [{ name: "PS3", color: "blue" }, { name: "Xbox 360", color: "green" }], notes: "Lanzamiento Consolas" },
-      { date: "2 de diciembre de 2008", platforms: [{ name: "PC", color: "dark" }], notes: "Lanzamiento en PC" },
-    ],
-    customSections: [
-      { title: "Noticias de GTA 4", description: "Novedades y artículos retro.", href: "/juegos/gta-4/noticias", icon: Newspaper, image: "/images/gta4-news.webp" },
-      { title: "Guías 100%", description: "Cómo superar las misiones de Niko Bellic.", href: "/juegos/gta-4/guias", icon: Gamepad2, image: "/images/gta4-guides.webp" },
-      { title: "Trucos Móvil", description: "Todos los códigos del teléfono.", href: "/juegos/gta-4/trucos", icon: Database, image: "/images/gta4-cheats.webp" }
+      { date: '29 Abr 2008', platforms: [{ name: 'PS3', color: 'blue' }, { name: 'Xbox 360', color: 'green' }], notes: 'Lanzamiento Original' },
+      { date: '2 Dic 2008', platforms: [{ name: 'PC', color: 'dark' }], notes: 'Lanzamiento en PC' }
     ]
   },
-  "gta-san-andreas": {
-    title: "GTA: San Andreas",
-    color: "#FF8C00",
-    heroImage: "/images/sa-hero.webp",
+  'gta-san-andreas': {
+    title: 'GTA: San Andreas',
+    assetPrefix: 'sa',
+    color: '#FFA500',
+    heroImage: '/images/sa-hero.webp',
     description: (
       <div className="space-y-4 text-center sm:text-justify">
-        <p>Hace cinco años, Carl Johnson escapó de las presiones de la vida en Los Santos, San Andreas, una ciudad destrozada por las pandillas, las drogas y la corrupción. Ahora, a principios de los 90, CJ tiene que volver a casa.</p>
+        <p>Hace cinco años, Carl Johnson escapó de la presión de Los Santos. Ahora vuelve a casa para encontrar a su familia destrozada.</p>
       </div>
     ),
-    gameInfo: {
-      developer: "Rockstar North",
-      publisher: "Rockstar Games",
-      releaseDate: "26 de octubre de 2004",
-      setting: "1992",
-      location: "San Andreas",
-      platforms: ["PS2", "Xbox", "PC", "Mobile"],
-      multiplayer: "SA-MP",
-    },
+    gameInfo: { developer: 'Rockstar North', releaseDate: '26 Oct 2004', platforms: 'PS2, Xbox, PC, Móvil' },
     releaseTimeline: [
-      { date: "26 de octubre de 2004", platforms: [{ name: "PS2", color: "blue" }], notes: "Lanzamiento Original" },
-    ],
-    customSections: [
-      { title: "Noticias Clásicas", description: "Curiosidades sobre el juego.", href: "/juegos/gta-san-andreas/noticias", icon: Newspaper, image: "/images/sa-news.webp" },
-      { title: "Misiones y Guías", description: "Respeta el barrio y consigue el 100%.", href: "/juegos/gta-san-andreas/guias", icon: Gamepad2, image: "/images/sa-guides.webp" },
-      { title: "Trucos", description: "Códigos legendarios como HESOYAM.", href: "/juegos/gta-san-andreas/trucos", icon: Database, image: "/images/sa-cheats.webp" }
+      { date: '26 Oct 2004', platforms: [{ name: 'PS2', color: 'blue' }], notes: 'Lanzamiento Original' },
+      { date: '11 Nov 2021', platforms: [{ name: 'Consolas Modernas', color: 'dark' }], notes: 'The Definitive Edition' }
     ]
   },
-  "gta-vice-city": {
-    title: "GTA: Vice City",
-    color: "#FF1493",
-    heroImage: "/images/vice-city-hero.webp",
+  'gta-vice-city': {
+    title: 'GTA: Vice City',
+    assetPrefix: 'vc',
+    color: '#00E5FF',
+    heroImage: '/images/vc-hero.webp',
     description: (
       <div className="space-y-4 text-center sm:text-justify">
-        <p>Bienvenido a la década de los 80. Tras pasar 15 años en prisión, Tommy Vercetti es enviado a Vice City por su antiguo jefe, Sonny Forelli.</p>
+        <p>Bienvenido a los años 80. La historia del ascenso de Tommy Vercetti a la cima del mundo criminal con pelos cardados y trajes pastel.</p>
       </div>
     ),
-    gameInfo: {
-      developer: "Rockstar North",
-      publisher: "Rockstar Games",
-      releaseDate: "29 de octubre de 2002",
-      setting: "1986",
-      location: "Vice City",
-      platforms: ["PS2", "Xbox", "PC", "Mobile"],
-      multiplayer: "VC-MP",
-    },
+    gameInfo: { developer: 'Rockstar North', releaseDate: '29 Oct 2002', platforms: 'PS2, Xbox, PC, Móvil' },
     releaseTimeline: [
-      { date: "29 de octubre de 2002", platforms: [{ name: "PS2", color: "blue" }], notes: "Lanzamiento Original" },
-    ],
-    customSections: [
-      { title: "Noticias Retro", description: "Artículos de Vice City.", href: "/juegos/gta-vice-city/noticias", icon: Newspaper, image: "/images/vc-news.webp" },
-      { title: "Guías Completas", description: "Conviértete en el rey de la ciudad.", href: "/juegos/gta-vice-city/guias", icon: Gamepad2, image: "/images/vc-guides.webp" },
-      { title: "Todos los Trucos", description: "Armas, salud y dinero.", href: "/juegos/gta-vice-city/trucos", icon: Database, image: "/images/vc-cheats.webp" }
+      { date: '29 Oct 2002', platforms: [{ name: 'PS2', color: 'blue' }], notes: 'Lanzamiento Original' },
+      { date: '11 Nov 2021', platforms: [{ name: 'Consolas Modernas', color: 'dark' }], notes: 'The Definitive Edition' }
     ]
   },
-  "gta-3": {
-    title: "Grand Theft Auto III",
-    color: "#FFD700",
-    heroImage: "/images/gta3-hero.webp",
+  'gta-3': {
+    title: 'Grand Theft Auto III',
+    assetPrefix: 'gta3',
+    color: '#E5E7EB',
+    heroImage: '/images/gta3-hero.webp',
     description: (
       <div className="space-y-4 text-center sm:text-justify">
-        <p>Todo comienza en Liberty City. El crimen paga. La épica aventura criminal que cambió los juegos de mundo abierto para siempre.</p>
+        <p>Todo empieza en Liberty City. El juego que definió el género de mundo abierto y nos enseñó que el crimen paga.</p>
       </div>
     ),
-    gameInfo: {
-      developer: "Rockstar DMA",
-      publisher: "Rockstar Games",
-      releaseDate: "22 de octubre de 2001",
-      setting: "2001",
-      location: "Liberty City",
-      platforms: ["PS2", "Xbox", "PC"],
-      multiplayer: "No",
-    },
+    gameInfo: { developer: 'DMA Design', releaseDate: '22 Oct 2001', platforms: 'PS2, Xbox, PC, Móvil' },
     releaseTimeline: [
-      { date: "22 de octubre de 2001", platforms: [{ name: "PS2", color: "blue" }], notes: "Lanzamiento Original" },
-    ],
-    customSections: [
-      { title: "Noticias y Lore", description: "Historias sobre los inicios del 3D.", href: "/juegos/gta-3/noticias", icon: Newspaper, image: "/images/gta3-news.webp" },
-      { title: "Guías Liberty City", description: "Supera todas las misiones de Claude.", href: "/juegos/gta-3/guias", icon: Gamepad2, image: "/images/gta3-guides.webp" },
-      { title: "Trucos GTA 3", description: "Códigos de la vieja escuela.", href: "/juegos/gta-3/trucos", icon: Database, image: "/images/gta3-cheats.webp" }
+      { date: '22 Oct 2001', platforms: [{ name: 'PS2', color: 'blue' }], notes: 'Lanzamiento Original' },
+      { date: '11 Nov 2021', platforms: [{ name: 'Consolas Modernas', color: 'dark' }], notes: 'The Definitive Edition' }
     ]
-  }
+  },
 };
 
 export async function generateStaticParams() {
   const data = await fetchAPI(`
     query TodosLosJuegos {
-      juegos {
+      juegos(first: 100) {
         nodes {
           slug
         }
@@ -188,7 +126,6 @@ export async function generateStaticParams() {
   `);
 
   if (!data?.juegos?.nodes) return [];
-
   return data.juegos.nodes.map((juego: any) => ({
     game: juego.slug,
   }));
@@ -198,12 +135,50 @@ export default async function GamePage({ params }: { params: Promise<{ game: str
   const { game } = await params;
   const gameData = gameDataDictionary[game];
 
-  if (!gameData) {
-    notFound();
-  }
+  if (!gameData) return notFound();
 
-  // Ahora sacamos las secciones directamente de la configuración única de cada juego.
-  const sections = gameData.customSections;
+  const prefix = gameData.assetPrefix; // Usamos el prefijo limpio (ej: gta6) en lugar de la ruta (gta-6)
+
+  const sections = [
+    {
+      title: 'Noticias',
+      description: `Últimas novedades de ${gameData.title}.`,
+      href: `/juegos/${game}/noticias`,
+      icon: Newspaper,
+      image: `/images/${prefix}-news.webp`,
+    },
+    {
+      title: 'Guías',
+      description: 'Misiones, coleccionables y 100%.',
+      href: `/juegos/${game}/guias`,
+      icon: ImageIcon,
+      image: `/images/${prefix}-guides.webp`,
+    },
+    {
+      title: 'Trucos',
+      description: 'Códigos de salud, armas y coches.',
+      href: `/juegos/${game}/trucos`,
+      icon: Gamepad2,
+      image: `/images/${prefix}-cheats.webp`,
+    },
+    {
+      title: 'Vídeos',
+      description: 'Tráilers y gameplays oficiales.',
+      href: `/juegos/${game}/videos`,
+      icon: Video,
+      image: `/images/${prefix}-videos.webp`,
+    },
+  ];
+
+  if (game === 'gta-6') {
+    sections.push({
+      title: 'Imágenes',
+      description: 'Galería oficial y capturas.',
+      href: `/juegos/${game}/imagenes`,
+      icon: Palette,
+      image: `/images/${prefix}-art.webp`,
+    });
+  }
 
   return (
     <GameHub
@@ -213,7 +188,7 @@ export default async function GamePage({ params }: { params: Promise<{ game: str
       description={gameData.description}
       sections={sections}
       gameInfo={gameData.gameInfo}
-      releaseTimeline={gameData.releaseTimeline}
+      releaseTimeline={gameData.releaseTimeline || []}
     />
   );
 }

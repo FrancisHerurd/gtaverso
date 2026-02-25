@@ -159,7 +159,7 @@ export default async function GameGuidesPage(
                     >
                       {fecha}
                     </time>
-                    <h2 className="text-xl font-bold text-white mb-3 leading-snug group-hover:text-[var(--hover-border)] transition-colors">
+                    <h2 className="text-xl font-bold text-white mb-3 leading-snug group-hover:text-(--hover-border) transition-colors">
                       <Link href={`/juegos/${game}/guias/${post.slug}`}>
                         {post.title}
                       </Link>
