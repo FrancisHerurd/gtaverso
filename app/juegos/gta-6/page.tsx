@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 import { Newspaper, Image as ImageIcon, Video, Music, Palette } from 'lucide-react'
 import { notFound } from 'next/navigation'
 import GameHub from '@/components/GameHub'
-import LatestNewsSection from '@/components/LatestNewsSection/LatestNewsSection'
+import LatestNewsSection from '@/components/CategoryHero/CategoryHero'
 import { getAllPosts } from '@/lib/posts'
 
 export const metadata: Metadata = {

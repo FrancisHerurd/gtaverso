@@ -2,12 +2,11 @@
 import GameHub from '@/components/GameHub';
 import { Newspaper, Image as ImageIcon, Video, Gamepad2, Palette } from 'lucide-react';
 import { notFound } from 'next/navigation';
-import { fetchAPI } from '@/lib/api';
 
 const gameDataDictionary: Record<string, any> = {
   'gta-6': {
     title: 'Grand Theft Auto VI',
-    assetPrefix: 'gta6', // <--- Prefijo exacto para las imágenes de tarjetas
+    assetPrefix: 'gta6',
     color: '#FF00FF',
     heroImage: '/images/gta6-hero.webp',
     description: (
@@ -114,20 +113,10 @@ const gameDataDictionary: Record<string, any> = {
   },
 };
 
-export async function generateStaticParams() {
-  const data = await fetchAPI(`
-    query TodosLosJuegos {
-      juegos(first: 100) {
-        nodes {
-          slug
-        }
-      }
-    }
-  `);
-
-  if (!data?.juegos?.nodes) return [];
-  return data.juegos.nodes.map((juego: any) => ({
-    game: juego.slug,
+export function generateStaticParams() {
+  // Genera dinámicamente las rutas basándose en las claves del diccionario local.
+  return Object.keys(gameDataDictionary).map((gameSlug) => ({
+    game: gameSlug,
   }));
 }
 
