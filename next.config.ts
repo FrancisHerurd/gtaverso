@@ -1,3 +1,4 @@
+// next.config.ts
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
@@ -5,11 +6,11 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "gtaverso.com", 
+        hostname: "**", // Permite imágenes desde cualquier URL HTTPS (ideal para WPGraphQL)
       },
       {
-        protocol: "https",
-        hostname: "www.gtaverso.com", 
+        protocol: "http",
+        hostname: "**", 
       }
     ],
   },

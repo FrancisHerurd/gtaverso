@@ -1,11 +1,13 @@
-// src/components/LatestNewsSection/LatestNewsSection.tsx
+// src/components/CategoryHero/CategoryHero.tsx
 import Image from 'next/image'
 import Link from 'next/link'
 import { Calendar, ArrowRight } from 'lucide-react'
-import type { Post } from '@/types/posts'
+
+// Quitamos la importación del Type antiguo
+// import type { Post } from '@/types/posts'
 
 interface LatestNewsSectionProps {
-  posts: Post[]
+  posts: any[] // Temporalmente a any[] para evitar errores de Build
   game: string
   gameLabel: string
   accentColor?: string
@@ -52,13 +54,13 @@ export default function LatestNewsSection({
           className="group relative flex min-h-[400px] flex-col justify-end overflow-hidden rounded-2xl bg-white/3 lg:col-span-8 lg:min-h-[500px]"
         >
           <Image
-            src={mainPost.cover || '/images/placeholder.jpg'}
+            src={mainPost.cover || '/images/default-cover.jpg'}
             alt={mainPost.title}
             fill
             className="object-cover transition-transform duration-700 group-hover:scale-105"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/40 to-transparent" />
           
           <div className="relative p-6 sm:p-8">
             <span 
@@ -98,7 +100,7 @@ export default function LatestNewsSection({
             >
               <div className="relative w-28 shrink-0 overflow-hidden rounded-lg sm:w-32 aspect-video">
                 <Image
-                  src={post.cover || '/images/placeholder.jpg'}
+                  src={post.cover || '/images/default-cover.jpg'}
                   alt={post.title}
                   fill
                   className="object-cover transition-transform duration-500 group-hover:scale-110"

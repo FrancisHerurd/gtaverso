@@ -1,61 +1,45 @@
 // app/juegos/[game]/noticias/page.tsx
 import { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
+import { fetchAPI } from '@/lib/api';
 
 export const revalidate = 60;
 
 const TITLES: Record<string, { label: string; color: string }> = {
-  'gta-6':      { label: 'GTA 6',      color: '#00FF41' },
-  'gta-5':      { label: 'GTA 5',      color: '#FF00FF' },
-  'gta-online': { label: 'GTA Online', color: '#FFA500' },
+  'gta-6': { label: 'GTA 6', color: '#FF00FF' }, // Color ajustado a magenta
+  'gta-5': { label: 'GTA 5', color: '#569446' },
+  'gta-4': { label: 'GTA 4', color: '#FBBF24' },
+  'gta-san-andreas': { label: 'GTA San Andreas', color: '#FFA500' },
+  'gta-vice-city': { label: 'GTA Vice City', color: '#00E5FF' },
+  'gta-3': { label: 'GTA 3', color: '#E5E7EB' },
 };
 
 async function getNewsByGame(gameSlug: string) {
-  const endpoint = process.env.NEXT_PUBLIC_WORDPRESS_API_URL!;
-
-  // 🔑 Usamos categoryName con el slug exacto de la URL (gta-6, gta-5...)
-  const res = await fetch(endpoint, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      query: `
-        query GetNewsByGame($gameSlug: String!) {
-          posts(first: 20, where: { categoryName: $gameSlug, orderby: { field: DATE, order: DESC } }) {
-            nodes {
-              title
-              slug
-              excerpt
-              date
-              featuredImage {
-                node {
-                  sourceUrl
-                  altText
-                }
-              }
+  const data = await fetchAPI(`
+    query GetNewsByGame($gameSlug: String!) {
+      posts(first: 20, where: { categoryName: $gameSlug, orderby: { field: DATE, order: DESC } }) {
+        nodes {
+          title
+          slug
+          excerpt
+          date
+          featuredImage {
+            node {
+              sourceUrl
+              altText
             }
           }
         }
-      `,
-      variables: { gameSlug },
-    }),
-    next: { revalidate: 60 },
-  });
+      }
+    }
+  `, { gameSlug });
 
-  const json = await res.json();
-
-  // Si hay error en la query o no hay noticias para ESA categoría exacta, devolvemos un array vacío.
-  // ❌ HEMOS QUITADO EL FALLBACK QUE MEZCLABA LAS NOTICIAS.
-  if (json.errors || !json.data?.posts?.nodes) {
+  if (!data?.posts?.nodes) {
     return [];
   }
 
-  return json.data.posts.nodes as Array<{
-    title: string;
-    slug: string;
-    excerpt: string;
-    date: string;
-    featuredImage?: { node: { sourceUrl: string; altText: string } };
-  }>;
+  return data.posts.nodes;
 }
 
 export async function generateMetadata(
@@ -79,7 +63,7 @@ export default async function GameNewsPage(
 
   return (
     <main className="min-h-screen bg-[#050508] pt-24 pb-20 text-white">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-(--container) px-4 sm:px-6 lg:px-8">
 
         <header className="mb-10">
           <p className="text-sm font-medium text-gray-500 mb-2 uppercase tracking-widest">
@@ -98,15 +82,15 @@ export default async function GameNewsPage(
         {posts.length === 0 ? (
           <div className="py-12 border-t border-white/10 mt-8">
             <p className="text-gray-400 text-lg">
-              Todavía no hay noticias publicadas para <strong className="text-white">{meta.label}</strong>.
+              Todavía no hay noticias publicadas para <strong className="text-white">{meta.label}</strong> en WordPress.
             </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {posts.map((post) => {
+            {posts.map((post: any) => {
               const cover = post.featuredImage?.node?.sourceUrl;
               const altText = post.featuredImage?.node?.altText || post.title;
-              const excerpt = post.excerpt?.replace(/<[^>]+>/g, '') ?? '';
+              const excerpt = (post.excerpt || '').replace(/<[^>]+>/g, '').trim();
               const fecha = new Date(post.date).toLocaleDateString('es-ES', {
                 day: 'numeric', month: 'long', year: 'numeric',
               });
@@ -118,10 +102,12 @@ export default async function GameNewsPage(
                 >
                   {cover ? (
                     <div className="aspect-video w-full overflow-hidden relative">
-                      <img
+                      <Image
                         src={cover}
                         alt={altText}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 absolute inset-0"
+                        fill
+                        sizes="(max-width: 768px) 100vw, 400px"
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     </div>
                   ) : (
@@ -134,13 +120,10 @@ export default async function GameNewsPage(
                   )}
 
                   <div className="flex flex-col flex-1 p-5">
-                    <time
-                      dateTime={post.date}
-                      className="text-xs text-gray-500 mb-2"
-                    >
+                    <time dateTime={post.date} className="text-xs text-gray-500 mb-2">
                       {fecha}
                     </time>
-                    <h2 className="text-lg font-bold text-white mb-2 leading-snug">
+                    <h2 className="text-lg font-bold text-white mb-2 leading-snug group-hover:text-gray-300 transition-colors">
                       {post.title}
                     </h2>
                     {excerpt && (
@@ -150,10 +133,10 @@ export default async function GameNewsPage(
                     )}
                     <Link
                       href={`/juegos/${game}/noticias/${post.slug}`}
-                      className="text-sm font-semibold mt-auto"
+                      className="text-sm font-semibold mt-auto inline-flex items-center gap-1"
                       style={{ color: meta.color }}
                     >
-                      Leer más →
+                      Leer más <span aria-hidden="true">&rarr;</span>
                     </Link>
                   </div>
                 </article>
