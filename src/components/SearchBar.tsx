@@ -1,35 +1,33 @@
-"use client";
+// src/components/SearchBar.tsx
+'use client'
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { Search } from 'lucide-react'
 
 export default function SearchBar() {
-  const [query, setQuery] = useState("");
-  const router = useRouter();
+  const router = useRouter()
+  const [query, setQuery] = useState('')
 
-  function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    const q = query.trim();
-    if (!q) return;
-    router.push(`/buscar?q=${encodeURIComponent(q)}`);
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (query.trim()) {
+      router.push(`/buscar?q=${encodeURIComponent(query.trim())}`)
+    }
   }
 
   return (
-    <form onSubmit={onSubmit} className="w-full">
-      <div className="relative flex items-center">
+    <form onSubmit={handleSubmit} className="relative w-full max-w-lg">
+      <div className="relative">
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/40" />
         <input
+          type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Buscar noticias, guías, trucos..."
-          className="w-full rounded-full bg-transparent px-6 py-4 text-white placeholder:text-gray-400 focus:outline-none sm:text-lg"
+          className="w-full rounded-lg border border-white/20 bg-white/5 py-3 pl-12 pr-4 text-white placeholder:text-white/40 focus:border-[#00FF41] focus:outline-none focus:ring-2 focus:ring-[#00FF41]/20 transition-colors"
         />
-        <button
-          type="submit"
-          className="absolute right-2 top-2 bottom-2 rounded-full bg-(--gta-green) px-6 font-bold text-black transition hover:bg-[#00cc34] hover:shadow-[0_0_15px_rgba(0,255,65,0.4)]"
-        >
-          Buscar
-        </button>
       </div>
     </form>
-  );
+  )
 }

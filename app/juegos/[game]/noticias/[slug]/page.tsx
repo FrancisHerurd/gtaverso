@@ -1,9 +1,10 @@
 // app/juegos/[game]/noticias/[slug]/page.tsx
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import Link from 'next/link'
 import Image from 'next/image'
 import { fetchAPI } from '@/lib/api'
+import Breadcrumbs from '@/components/Breadcrumbs'
+import RelatedPosts from '@/components/RelatedPosts'
 
 // ─── Configuración ISR ────────────────────────────────────────────────
 export const revalidate = 600;
@@ -44,14 +45,34 @@ type SingleNoticia = {
   author?: { node?: { name?: string } }
 }
 
+type RelatedPost = {
+  title: string
+  slug: string
+  excerpt?: string
+  date: string
+  featuredImage?: { node?: { sourceUrl?: string; altText?: string } }
+}
+
 const GAME_COLORS: Record<string, string> = {
   'gta-6': '#FF00FF',
   'gta-5': '#569446',
   'gta-4': '#FBBF24',
   'gta-online': '#FFA500',
+  'gta-san-andreas': '#FFA500',
+  'gta-vice-city': '#00E5FF',
+  'gta-3': '#E5E7EB',
 }
 
-// ─── Query ────────────────────────────────────────────────────────────
+const GAME_LABELS: Record<string, string> = {
+  'gta-6': 'GTA 6',
+  'gta-5': 'GTA 5',
+  'gta-4': 'GTA 4',
+  'gta-san-andreas': 'GTA San Andreas',
+  'gta-vice-city': 'GTA Vice City',
+  'gta-3': 'GTA 3',
+}
+
+// ─── Query post individual ────────────────────────────────────────────
 async function getNoticiaBySlug(slug: string): Promise<SingleNoticia | null> {
   const data = await fetchAPI(
     `
@@ -67,10 +88,35 @@ async function getNoticiaBySlug(slug: string): Promise<SingleNoticia | null> {
       }
     }
   `,
-    { id: slug } // ✅ Ahora pasa variables como segundo parámetro
+    { id: slug }
   )
 
   return data?.post || null
+}
+
+// ─── Query posts relacionados ─────────────────────────────────────────
+async function getRelatedPosts(gameSlug: string, currentSlug: string): Promise<RelatedPost[]> {
+  const data = await fetchAPI(
+    `
+    query RelatedPosts($gameSlug: String!) {
+      posts(first: 4, where: { categoryName: $gameSlug, orderby: { field: DATE, order: DESC } }) {
+        nodes {
+          title
+          slug
+          excerpt
+          date
+          featuredImage { node { sourceUrl altText } }
+        }
+      }
+    }
+  `,
+    { gameSlug }
+  )
+
+  const allPosts = (data?.posts?.nodes || []) as RelatedPost[]
+  
+  // Excluir el post actual y limitar a 3
+  return allPosts.filter(post => post.slug !== currentSlug).slice(0, 3)
 }
 
 // ─── Metadata dinámica ────────────────────────────────────────────────
@@ -115,7 +161,10 @@ export default async function NoticiaDetailPage({ params }: PageProps) {
     notFound()
   }
 
-  const gameName = game.replace(/-/g, ' ').toUpperCase()
+  // Obtener posts relacionados
+  const relatedPosts = await getRelatedPosts(game, slug)
+
+  const gameName = GAME_LABELS[game] || game.replace(/-/g, ' ').toUpperCase()
   const gameColor = GAME_COLORS[game] || '#00FF41'
   const imageUrl = noticia.featuredImage?.node?.sourceUrl
   const imageAlt = noticia.featuredImage?.node?.altText || `Imagen destacada de ${noticia.title}`
@@ -125,17 +174,7 @@ export default async function NoticiaDetailPage({ params }: PageProps) {
     year: 'numeric',
   })
 
-  const breadcrumbJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Juegos', item: 'https://www.gtaverso.com/juegos' },
-      { '@type': 'ListItem', position: 2, name: gameName, item: `https://www.gtaverso.com/juegos/${game}` },
-      { '@type': 'ListItem', position: 3, name: 'Noticias', item: `https://www.gtaverso.com/juegos/${game}/noticias` },
-      { '@type': 'ListItem', position: 4, name: noticia.title, item: `https://www.gtaverso.com/juegos/${game}/noticias/${slug}` }
-    ]
-  }
-
+  // Structured data para el artículo
   const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'NewsArticle',
@@ -148,18 +187,17 @@ export default async function NoticiaDetailPage({ params }: PageProps) {
 
   return (
     <main className="mx-auto w-full max-w-4xl px-4 py-12 lg:py-24 min-h-screen bg-[#050508] text-white">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
 
-      <nav aria-label="Breadcrumb" className="mb-10 text-sm font-medium text-white/50 tracking-wide uppercase">
-        <ol className="flex flex-wrap items-center gap-2">
-          <li><Link href="/" className="hover:text-white transition">Inicio</Link></li>
-          <li><span className="px-1 opacity-50">/</span></li>
-          <li><Link href={`/juegos/${game}`} className="hover:text-white transition">{gameName}</Link></li>
-          <li><span className="px-1 opacity-50">/</span></li>
-          <li><Link href={`/juegos/${game}/noticias`} className="hover:text-white transition">Noticias</Link></li>
-        </ol>
-      </nav>
+      {/* Breadcrumbs */}
+      <Breadcrumbs
+        items={[
+          { label: gameName, href: `/juegos/${game}` },
+          { label: 'Noticias', href: `/juegos/${game}/noticias` },
+          { label: noticia.title },
+        ]}
+        className="mb-10"
+      />
 
       <article>
         <header className="mb-12">
@@ -206,6 +244,14 @@ export default async function NoticiaDetailPage({ params }: PageProps) {
           dangerouslySetInnerHTML={{ __html: noticia.content }}
         />
       </article>
+
+      {/* Posts relacionados */}
+      <RelatedPosts
+        posts={relatedPosts}
+        gameSlug={game}
+        gameColor={gameColor}
+        gameName={gameName}
+      />
     </main>
   )
 }
