@@ -1,0 +1,84 @@
+## 📋 Archivos a modificar para añadir un nuevo juego
+
+### **🎮 EN WORDPRESS (csm.gtaverso.com)**
+
+1. **ACF → Taxonomías → Juegos**
+   - Añadir nuevo término (ej: "GTA VII" con slug `gta-7`)
+   - ✅ Asegurarte de que el slug siga el patrón: `gta-X` o `nombre-completo`
+
+2. **Posts → Editar posts existentes o crear nuevos**
+   - Asignar la nueva taxonomía "GTA VII" a los posts correspondientes
+
+***
+
+### **💻 EN NEXT.JS (Visual Studio Code)**
+
+#### **Archivos que SÍ necesitas modificar:**
+
+1. **`app/juegos/page.tsx`**
+   - Añadir el nuevo juego al array `games` (con título, slug, año, imagen, descripción, colores)
+
+2. **`app/juegos/[game]/page.tsx`**
+   - Añadir el nuevo juego al objeto `gameDataDictionary` (con todos sus datos: título, color, imagen hero, descripción, gameInfo, releaseTimeline)
+
+3. **`src/components/JuegoBadge.tsx`**
+   - Añadir el color del nuevo juego al objeto `colorMap` dentro de la función `getColorClass()`
+
+4. **`public/images/`**
+   - Subir las imágenes del nuevo juego:
+     - `gta7-hero.webp` (imagen principal)
+     - `gta7-news.webp` (imagen de sección noticias)
+     - Cualquier otra imagen que uses en el hub del juego
+
+***
+
+#### **Archivos que NO necesitas modificar (se auto-generan):**
+
+❌ **`src/lib/wp.ts`** → Ya consulta WordPress dinámicamente  
+❌ **`src/types/wordpress.ts`** → Los tipos son genéricos  
+❌ **`app/juegos/[game]/noticias/page.tsx`** → Se genera automáticamente por cada slug  
+❌ **`app/sitemap.ts`** → Se auto-genera desde WordPress  
+
+***
+
+### **📊 Resumen visual**
+
+```
+📁 WordPress
+   └── ACF → Taxonomías → Juegos
+       └── ✏️ Añadir término: "GTA VII" (slug: gta-7)
+
+📁 Next.js
+   ├── app/juegos/page.tsx
+   │   └── ✏️ Añadir al array 'games'
+   │
+   ├── app/juegos/[game]/page.tsx
+   │   └── ✏️ Añadir al objeto 'gameDataDictionary'
+   │
+   ├── src/components/JuegoBadge.tsx
+   │   └── ✏️ Añadir color en 'colorMap'
+   │
+   └── public/images/
+       ├── ➕ gta7-hero.webp
+       └── ➕ gta7-news.webp
+```
+
+***
+
+### **🎯 Orden recomendado:**
+
+1. **WordPress** → Crear taxonomía "GTA VII"
+2. **Next.js** → Subir imágenes a `public/images/`
+3. **Next.js** → Modificar `app/juegos/page.tsx`
+4. **Next.js** → Modificar `app/juegos/[game]/page.tsx`
+5. **Next.js** → Modificar `src/components/JuegoBadge.tsx`
+6. **Probar** → Visitar `/juegos/gta-7` y `/juegos/gta-7/noticias`
+
+***
+
+### **✅ Ventajas de tu arquitectura:**
+
+- Solo 3 archivos de código + imágenes
+- El resto se auto-genera desde WordPress
+- Las noticias se filtran automáticamente por taxonomía
+- El sitemap se actualiza solo
