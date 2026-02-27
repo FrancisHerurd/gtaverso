@@ -5,43 +5,54 @@ import { fetchAPI } from "@/lib/api";
 import PostCard from "@/components/PostCard";
 import SearchBar from "@/components/SearchBar";
 import { generateSEO, generateWebsiteSchema } from "@/lib/seo";
+import { mockPosts } from "@/lib/mock-posts";
 import type { WPPost } from "@/types/wordpress";
 
 export const revalidate = 300;
 
 async function getHomePosts() {
-  const data = await fetchAPI(`
-    query HomePosts {
-      posts(first: 9, where: { orderby: { field: DATE, order: DESC } }) {
-        nodes {
-          title
-          slug
-          excerpt
-          date
-          featuredImage { node { sourceUrl } }
-          juegos { nodes { slug name } }
-          categories { nodes { slug name } }
+  try {
+    const data = await fetchAPI(`
+      query HomePosts {
+        posts(first: 9, where: { orderby: { field: DATE, order: DESC } }) {
+          nodes {
+            title
+            slug
+            excerpt
+            date
+            featuredImage { node { sourceUrl } }
+            juegos { nodes { slug name } }
+            categories { nodes { slug name } }
+          }
         }
       }
+    `);
+
+    const nodes = data?.posts?.nodes || [];
+
+    if (nodes.length === 0) {
+      console.log('No posts from WordPress, using mock data');
+      return mockPosts;
     }
-  `);
 
-  const nodes = data?.posts?.nodes || [];
+    return nodes.map((node: any) => {
+      const gameSlug = node.juegos?.nodes?.[0]?.slug || "gta-6";
+      const typeSlug = node.categories?.nodes?.find((c: any) => c.slug !== 'sin-categoria')?.slug || "noticias";
 
-  return nodes.map((node: any) => {
-    const gameSlug = node.juegos?.nodes?.[0]?.slug || "gta-6";
-    const typeSlug = node.categories?.nodes?.find((c: any) => c.slug !== 'sin-categoria')?.slug || "noticias";
-
-    return {
-      title: node.title || "Sin título",
-      slug: node.slug,
-      description: (node.excerpt || "").replace(/<[^>]+>/g, "").trim(),
-      date: node.date,
-      cover: node.featuredImage?.node?.sourceUrl || "/images/default-cover.jpg",
-      game: gameSlug,
-      type: typeSlug,
-    };
-  });
+      return {
+        title: node.title || "Sin título",
+        slug: node.slug,
+        description: (node.excerpt || "").replace(/<[^>]+>/g, "").trim(),
+        date: node.date,
+        cover: node.featuredImage?.node?.sourceUrl || "/images/default-cover.jpg",
+        game: gameSlug,
+        type: typeSlug,
+      };
+    });
+  } catch (error) {
+    console.error('Error fetching WordPress posts, using mock data:', error);
+    return mockPosts;
+  }
 }
 
 // Metadatos mejorados con utilidad SEO
