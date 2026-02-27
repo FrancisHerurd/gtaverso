@@ -1,4 +1,4 @@
-// src/lib/api.ts (ACTUALIZADO)
+// src/lib/api.ts (CORREGIDO Y COMPLETO)
 
 const WORDPRESS_API_URL = process.env.NEXT_PUBLIC_WORDPRESS_API_URL;
 
@@ -20,6 +20,7 @@ const POST_FIELDS = `
   excerpt
   content
   date
+  modified
   featuredImage {
     node {
       sourceUrl
@@ -37,6 +38,12 @@ const POST_FIELDS = `
       databaseId
     }
   }
+  tipos {
+    nodes {
+      name
+      slug
+    }
+  }
   seo {
     title
     metaDesc
@@ -51,6 +58,12 @@ const POST_FIELDS = `
     twitterDescription
     fullHead
   }
+  author {
+    node {
+      name
+      slug
+    }
+  }
 `;
 
 /**
@@ -58,7 +71,7 @@ const POST_FIELDS = `
  */
 export const GET_ALL_POSTS_QUERY = `
   query GetAllPosts($first: Int = 100, $after: String) {
-    posts(first: $first, after: $after) {
+    posts(first: $first, after: $after, where: { orderby: { field: DATE, order: DESC } }) {
       nodes {
         ${POST_FIELDS}
       }
@@ -90,11 +103,37 @@ export const GET_POSTS_BY_JUEGO_QUERY = `
       nodes {
         name
         slug
-        posts(first: $first) {
+        databaseId
+        posts(first: $first, where: { orderby: { field: DATE, order: DESC } }) {
           nodes {
             ${POST_FIELDS}
           }
         }
+      }
+    }
+  }
+`;
+
+/**
+ * Query: Obtener posts por juego + tipo (ej: gta-5 + noticias)
+ */
+export const GET_POSTS_BY_GAME_TYPE_QUERY = `
+  query GetPostsByGameType($game: String!, $type: String!, $first: Int = 20) {
+    posts(
+      first: $first
+      where: {
+        taxQuery: {
+          relation: AND
+          taxArray: [
+            { taxonomy: JUEGO, terms: [$game], field: SLUG }
+            { taxonomy: TIPO, terms: [$type], field: SLUG }
+          ]
+        }
+        orderby: { field: DATE, order: DESC }
+      }
+    ) {
+      nodes {
+        ${POST_FIELDS}
       }
     }
   }
@@ -186,6 +225,18 @@ export async function getPostsByJuego(slug: string) {
     juego: juego ? { name: juego.name, slug: juego.slug } : null,
     posts: juego?.posts?.nodes || [],
   };
+}
+
+/**
+ * Obtener posts filtrados por juego + tipo (ej: gta-5 + noticias)
+ * ✅ FUNCIÓN NUEVA AÑADIDA
+ */
+export async function getPostsByGameAndType(
+  game: string,
+  type: string
+): Promise<any[]> {
+  const data = await fetchAPI(GET_POSTS_BY_GAME_TYPE_QUERY, { game, type });
+  return data?.posts?.nodes || [];
 }
 
 /**
