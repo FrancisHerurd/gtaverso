@@ -1,57 +1,29 @@
 // app/page.tsx
+
 import Image from "next/image";
 import { Metadata } from "next";
-import { fetchAPI } from "@/lib/api";
+import { getAllPosts } from "@/lib/api"; // ✅ Cambio: usar getAllPosts de api.ts
 import PostCard from "@/components/PostCard";
 import SearchBar from "@/components/SearchBar";
 import { generateSEO, generateWebsiteSchema } from "@/lib/seo";
-import { mockPosts } from "@/lib/mock-posts";
 import type { WPPost } from "@/types/wordpress";
 
 export const revalidate = 300;
 
 async function getHomePosts() {
   try {
-    const data = await fetchAPI(`
-      query HomePosts {
-        posts(first: 9, where: { orderby: { field: DATE, order: DESC } }) {
-          nodes {
-            title
-            slug
-            excerpt
-            date
-            featuredImage { node { sourceUrl } }
-            juegos { nodes { slug name } }
-            categories { nodes { slug name } }
-          }
-        }
-      }
-    `);
+    const posts = await getAllPosts();
 
-    const nodes = data?.posts?.nodes || [];
-
-    if (nodes.length === 0) {
-      console.log('No posts from WordPress, using mock data');
-      return mockPosts;
+    if (!posts || posts.length === 0) {
+      console.log('No posts from WordPress');
+      return [];
     }
 
-    return nodes.map((node: any) => {
-      const gameSlug = node.juegos?.nodes?.[0]?.slug || "gta-6";
-      const typeSlug = node.categories?.nodes?.find((c: any) => c.slug !== 'sin-categoria')?.slug || "noticias";
-
-      return {
-        title: node.title || "Sin título",
-        slug: node.slug,
-        description: (node.excerpt || "").replace(/<[^>]+>/g, "").trim(),
-        date: node.date,
-        cover: node.featuredImage?.node?.sourceUrl || "/images/default-cover.jpg",
-        game: gameSlug,
-        type: typeSlug,
-      };
-    });
+    // Tomar los últimos 9 posts
+    return posts.slice(0, 9);
   } catch (error) {
-    console.error('Error fetching WordPress posts, using mock data:', error);
-    return mockPosts;
+    console.error('Error fetching WordPress posts:', error);
+    return [];
   }
 }
 
@@ -67,6 +39,17 @@ export const metadata: Metadata = generateSEO({
 export default async function Page() {
   const posts = await getHomePosts();
   
+  if (!posts || posts.length === 0) {
+    return (
+      <main className="min-h-screen bg-gray-950 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold text-white mb-4">No hay posts disponibles</h1>
+          <p className="text-gray-400">Añade posts en WordPress para verlos aquí</p>
+        </div>
+      </main>
+    );
+  }
+
   const featured = posts.slice(0, 3);
   const latest = posts.slice(3, 9);
 
@@ -89,7 +72,7 @@ export default async function Page() {
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-linear-to-b from-transparent via-gray-950/60 to-gray-950" />
           <Image
-            src={main?.cover || "/images/hero-fallback.jpg"}
+            src={main?.featuredImage?.node?.sourceUrl || "/images/hero-fallback.jpg"}
             alt="Hero background"
             fill
             priority
@@ -115,7 +98,7 @@ export default async function Page() {
               <div className="grid gap-0 lg:grid-cols-2">
                 <div className="relative aspect-video lg:aspect-auto">
                   <Image
-                    src={main.cover}
+                    src={main.featuredImage?.node?.sourceUrl || "/images/hero-fallback.jpg"}
                     alt={main.title}
                     fill
                     priority
@@ -130,9 +113,11 @@ export default async function Page() {
                   <h2 className="mb-4 text-3xl font-bold leading-tight text-white sm:text-4xl">
                     {main.title}
                   </h2>
-                  <p className="mb-6 text-gray-300 line-clamp-3">{main.description}</p>
+                  <p className="mb-6 text-gray-300 line-clamp-3">
+                    {main.excerpt.replace(/<[^>]+>/g, "").trim()}
+                  </p>
                   <a
-                    href={`/juegos/${main.game}/${main.type}/${main.slug}`}
+                    href={`/noticias/${main.slug}`}
                     className="inline-flex w-fit items-center gap-2 rounded-lg bg-[#00FF41] px-6 py-3 font-semibold text-black transition-colors hover:bg-[#00FF41]/90"
                   >
                     Leer más
