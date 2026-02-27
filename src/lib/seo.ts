@@ -88,8 +88,10 @@ export function generateSEO({
   }
 
   // Open Graph adicional para artículos
-  if (type === 'article' && metadata.openGraph && typeof metadata.openGraph === 'object') {
-    metadata.openGraph.article = {
+  if (type === 'article') {
+    metadata.openGraph = {
+      ...metadata.openGraph,
+      type: 'article',
       publishedTime,
       modifiedTime,
       authors: author ? [author] : undefined,
