@@ -1,3 +1,4 @@
+// app/layout.tsx
 import type { Metadata } from "next";
 import "./globals.css";
 
@@ -21,6 +22,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es" className="dark" suppressHydrationWarning>
+      <head>
+        {/* RSS Autodiscovery */}
+        <link 
+          rel="alternate" 
+          type="application/rss+xml" 
+          title="GTAVerso RSS Feed" 
+          href="https://www.gtaverso.com/feed.xml" 
+        />
+      </head>
       <body className="min-h-screen bg-gray-950 text-white antialiased">
         <Header />
         <main>{children}</main>

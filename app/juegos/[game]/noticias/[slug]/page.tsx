@@ -3,8 +3,10 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import { fetchAPI } from '@/lib/api'
+import { generateSEO, generateArticleSchema, generateBreadcrumbSchema } from '@/lib/seo'
 import Breadcrumbs from '@/components/Breadcrumbs'
 import RelatedPosts from '@/components/RelatedPosts'
+import ShareButtons from '@/components/ShareButtons'
 
 // ─── Configuración ISR ────────────────────────────────────────────────
 export const revalidate = 600;
@@ -43,6 +45,7 @@ type SingleNoticia = {
   modified: string
   featuredImage?: { node?: { sourceUrl?: string; altText?: string } }
   author?: { node?: { name?: string } }
+  tags?: { nodes?: Array<{ name?: string }> }
 }
 
 type RelatedPost = {
@@ -72,6 +75,11 @@ const GAME_LABELS: Record<string, string> = {
   'gta-3': 'GTA 3',
 }
 
+// ─── Función auxiliar ─────────────────────────────────────────────────
+function stripHtml(html?: string) {
+  return (html || '').replace(/<[^>]+>/g, '').trim()
+}
+
 // ─── Query post individual ────────────────────────────────────────────
 async function getNoticiaBySlug(slug: string): Promise<SingleNoticia | null> {
   const data = await fetchAPI(
@@ -85,6 +93,7 @@ async function getNoticiaBySlug(slug: string): Promise<SingleNoticia | null> {
         modified
         featuredImage { node { sourceUrl altText } }
         author { node { name } }
+        tags { nodes { name } }
       }
     }
   `,
@@ -119,37 +128,34 @@ async function getRelatedPosts(gameSlug: string, currentSlug: string): Promise<R
   return allPosts.filter(post => post.slug !== currentSlug).slice(0, 3)
 }
 
-// ─── Metadata dinámica ────────────────────────────────────────────────
+// ─── Metadata dinámica mejorada ───────────────────────────────────────
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { game, slug } = await params
   const noticia = await getNoticiaBySlug(slug)
 
-  if (!noticia) return {}
-
-  const plainExcerpt = noticia.excerpt?.replace(/<[^>]+>/g, '').trim() || ''
-  const imageUrl = noticia.featuredImage?.node?.sourceUrl || ''
-  const canonical = `https://www.gtaverso.com/juegos/${game}/noticias/${slug}`
-
-  return {
-    title: `${noticia.title} · GTAVerso`,
-    description: plainExcerpt,
-    alternates: { canonical },
-    openGraph: {
-      title: noticia.title,
-      description: plainExcerpt,
-      url: canonical,
-      type: 'article',
-      publishedTime: noticia.date,
-      modifiedTime: noticia.modified,
-      images: imageUrl ? [{ url: imageUrl }] : [],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: noticia.title,
-      description: plainExcerpt,
-      images: imageUrl ? [imageUrl] : [],
-    },
+  if (!noticia) {
+    return generateSEO({ 
+      title: 'Noticia no encontrada', 
+      noindex: true 
+    })
   }
+
+  const plainExcerpt = stripHtml(noticia.excerpt).slice(0, 155)
+  const imageUrl = noticia.featuredImage?.node?.sourceUrl || '/og-default.webp'
+  const postUrl = `/juegos/${game}/noticias/${slug}`
+  const tags = noticia.tags?.nodes?.map(t => t.name || '') || []
+
+  return generateSEO({
+    title: noticia.title,
+    description: plainExcerpt,
+    image: imageUrl,
+    url: postUrl,
+    type: 'article',
+    publishedTime: noticia.date,
+    modifiedTime: noticia.modified,
+    author: noticia.author?.node?.name || 'Equipo GTAVerso',
+    tags,
+  })
 }
 
 // ─── Componente principal ─────────────────────────────────────────────
@@ -174,20 +180,40 @@ export default async function NoticiaDetailPage({ params }: PageProps) {
     year: 'numeric',
   })
 
-  // Structured data para el artículo
-  const articleJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'NewsArticle',
-    headline: noticia.title,
-    image: imageUrl ? [imageUrl] : [],
-    datePublished: noticia.date,
-    dateModified: noticia.modified,
-    author: [{ '@type': 'Person', name: noticia.author?.node?.name || 'Redacción GTAVerso' }]
-  }
+  // URL completa para compartir
+  const fullUrl = `https://www.gtaverso.com/juegos/${game}/noticias/${slug}`
+
+  // Structured Data mejorados
+  const articleSchema = generateArticleSchema({
+    title: noticia.title,
+    description: stripHtml(noticia.excerpt).slice(0, 155),
+    image: imageUrl || '/og-default.webp',
+    url: fullUrl,
+    publishedTime: noticia.date,
+    modifiedTime: noticia.modified,
+    author: noticia.author?.node?.name || 'Equipo GTAVerso',
+  })
+
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: 'Inicio', url: 'https://www.gtaverso.com' },
+    { name: gameName, url: `https://www.gtaverso.com/juegos/${game}` },
+    { name: 'Noticias', url: `https://www.gtaverso.com/juegos/${game}/noticias` },
+    { name: noticia.title, url: fullUrl },
+  ])
 
   return (
     <main className="mx-auto w-full max-w-4xl px-4 py-12 lg:py-24 min-h-screen bg-[#050508] text-white">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
+      {/* Structured Data - NewsArticle */}
+      <script 
+        type="application/ld+json" 
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} 
+      />
+      
+      {/* Structured Data - Breadcrumbs */}
+      <script 
+        type="application/ld+json" 
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} 
+      />
 
       {/* Breadcrumbs */}
       <Breadcrumbs
@@ -242,6 +268,13 @@ export default async function NoticiaDetailPage({ params }: PageProps) {
           prose-strong:text-white
           prose-ul:text-gray-300 prose-li:marker:text-[#00FF41]"
           dangerouslySetInnerHTML={{ __html: noticia.content }}
+        />
+
+        {/* Botones de compartir */}
+        <ShareButtons
+          url={fullUrl}
+          title={noticia.title}
+          description={stripHtml(noticia.excerpt)}
         />
       </article>
 

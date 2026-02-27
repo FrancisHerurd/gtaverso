@@ -17,6 +17,30 @@ const XIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+// Icono TikTok personalizado
+const TikTokIcon = ({ className }: { className?: string }) => (
+  <svg
+    viewBox="0 0 24 24"
+    aria-hidden="true"
+    className={className}
+    fill="currentColor"
+  >
+    <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1-.1z" />
+  </svg>
+);
+
+// Icono RSS personalizado
+const RSSIcon = ({ className }: { className?: string }) => (
+  <svg
+    viewBox="0 0 24 24"
+    aria-hidden="true"
+    className={className}
+    fill="currentColor"
+  >
+    <path d="M6.503 20.752c0 1.794-1.456 3.248-3.251 3.248-1.796 0-3.252-1.454-3.252-3.248 0-1.794 1.456-3.248 3.252-3.248 1.795.001 3.251 1.454 3.251 3.248zm-6.503-12.572v4.811c6.05.062 10.96 4.966 11.022 11.009h4.817c-.062-8.71-7.118-15.758-15.839-15.82zm0-3.368c10.58.046 19.152 8.594 19.183 19.188h4.817c-.03-13.231-10.755-23.954-24-24v4.812z" />
+  </svg>
+);
+
 export default function Footer() {
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -105,7 +129,6 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                {/* FIX: Se añade /juegos/ a la ruta */}
                 <Link
                   href="/juegos/gta-6"
                   className="text-gray-400 transition-colors hover:text-[#00FF41]"
@@ -114,7 +137,6 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                {/* FIX: Se añade /juegos/ a la ruta */}
                 <Link
                   href="/juegos/gta-5"
                   className="text-gray-400 transition-colors hover:text-[#00FF41]"
@@ -123,7 +145,6 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                {/* FIX: Se añade /juegos/ a la ruta */}
                 <Link
                   href="/juegos/gta-4"
                   className="text-gray-400 transition-colors hover:text-[#00FF41]"
@@ -132,7 +153,6 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                {/* FIX: Se añade /juegos/ a la ruta */}
                 <Link
                   href="/juegos/gta-san-andreas"
                   className="text-gray-400 transition-colors hover:text-[#00FF41]"
@@ -141,7 +161,6 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                {/* FIX: Se añade /juegos/ a la ruta */}
                 <Link
                   href="/juegos/gta-vice-city"
                   className="text-gray-400 transition-colors hover:text-[#00FF41]"
@@ -150,7 +169,6 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                {/* FIX: Se añade /juegos/ a la ruta */}
                 <Link
                   href="/juegos/gta-3"
                   className="text-gray-400 transition-colors hover:text-[#00FF41]"
@@ -218,7 +236,7 @@ export default function Footer() {
             <div className="flex gap-3">
               {/* X (Twitter) */}
               <a
-                href="https://x.com/GTA_Verso"
+                href="https://twitter.com/GTA_Verso"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-900 text-gray-400 transition-colors hover:bg-[#00FF41]/10 hover:text-[#00FF41]"
@@ -229,13 +247,35 @@ export default function Footer() {
 
               {/* Instagram */}
               <a
-                href="https://instagram.com/gta_verso"
+                href="https://instagram.com/GTA_Verso"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-900 text-gray-400 transition-colors hover:bg-[#00FF41]/10 hover:text-[#00FF41]"
                 aria-label="Instagram"
               >
                 <Instagram className="h-5 w-5" />
+              </a>
+
+              {/* TikTok */}
+              <a
+                href="https://tiktok.com/@gta.verso"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-900 text-gray-400 transition-colors hover:bg-[#00FF41]/10 hover:text-[#00FF41]"
+                aria-label="TikTok"
+              >
+                <TikTokIcon className="h-5 w-5" />
+              </a>
+
+              {/* RSS Feed */}
+              <a
+                href="/feed.xml"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-900 text-gray-400 transition-colors hover:bg-[#00FF41]/10 hover:text-[#00FF41]"
+                aria-label="RSS Feed"
+              >
+                <RSSIcon className="h-5 w-5" />
               </a>
 
               {/* Email */}

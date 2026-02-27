@@ -1,151 +1,125 @@
 // app/sitemap.ts
-import { MetadataRoute } from 'next';
-import { fetchAPI } from '@/lib/api';
+import { MetadataRoute } from 'next'
+import { fetchAPI } from '@/lib/api'
 
-export const revalidate = 3600;
+type PostNode = {
+  slug: string
+  modified: string
+  juegos?: { nodes?: Array<{ slug?: string }> }
+}
+
+const GAMES = ['gta-6', 'gta-5', 'gta-4', 'gta-san-andreas', 'gta-vice-city', 'gta-3']
+
+async function getAllPosts(): Promise<PostNode[]> {
+  const data = await fetchAPI(`
+    query AllPostsForSitemap {
+      posts(first: 1000, where: { orderby: { field: DATE, order: DESC } }) {
+        nodes {
+          slug
+          modified
+          juegos { nodes { slug } }
+        }
+      }
+    }
+  `)
+  return (data?.posts?.nodes ?? []) as PostNode[]
+}
+
+export const revalidate = 3600 // Revalidar cada hora
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.gtaverso.com';
+  const baseUrl = 'https://www.gtaverso.com'
+  const posts = await getAllPosts()
+  const now = new Date().toISOString()
 
-  const staticRoutes: MetadataRoute.Sitemap = [
+  // Páginas estáticas
+  const staticPages: MetadataRoute.Sitemap = [
     {
-      url: `${baseUrl}`,
-      lastModified: new Date(),
+      url: baseUrl,
+      lastModified: now,
       changeFrequency: 'daily',
       priority: 1,
     },
     {
       url: `${baseUrl}/noticias`,
-      lastModified: new Date(),
+      lastModified: now,
       changeFrequency: 'daily',
       priority: 0.9,
     },
     {
-      url: `${baseUrl}/juegos/gta-6`,
-      lastModified: new Date(),
+      url: `${baseUrl}/buscar`,
+      lastModified: now,
       changeFrequency: 'weekly',
-      priority: 0.9,
+      priority: 0.5,
     },
-    {
-      url: `${baseUrl}/juegos/gta-5`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/juegos/gta-4`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/juegos/gta-san-andreas`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/juegos/gta-vice-city`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/juegos/gta-3`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/juegos/gta-6/noticias`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/juegos/gta-5/noticias`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/juegos/gta-4/noticias`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
+  ]
+
+  // Páginas de juegos (hubs)
+  const gamePages: MetadataRoute.Sitemap = GAMES.map(game => ({
+    url: `${baseUrl}/juegos/${game}`,
+    lastModified: now,
+    changeFrequency: 'weekly' as const,
+    priority: 0.8,
+  }))
+
+  // Páginas de noticias por juego
+  const gameNewsPages: MetadataRoute.Sitemap = GAMES.map(game => ({
+    url: `${baseUrl}/juegos/${game}/noticias`,
+    lastModified: now,
+    changeFrequency: 'daily' as const,
+    priority: 0.7,
+  }))
+
+  // Posts individuales
+  const postPages: MetadataRoute.Sitemap = posts.map(post => {
+    const gameSlug = post.juegos?.nodes?.[0]?.slug || 'gta-6'
+    return {
+      url: `${baseUrl}/juegos/${gameSlug}/noticias/${post.slug}`,
+      lastModified: post.modified,
+      changeFrequency: 'weekly' as const,
       priority: 0.6,
-    },
+    }
+  })
+
+  // Páginas legales
+  const legalPages: MetadataRoute.Sitemap = [
     {
       url: `${baseUrl}/aviso-legal`,
-      lastModified: new Date(),
-      changeFrequency: 'yearly',
+      lastModified: now,
+      changeFrequency: 'yearly' as const,
       priority: 0.3,
     },
     {
       url: `${baseUrl}/politica-de-privacidad`,
-      lastModified: new Date(),
-      changeFrequency: 'yearly',
+      lastModified: now,
+      changeFrequency: 'yearly' as const,
       priority: 0.3,
     },
     {
       url: `${baseUrl}/politica-de-cookies`,
-      lastModified: new Date(),
-      changeFrequency: 'yearly',
+      lastModified: now,
+      changeFrequency: 'yearly' as const,
       priority: 0.3,
     },
     {
       url: `${baseUrl}/terminos-de-uso`,
-      lastModified: new Date(),
-      changeFrequency: 'yearly',
+      lastModified: now,
+      changeFrequency: 'yearly' as const,
       priority: 0.3,
     },
     {
       url: `${baseUrl}/contacto`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.5,
+      lastModified: now,
+      changeFrequency: 'monthly' as const,
+      priority: 0.4,
     },
-  ];
+  ]
 
-  let dynamicRoutes: MetadataRoute.Sitemap = [];
-
-  try {
-    const data = await fetchAPI(`
-      query AllPostsForSitemap {
-        posts(first: 1000, where: { orderby: { field: DATE, order: DESC } }) {
-          nodes {
-            slug
-            modified
-            juegos {
-              nodes {
-                slug
-              }
-            }
-            categories {
-              nodes {
-                slug
-              }
-            }
-          }
-        }
-      }
-    `);
-
-    const posts = data?.posts?.nodes || [];
-
-    dynamicRoutes = posts.map((post: any) => {
-      const gameSlug = post.juegos?.nodes?.[0]?.slug || 'gta-6';
-      const typeSlug = post.categories?.nodes?.find((c: any) => c.slug !== 'sin-categoria')?.slug || 'noticias';
-
-      return {
-        url: `${baseUrl}/juegos/${gameSlug}/${typeSlug}/${post.slug}`,
-        lastModified: post.modified ? new Date(post.modified) : new Date(),
-        changeFrequency: 'weekly' as const,
-        priority: 0.6,
-      };
-    });
-  } catch (error) {
-    console.error('❌ Error generando sitemap dinámico desde WordPress:', error);
-  }
-
-  return [...staticRoutes, ...dynamicRoutes];
+  return [
+    ...staticPages,
+    ...gamePages,
+    ...gameNewsPages,
+    ...postPages,
+    ...legalPages,
+  ]
 }

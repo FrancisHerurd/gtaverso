@@ -18,7 +18,7 @@ export default function SEO({
   title,
   description,
   type = 'website',
-  image = '/images/og-default.jpg', // Tu imagen por defecto
+  image = '/images/og-default.webp', // Tu imagen por defecto
   url,
   publishedTime,
   modifiedTime,
