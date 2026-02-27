@@ -87,7 +87,7 @@ export default async function Page() {
       {/* Hero Section */}
       <section className="relative flex min-h-125 flex-col justify-center overflow-hidden border-b border-white/8 bg-gray-950 sm:min-h-150">
         <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-gray-950/60 to-gray-950" />
+          <div className="absolute inset-0 bg-linear-to-b from-transparent via-gray-950/60 to-gray-950" />
           <Image
             src={main?.cover || "/images/hero-fallback.jpg"}
             alt="Hero background"

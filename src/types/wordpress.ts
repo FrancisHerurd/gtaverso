@@ -1,70 +1,139 @@
 // src/types/wordpress.ts
 
 /**
- * Taxonomía personalizada "Juegos" desde ACF
+ * Taxonomía "Juegos" desde ACF/WordPress
  */
-export interface JuegoTaxonomy {
-  name: string;        // Ej: "GTA V"
-  slug: string;        // Ej: "gta-v"
-  databaseId: number;  // ID de WordPress
+export interface WPJuego {
+  name: string;
+  slug: string;
+  databaseId: number;
+  count?: number;
+}
+
+/**
+ * Taxonomía "Tipos" (noticias, guías, trucos, etc.)
+ */
+export interface WPTipo {
+  name: string;
+  slug: string;
 }
 
 /**
  * Metadatos SEO de Yoast
  */
-export interface YoastSEO {
-  title: string;                    // Meta title
-  metaDesc: string;                 // Meta description
-  canonical?: string;               // URL canónica
-  opengraphTitle?: string;          // OG title
-  opengraphDescription?: string;    // OG description
+export interface WPYoastSEO {
+  title: string;
+  metaDesc: string;
+  canonical?: string;
+  opengraphTitle?: string;
+  opengraphDescription?: string;
   opengraphImage?: {
     sourceUrl: string;
     altText?: string;
   };
   twitterTitle?: string;
   twitterDescription?: string;
-  fullHead?: string;                // HTML completo pre-renderizado
+  fullHead?: string; // HTML completo pre-renderizado con JSON-LD
 }
 
 /**
- * Post de WordPress con taxonomías y SEO
+ * Imagen destacada de WordPress
  */
-export interface WordPressPost {
-  id: string;
-  databaseId: number;
+export interface WPFeaturedImage {
+  node: {
+    sourceUrl: string;
+    altText?: string;
+    mediaDetails?: {
+      width: number;
+      height: number;
+    };
+  };
+}
+
+/**
+ * Autor de WordPress
+ */
+export interface WPAuthor {
+  node: {
+    name: string;
+    slug: string;
+    avatar?: {
+      url: string;
+    };
+  };
+}
+
+/**
+ * Post básico de WordPress (lista)
+ */
+export interface WPPost {
   title: string;
   slug: string;
   excerpt: string;
-  content: string;
   date: string;
-  featuredImage?: {
-    node: {
-      sourceUrl: string;
-      altText: string;
-      mediaDetails?: {
-        width: number;
-        height: number;
-      };
-    };
-  };
+  modified?: string;
+  databaseId?: number;
   
-  // Taxonomía Juegos
-  juegos?: {
-    nodes: JuegoTaxonomy[];
-  };
+  // Imagen destacada
+  featuredImage?: WPFeaturedImage;
+  
+  // Taxonomías
+  juegos?: { nodes: WPJuego[] };
+  tipos?: { nodes: WPTipo[] };
   
   // SEO de Yoast
-  seo?: YoastSEO;
+  seo?: WPYoastSEO;
+  
+  // Autor
+  author?: WPAuthor;
+  
+  // Alias para compatibilidad con código legacy
+  description?: string; // = excerpt
+  cover?: string; // = featuredImage.node.sourceUrl
+  game?: string; // = juegos.nodes[0].slug
+  type?: string; // = tipos.nodes[0].slug
 }
 
 /**
- * Respuesta paginada de posts
+ * Post completo con contenido HTML
  */
-export interface PostsConnection {
-  nodes: WordPressPost[];
-  pageInfo: {
-    hasNextPage: boolean;
-    endCursor: string | null;
+export interface WPPostDetail extends WPPost {
+  content: string;
+}
+
+/**
+ * Respuesta paginada de WordPress
+ */
+export interface WPPostsResponse {
+  posts: {
+    nodes: WPPost[];
+    pageInfo?: {
+      hasNextPage: boolean;
+      endCursor: string | null;
+    };
   };
+}
+
+/**
+ * Respuesta de taxonomía Juegos
+ */
+export interface WPJuegosResponse {
+  juegos: {
+    nodes: Array<{
+      name: string;
+      slug: string;
+      databaseId: number;
+      count?: number;
+      posts?: {
+        nodes: WPPost[];
+      };
+    }>;
+  };
+}
+
+/**
+ * Respuesta de post individual
+ */
+export interface WPPostResponse {
+  post: WPPostDetail;
 }

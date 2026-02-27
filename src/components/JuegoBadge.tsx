@@ -1,12 +1,12 @@
 // src/components/JuegoBadge.tsx
 
 import Link from 'next/link';
-import { JuegoTaxonomy } from '@/types/wordpress';
+import { WPJuego } from '@/types/wordpress'; // ← CAMBIO: WPJuego en vez de JuegoTaxonomy
 
 interface Props {
-  juegos: JuegoTaxonomy[];
+  juegos: WPJuego[]; // ← CAMBIO
   className?: string;
-  showLink?: boolean; // Por si quieres badges sin enlace
+  showLink?: boolean;
 }
 
 /**
@@ -20,7 +20,7 @@ export default function JuegoBadge({
 }: Props) {
   if (!juegos || juegos.length === 0) return null;
 
-  // Mapeo de colores por slug para visual consistency
+  // Mapeo de colores por slug
   const getColorClass = (slug: string) => {
     const colorMap: Record<string, string> = {
       'gta-6': 'from-purple-500 to-pink-600',
@@ -42,7 +42,7 @@ export default function JuegoBadge({
           <span
             className={`
               px-3 py-1 
-              bg-gradient-to-r ${getColorClass(juego.slug)}
+              bg-linear-to-r ${getColorClass(juego.slug)}
               text-white text-xs md:text-sm font-semibold 
               rounded-full 
               inline-block

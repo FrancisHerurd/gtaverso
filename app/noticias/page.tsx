@@ -1,48 +1,11 @@
 // app/noticias/page.tsx
-import type { Metadata } from 'next'
-import { fetchAPI } from '@/lib/api'
-import NoticiasClient from './NoticiasClient'
+
+import type { Metadata } from 'next';
+import { getAllPosts } from '@/lib/wp';
+import type { WPPost } from '@/types/wordpress';
+import NoticiasClient from './NoticiasClient';
 
 export const revalidate = 300;
-
-type PostNode = {
-  title?: string
-  slug?: string
-  excerpt?: string
-  date?: string
-  featuredImage?: { node?: { sourceUrl?: string; altText?: string } }
-  juegos?: { nodes?: Array<{ slug?: string; name?: string }> }
-}
-
-type PageInfo = {
-  hasNextPage: boolean
-  endCursor: string | null
-}
-
-async function getAllNews(): Promise<{ posts: PostNode[]; pageInfo: PageInfo }> {
-  const data = await fetchAPI(`
-    query TodasLasNoticias {
-      posts(first: 12, where: { orderby: { field: DATE, order: DESC } }) {
-        nodes {
-          title
-          slug
-          excerpt
-          date
-          featuredImage { node { sourceUrl altText } }
-          juegos { nodes { slug name } }
-        }
-        pageInfo {
-          hasNextPage
-          endCursor
-        }
-      }
-    }
-  `)
-  return {
-    posts: (data?.posts?.nodes ?? []) as PostNode[],
-    pageInfo: data?.posts?.pageInfo ?? { hasNextPage: false, endCursor: null }
-  }
-}
 
 export const metadata: Metadata = {
   title: 'Todas las Noticias de GTA · GTAVerso',
@@ -54,9 +17,24 @@ export const metadata: Metadata = {
     url: 'https://www.gtaverso.com/noticias',
     type: 'website',
   },
-}
+};
 
 export default async function GlobalNoticiasPage() {
-  const { posts, pageInfo } = await getAllNews()
-  return <NoticiasClient initialPosts={posts} initialPageInfo={pageInfo} />
+  // Usa la función getAllPosts de wp.ts
+  const posts = await getAllPosts();
+
+  // Filtrar solo posts de tipo "noticias" (si usas taxonomía Tipos)
+  const noticias = posts.filter(
+    (post) => post.tipos?.nodes?.some((tipo) => tipo.slug === 'noticias')
+  );
+
+  // Si no usas taxonomía Tipos, usa todos los posts
+  const finalPosts = noticias.length > 0 ? noticias : posts;
+
+  return (
+    <NoticiasClient 
+      initialPosts={finalPosts} 
+      initialPageInfo={{ hasNextPage: false, endCursor: null }} 
+    />
+  );
 }
