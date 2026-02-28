@@ -31,13 +31,12 @@ const GAME_LABELS: Record<string, string> = {
 };
 
 export default function PostCard({ post, priority = false }: PostCardProps) {
-  // Obtener slug del juego desde la taxonomía
+  // Obtener slug del juego y tipo desde la taxonomía
   const gameSlug = post.juegos?.nodes?.[0]?.slug || post.game || "gta-6";
   const gameName = post.juegos?.nodes?.[0]?.name || GAME_LABELS[gameSlug] || "GTA";
   
-  // Obtener tipo desde la taxonomía
   const typeSlug = post.tipos?.nodes?.[0]?.slug || post.type || "noticias";
-  const typeName = post.tipos?.nodes?.[0]?.name || (typeSlug === "guias" ? "Guía" : "Noticia");
+  const typeName = post.tipos?.nodes?.[0]?.name || "Noticia";
 
   const gameColor = GAME_COLORS[gameSlug] || "#00FF41";
 
@@ -47,17 +46,16 @@ export default function PostCard({ post, priority = false }: PostCardProps) {
     year: "numeric",
   });
 
-  // ✅ URL CORRECTA: Siempre a /noticias/[slug]
-  const postUrl = `/noticias/${post.slug}`;
+  // ✅ URL SILO: /juegos/[game]/[tipo]/[slug]
+  const postUrl = `/juegos/${gameSlug}/${typeSlug}/${post.slug}`;
 
-  // ✅ Extraer texto del excerpt/description de forma segura
+  // Extraer texto de forma segura
   const description = ((post.excerpt || post.description) ?? "")
     .replace(/<[^>]+>/g, "")
     .trim();
 
   return (
     <article className="group relative flex flex-col overflow-hidden rounded-2xl bg-white/3 border border-white/8 transition-all duration-300 hover:bg-white/5 hover:border-white/20 hover:shadow-2xl hover:shadow-black/20">
-      {/* Imagen destacada */}
       <Link href={postUrl} className="relative aspect-video w-full overflow-hidden">
         <Image
           src={post.featuredImage?.node?.sourceUrl || post.cover || "/images/default-cover.jpg"}
@@ -68,7 +66,6 @@ export default function PostCard({ post, priority = false }: PostCardProps) {
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
         
-        {/* Badge del juego */}
         <div className="absolute top-4 left-4">
           <span
             className="inline-block rounded-md px-3 py-1 text-xs font-bold uppercase tracking-wider text-black shadow-lg"
@@ -78,7 +75,6 @@ export default function PostCard({ post, priority = false }: PostCardProps) {
           </span>
         </div>
 
-        {/* Badge del tipo (Noticia/Guía) */}
         <div className="absolute top-4 right-4">
           <span className="inline-block rounded-md bg-black/60 backdrop-blur-sm px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white">
             {typeName}
@@ -86,7 +82,6 @@ export default function PostCard({ post, priority = false }: PostCardProps) {
         </div>
       </Link>
 
-      {/* Contenido */}
       <div className="flex flex-1 flex-col p-5 sm:p-6">
         <Link href={postUrl}>
           <h3 className="mb-3 text-xl font-bold leading-tight text-white transition-colors group-hover:text-gray-200 sm:text-2xl">

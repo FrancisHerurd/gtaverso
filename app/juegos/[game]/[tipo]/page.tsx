@@ -1,58 +1,91 @@
-// app/juegos/[game]/noticias/page.tsx
+// app/juegos/[game]/[tipo]/page.tsx
 
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { getPostsByGameAndType, getAllJuegos } from '@/lib/wp';
-import type { WPPost } from '@/types/wordpress';
-import JuegoBadge from '@/components/JuegoBadge';
+import { getPostsByGameAndType, getAllJuegos } from '@/lib/api';
+import Breadcrumbs from '@/components/Breadcrumbs';
 
 export const revalidate = 60;
 
 interface Props {
-  params: Promise<{ game: string }>;
+  params: Promise<{ game: string; tipo: string }>;
 }
 
-const TITLES: Record<string, { label: string; color: string }> = {
-  'gta-6': { label: 'GTA 6', color: '#FF00FF' },
-  'gta-5': { label: 'GTA 5', color: '#569446' },
-  'gta-4': { label: 'GTA 4', color: '#FBBF24' },
-  'san-andreas': { label: 'GTA San Andreas', color: '#FFA500' },
-  'vice-city': { label: 'GTA Vice City', color: '#00E5FF' },
-  'gta-3': { label: 'GTA 3', color: '#E5E7EB' },
+const GAME_LABELS: Record<string, string> = {
+  'gta-6': 'GTA 6',
+  'gta-5': 'GTA 5',
+  'gta-4': 'GTA 4',
+  'gta-san-andreas': 'GTA San Andreas',
+  'vice-city': 'GTA Vice City',
+  'gta-3': 'GTA 3',
+};
+
+const TIPO_LABELS: Record<string, string> = {
+  'noticias': 'Noticias',
+  'guias': 'Guías',
+  'trucos': 'Trucos',
 };
 
 // Generar rutas estáticas
 export async function generateStaticParams() {
   const juegos = await getAllJuegos();
-  return juegos.map((juego) => ({
-    game: juego.slug,
-  }));
+  const tipos = ['noticias', 'guias', 'trucos'];
+  
+  const params = [];
+  for (const juego of juegos) {
+    for (const tipo of tipos) {
+      params.push({
+        game: juego.slug,
+        tipo: tipo,
+      });
+    }
+  }
+  
+  return params;
 }
 
 // Metadata dinámica
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { game } = await params;
-  const meta = TITLES[game] ?? { label: game.toUpperCase(), color: '#00FF41' };
+  const { game, tipo } = await params;
+  const gameLabel = GAME_LABELS[game] || game.toUpperCase();
+  const tipoLabel = TIPO_LABELS[tipo] || tipo;
   
   return {
-    title: `Noticias de ${meta.label} | GTAVerso`,
-    description: `Últimas noticias y novedades de ${meta.label}.`,
-    alternates: { canonical: `https://www.gtaverso.com/juegos/${game}/noticias` },
+    title: `${tipoLabel} de ${gameLabel} | GTAVerso`,
+    description: `Todas las ${tipoLabel.toLowerCase()} de ${gameLabel}.`,
+    alternates: { canonical: `https://www.gtaverso.com/juegos/${game}/${tipo}` },
+    openGraph: {
+      title: `${tipoLabel} de ${gameLabel} | GTAVerso`,
+      description: `Todas las ${tipoLabel.toLowerCase()} de ${gameLabel}.`,
+      url: `https://www.gtaverso.com/juegos/${game}/${tipo}`,
+      type: 'website',
+    },
   };
 }
 
-export default async function GameNewsPage({ params }: Props) {
-  const { game } = await params;
-  const posts = await getPostsByGameAndType(game, 'noticias');
-  const meta = TITLES[game] ?? { label: game.toUpperCase().replace('-', ' '), color: '#00FF41' };
+export default async function GameTipoPage({ params }: Props) {
+  const { game, tipo } = await params;
+  const posts = await getPostsByGameAndType(game, tipo);
+  const gameLabel = GAME_LABELS[game] || game.toUpperCase();
+  const tipoLabel = TIPO_LABELS[tipo] || tipo;
+
+  // Breadcrumbs
+  const breadcrumbs = [
+    { label: 'Inicio', href: '/' },
+    { label: 'Juegos', href: '/juegos' },
+    { label: gameLabel, href: `/juegos/${game}` },
+    { label: tipoLabel, href: `/juegos/${game}/${tipo}` },
+  ];
 
   if (!posts || posts.length === 0) {
     return (
       <div className="min-h-screen bg-[#050508] pt-24 pb-20">
         <div className="mx-auto max-w-7xl px-4">
-          <h1 className="text-4xl font-bold text-white mb-4">
-            No hay noticias disponibles
+          <Breadcrumbs items={breadcrumbs} />
+          
+          <h1 className="text-4xl font-bold text-white mb-4 mt-6">
+            No hay {tipoLabel.toLowerCase()} disponibles para {gameLabel}
           </h1>
           <Link href={`/juegos/${game}`} className="text-orange-500 hover:underline">
             ← Volver al hub del juego
@@ -65,8 +98,9 @@ export default async function GameNewsPage({ params }: Props) {
   return (
     <div className="min-h-screen bg-[#050508] pt-24 pb-20">
       <div className="mx-auto max-w-7xl px-4">
-        {/* Header */}
-        <div className="mb-8">
+        <Breadcrumbs items={breadcrumbs} />
+        
+        <div className="mb-8 mt-6">
           <Link 
             href={`/juegos/${game}`}
             className="text-orange-500 hover:underline mb-4 inline-block"
@@ -74,20 +108,18 @@ export default async function GameNewsPage({ params }: Props) {
             ← Volver
           </Link>
           <h1 className="text-4xl font-bold text-white">
-            Noticias de {meta.label}
+            {tipoLabel} de {gameLabel}
           </h1>
         </div>
 
-        {/* Grid de noticias */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {posts.map((post: WPPost) => (
+          {posts.map((post: any) => (
             <Link
               key={post.slug}
-              href={`/noticias/${post.slug}`}
+              href={`/juegos/${game}/${tipo}/${post.slug}`}
               className="group"
             >
               <article className="bg-[#0a0b14] rounded-lg overflow-hidden border border-white/10 hover:border-orange-500/50 transition-all h-full flex flex-col">
-                {/* Imagen */}
                 {post.featuredImage && (
                   <div className="relative aspect-video overflow-hidden">
                     <Image
@@ -100,7 +132,6 @@ export default async function GameNewsPage({ params }: Props) {
                   </div>
                 )}
 
-                {/* Contenido */}
                 <div className="p-5 flex-1 flex flex-col">
                   <time className="text-xs text-gray-500 block mb-2">
                     {new Date(post.date).toLocaleDateString('es-ES', {
