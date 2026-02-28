@@ -6,7 +6,8 @@ if (!WORDPRESS_API_URL) {
   throw new Error('NEXT_PUBLIC_WORDPRESS_API_URL no está definida');
 }
 
-async function fetchAPI(query: string, variables = {}) {
+// ✅ DESPUÉS:
+export async function fetchAPI(query: string, variables = {}) {
   if (!query || query.trim() === '') {
     console.error('❌ Query GraphQL vacía');
     return null;
