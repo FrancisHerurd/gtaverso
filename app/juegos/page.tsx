@@ -17,7 +17,7 @@ const games = [
     title: "Grand Theft Auto VI",
     slug: "gta-6",
     year: "2025",
-    image: "/images/gta6-hero.jpg", // Asegúrate de que esta imagen exista
+    image: "/images/gta6-hero.webp", // Asegúrate de que esta imagen exista
     description: "El regreso a Leonida y Vice City con Lucía y Jason. El juego más esperado de la década.",
     hoverColor: "hover:border-[#FF00FF] hover:shadow-[0_0_20px_rgba(255,0,255,0.15)]",
     textColor: "group-hover:text-[#FF00FF]",
@@ -26,7 +26,7 @@ const games = [
     title: "Grand Theft Auto V",
     slug: "gta-5",
     year: "2013",
-    image: "/images/default-cover.jpg", // Cambia a tu imagen de gta 5
+    image: "/images/gta5-hero.webp", // Cambia a tu imagen de gta 5
     description: "Tres criminales muy diferentes lo arriesgan todo en una serie de atrevidos y peligrosos atracos en Los Santos.",
     hoverColor: "hover:border-[#00FF41] hover:shadow-[0_0_20px_rgba(0,255,65,0.15)]",
     textColor: "group-hover:text-[#00FF41]",
@@ -53,7 +53,7 @@ const games = [
     title: "GTA: Vice City",
     slug: "gta-vice-city",
     year: "2002",
-    image: "/images/vice-city-hero.webp",
+    image: "/images/vc-hero.webp",
     description: "Traición, venganza y luces de neón. El ascenso de Tommy Vercetti en los gloriosos años 80.",
     hoverColor: "hover:border-[#00E5FF] hover:shadow-[0_0_20px_rgba(0,229,255,0.15)]",
     textColor: "group-hover:text-[#00E5FF]",

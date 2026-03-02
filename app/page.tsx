@@ -61,9 +61,23 @@ export default async function Page() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
       />
 
-      {/* Hero Section - Estilo Figma */}
-      <section className="relative flex min-h-[60vh] flex-col justify-center overflow-hidden border-b border-white/8 bg-linear-to-b from-gray-900 to-gray-950">
-        <div className="relative z-10 mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+      {/* Hero Section - Más compacto y preparado para imagen de fondo */}
+      <section className="relative flex items-center justify-center overflow-hidden border-b border-white/8 bg-gradient-to-b from-gray-900 to-gray-950 py-20 sm:py-24 lg:py-28">
+        {/* 
+          FUTURO: Agregar imagen de fondo aquí
+          <div className="absolute inset-0 z-0">
+            <Image 
+              src="/images/hero-bg.webp" 
+              alt="" 
+              fill 
+              className="object-cover opacity-30" 
+              priority 
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-gray-950" />
+          </div>
+        */}
+        
+        <div className="relative z-10 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col items-center text-center">
             <h1 className="mb-4 text-5xl font-black uppercase tracking-tight text-white sm:text-6xl lg:text-7xl">
               GTA<span className="text-[#00FF41]">Verso</span>

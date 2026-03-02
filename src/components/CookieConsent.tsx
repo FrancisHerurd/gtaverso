@@ -31,61 +31,79 @@ export default function CookieConsent() {
   return (
     <AnimatePresence>
       {showConsent && (
-        <motion.div
-          initial={{ y: 100, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: 100, opacity: 0 }}
-          transition={{ duration: 0.3 }}
-          className="fixed bottom-6 left-4 right-4 z-[100] md:bottom-8 md:left-8 md:right-8 max-w-2xl mx-auto"
-        >
-          <div className="bg-gray-900/95 border border-[var(--gta-green)]/30 rounded-2xl p-6 shadow-2xl shadow-[var(--gta-green)]/10 backdrop-blur-xl">
-            <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4">
-              {/* Icono + texto */}
-              <div className="flex items-start gap-3 flex-1 min-w-0">
-                <div className="bg-[var(--gta-green)]/10 p-2 rounded-xl">
-                  <Cookie className="h-6 w-6 text-[var(--gta-green)] flex-shrink-0" />
-                </div>
-                <div className="space-y-1">
-                  <h3 className="text-white font-bold text-lg leading-tight">
-                    🍪 Cookies GTAVerso
-                  </h3>
-                  <p className="text-gray-300 text-sm leading-relaxed">
-                    Usamos cookies para mejorar tu experiencia, análisis y anuncios. 
-                    <Link 
-                      href="/politica-de-cookies" 
-                      className="text-[var(--gta-green)] hover:underline font-medium ml-1"
-                    >
-                      Más info
-                    </Link>
-                  </p>
-                </div>
-              </div>
+        <>
+          {/* Overlay oscuro con blur */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-sm"
+            onClick={handleReject}
+          />
 
-              {/* Botones */}
-              <div className="flex items-center gap-2 w-full lg:w-auto">
+          {/* Modal centrado */}
+          <div className="fixed inset-0 z-[101] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              transition={{ duration: 0.3, type: "spring", damping: 25 }}
+              className="relative w-full max-w-lg"
+            >
+              <div className="bg-gray-900/95 border border-[var(--gta-green)]/30 rounded-2xl p-6 shadow-2xl shadow-[var(--gta-green)]/20 backdrop-blur-xl">
+                {/* Botón cerrar (esquina superior derecha) */}
                 <button
                   onClick={handleReject}
-                  className="flex-1 lg:flex-none h-11 px-4 text-gray-200 border border-gray-700/50 rounded-xl hover:bg-gray-800/50 hover:border-[var(--gta-green)]/50 hover:text-white text-sm font-medium transition-all duration-200"
-                >
-                  Rechazar
-                </button>
-                <button
-                  onClick={handleAccept}
-                  className="flex-1 lg:flex-none h-11 px-6 bg-[var(--gta-green)] hover:bg-[var(--gta-green)]/90 text-black font-bold text-sm rounded-xl shadow-lg shadow-[var(--gta-green)]/20 transition-all duration-200"
-                >
-                  ¡Aceptar!
-                </button>
-                <button
-                  onClick={handleReject}
-                  className="lg:hidden -ml-2 h-9 w-9 p-0 text-gray-400 hover:text-white hover:bg-gray-800/50 rounded-lg transition-all duration-200 flex items-center justify-center"
+                  className="absolute top-4 right-4 p-1.5 text-gray-400 hover:text-white hover:bg-gray-800/50 rounded-lg transition-all duration-200"
                   aria-label="Cerrar"
                 >
-                  <X className="h-4 w-4" />
+                  <X className="h-5 w-5" />
                 </button>
+
+                {/* Contenido */}
+                <div className="space-y-4">
+                  {/* Icono + Título */}
+                  <div className="flex items-start gap-3">
+                    <div className="bg-[var(--gta-green)]/10 p-3 rounded-xl">
+                      <Cookie className="h-7 w-7 text-[var(--gta-green)] flex-shrink-0" />
+                    </div>
+                    <div className="flex-1 pt-1">
+                      <h3 className="text-white font-bold text-xl leading-tight mb-2">
+                        🍪 Cookies GTAVerso
+                      </h3>
+                      <p className="text-gray-300 text-sm leading-relaxed">
+                        Usamos cookies para mejorar tu experiencia, análisis y anuncios. 
+                        <Link 
+                          href="/politica-de-cookies" 
+                          className="text-[var(--gta-green)] hover:underline font-medium ml-1"
+                        >
+                          Más información
+                        </Link>
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Botones */}
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
+                    <button
+                      onClick={handleReject}
+                      className="flex-1 h-12 px-5 text-gray-200 border border-gray-700/50 rounded-xl hover:bg-gray-800/50 hover:border-[var(--gta-green)]/50 hover:text-white text-sm font-medium transition-all duration-200"
+                    >
+                      Rechazar
+                    </button>
+                    <button
+                      onClick={handleAccept}
+                      className="flex-1 h-12 px-6 bg-[var(--gta-green)] hover:bg-[var(--gta-green)]/90 text-black font-bold text-sm rounded-xl shadow-lg shadow-[var(--gta-green)]/30 transition-all duration-200"
+                    >
+                      ¡Aceptar cookies!
+                    </button>
+                  </div>
+                </div>
               </div>
-            </div>
+            </motion.div>
           </div>
-        </motion.div>
+        </>
       )}
     </AnimatePresence>
   );

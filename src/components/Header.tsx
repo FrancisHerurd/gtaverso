@@ -2,8 +2,9 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { Menu, Search, X } from "lucide-react";
+import { Menu, Search, X, ChevronDown } from "lucide-react";
 import { useState } from "react";
 
 // Menú principal de la web
@@ -54,6 +55,7 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -70,21 +72,77 @@ export default function Header() {
     <header className="sticky top-0 z-50 border-b border-[#00FF41]/20 bg-black/95 backdrop-blur-sm">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
-        {/* FILA PRINCIPAL: LOGO Y NAVEGACIÓN */}
+        {/* FILA PRINCIPAL */}
         <div className="flex h-16 items-center justify-between">
           
-          {/* LOGO NEÓN GTAVERSO */}
-          <Link href="/" className="flex items-center space-x-2 group">
-            <div className="relative">
-              <div className="absolute inset-0 bg-[#00FF41] blur-lg opacity-50 group-hover:opacity-75 transition-opacity" />
-              <span className="relative text-2xl font-black text-[#00FF41] tracking-tighter uppercase">
-                GTA<span className="text-white">VERSO</span>
-              </span>
-            </div>
+          {/* IZQUIERDA: Menú hamburguesa (móvil) */}
+          <div className="flex items-center">
+            {/* Menú Hamburguesa - Solo móvil */}
+            <button
+              type="button"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-300 hover:bg-[#00FF41]/10 hover:text-[#00FF41] md:hidden transition-colors mr-2"
+              onClick={() => setMobileMenuOpen((v) => !v)}
+            >
+              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+
+            {/* LOGO DESKTOP - Con imagen o fallback a texto */}
+            <Link href="/" className="hidden md:flex items-center group">
+              <Image 
+                src="/images/logo-header.png" 
+                alt="GTAVerso" 
+                width={150} 
+                height={40}
+                className="h-10 w-auto transition-opacity group-hover:opacity-80"
+                priority
+                onError={(e) => {
+                  // Fallback a logo texto si la imagen no carga
+                  e.currentTarget.style.display = 'none';
+                  const parent = e.currentTarget.parentElement;
+                  if (parent) {
+                    parent.innerHTML = `
+                      <div class="relative">
+                        <div class="absolute inset-0 bg-[#00FF41] blur-lg opacity-50 group-hover:opacity-75 transition-opacity"></div>
+                        <span class="relative text-2xl font-black text-[#00FF41] tracking-tighter uppercase">
+                          GTA<span class="text-white">VERSO</span>
+                        </span>
+                      </div>
+                    `;
+                  }
+                }}
+              />
+            </Link>
+          </div>
+
+          {/* CENTRO: Logo móvil (absolute center) */}
+          <Link href="/" className="absolute left-1/2 -translate-x-1/2 md:hidden flex items-center group">
+            <Image 
+              src="/images/logo-header.png" 
+              alt="GTAVerso" 
+              width={120} 
+              height={32}
+              className="h-8 w-auto transition-opacity group-hover:opacity-80"
+              priority
+              onError={(e) => {
+                // Fallback a logo texto si la imagen no carga
+                e.currentTarget.style.display = 'none';
+                const parent = e.currentTarget.parentElement;
+                if (parent) {
+                  parent.innerHTML = `
+                    <div class="relative">
+                      <div class="absolute inset-0 bg-[#00FF41] blur-lg opacity-50 group-hover:opacity-75 transition-opacity"></div>
+                      <span class="relative text-xl font-black text-[#00FF41] tracking-tighter uppercase">
+                        GTA<span class="text-white">VERSO</span>
+                      </span>
+                    </div>
+                  `;
+                }
+              }}
+            />
           </Link>
 
           {/* NAVEGACIÓN DESKTOP */}
-          <nav className="hidden items-center space-x-6 md:flex">
+          <nav className="hidden md:flex items-center space-x-6">
             <Link
               href="/"
               className={`text-sm uppercase font-semibold tracking-wide transition-colors ${
@@ -114,12 +172,42 @@ export default function Header() {
                 </Link>
               );
             })}
+
+            {/* DROPDOWN "MÁS" - Desktop */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setMoreMenuOpen(!moreMenuOpen)}
+                onBlur={() => setTimeout(() => setMoreMenuOpen(false), 200)}
+                className={`flex items-center gap-1 text-sm uppercase font-semibold tracking-wide transition-colors ${
+                  isActive(pathname, "/juegos")
+                    ? "text-[#00FF41]"
+                    : "text-gray-300 hover:text-[#00FF41]"
+                }`}
+              >
+                Más
+                <ChevronDown className={`h-4 w-4 transition-transform ${moreMenuOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {/* Dropdown Menu */}
+              {moreMenuOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-gray-900 border border-[#00FF41]/30 rounded-lg shadow-lg shadow-[#00FF41]/10 overflow-hidden">
+                  <Link
+                    href="/juegos"
+                    className="block px-4 py-3 text-sm text-gray-300 hover:bg-[#00FF41]/10 hover:text-[#00FF41] transition-colors"
+                    onClick={() => setMoreMenuOpen(false)}
+                  >
+                    🎮 Todos los juegos
+                  </Link>
+                </div>
+              )}
+            </div>
           </nav>
 
-          {/* BOTONES DERECHA */}
+          {/* DERECHA: Redes (desktop) + Lupa */}
           <div className="flex items-center space-x-1">
             
-            {/* Redes Sociales - Desktop */}
+            {/* Redes Sociales - Solo Desktop */}
             <div className="hidden lg:flex items-center gap-1 mr-1">
               <a
                 href="https://twitter.com/GTA_Verso"
@@ -163,7 +251,7 @@ export default function Header() {
               </a>
             </div>
             
-            {/* Botón Lupa */}
+            {/* Botón Lupa (móvil y desktop) */}
             <button
               type="button"
               onClick={() => setSearchOpen((v) => !v)}
@@ -171,15 +259,6 @@ export default function Header() {
               aria-label="Buscar"
             >
               <Search className="h-5 w-5" />
-            </button>
-
-            {/* Menú Hamburguesa (Solo Móvil) */}
-            <button
-              type="button"
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-300 hover:bg-[#00FF41]/10 hover:text-[#00FF41] lg:hidden transition-colors"
-              onClick={() => setMobileMenuOpen((v) => !v)}
-            >
-              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
           </div>
         </div>
@@ -209,7 +288,7 @@ export default function Header() {
 
       {/* MENÚ MÓVIL DESPLEGABLE */}
       {mobileMenuOpen && (
-        <div className="bg-black/98 border-t border-[#00FF41]/20 lg:hidden animate-in fade-in slide-in-from-top-2">
+        <div className="bg-black/98 border-t border-[#00FF41]/20 md:hidden animate-in fade-in slide-in-from-top-2">
           <nav className="flex flex-col space-y-1 px-4 py-4">
             <Link
               href="/"
@@ -231,6 +310,17 @@ export default function Header() {
                 </Link>
               );
             })}
+
+            {/* Menú "MÁS" en móvil */}
+            <div className="border-t border-[#00FF41]/20 pt-2 mt-2">
+              <Link
+                href="/juegos"
+                className="block rounded-lg px-4 py-3 text-sm font-semibold tracking-wide text-gray-300 hover:bg-[#00FF41]/10 hover:text-[#00FF41] uppercase transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                🎮 Todos los juegos
+              </Link>
+            </div>
             
             {/* Redes en móvil */}
             <div className="flex items-center gap-3 pt-4 border-t border-[#00FF41]/20">
