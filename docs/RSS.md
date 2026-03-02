@@ -2,7 +2,7 @@
 
 ## URL del Feed
 
-**Feed RSS principal:** [https://www.gtaverso.com/feed.xml](https://www.gtaverso.com/feed.xml)
+**Feed RSS principal:** [https://gtaverso.com/feed.xml](https://www.gtaverso.com/feed.xml)
 
 ## Características
 

@@ -2,7 +2,7 @@
 
 ## URL del Sitemap
 
-**Sitemap principal:** [https://www.gtaverso.com/sitemap.xml](https://www.gtaverso.com/sitemap.xml)
+**Sitemap principal:** [https:/gtaverso.com/sitemap.xml](https://gtaverso.com/sitemap.xml)
 
 ## Contenido del Sitemap
 
@@ -51,7 +51,7 @@ El sitemap incluye automáticamente:
 1. Accede a [Google Search Console](https://search.google.com/search-console)
 2. Añade tu propiedad: `gtaverso.com`
 3. Ve a **Sitemaps**
-4. Añade la URL: `https://www.gtaverso.com/sitemap.xml`
+4. Añade la URL: `https://gtaverso.com/sitemap.xml`
 5. Haz clic en **Enviar**
 
 ## Testing local

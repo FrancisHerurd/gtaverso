@@ -2,7 +2,6 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
 import { Instagram, Mail } from "lucide-react";
 
 // Icono X (Twitter) personalizado
@@ -42,66 +41,12 @@ const RSSIcon = ({ className }: { className?: string }) => (
 );
 
 export default function Footer() {
-  const [email, setEmail] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const currentYear = new Date().getFullYear();
-
-  const handleNewsletterSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!email || !email.includes("@")) {
-      alert("Por favor, introduce un email válido");
-      return;
-    }
-
-    setIsSubmitting(true);
-    // Simulación
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    setIsSubmitting(false);
-    setEmail("");
-    alert("¡Suscripción registrada! (demo)");
-  };
 
   return (
     <footer className="bg-black border-t border-[#00FF41]/20">
-      {/* Newsletter */}
-      <div className="border-b border-[#00FF41]/20 bg-linear-to-r from-black via-gray-900 to-black">
-        <div className="mx-auto max-w-(--container) px-4 py-10 sm:px-6 lg:px-8">
-          <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
-            <div className="text-center md:text-left">
-              <h3 className="mb-2 text-2xl font-bold text-white">
-                ¿No quieres perderte nada?
-              </h3>
-              <p className="text-sm text-gray-400">
-                Suscríbete y recibe las últimas noticias y guías de GTA en tu correo.
-              </p>
-            </div>
-            <form
-              onSubmit={handleNewsletterSubmit}
-              className="flex w-full gap-2 md:w-auto"
-            >
-              <input
-                type="email"
-                placeholder="tu@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-lg border border-[#00FF41]/30 bg-gray-900/50 px-3 py-2 text-sm text-white placeholder:text-gray-500 outline-none focus:border-[#00FF41] md:w-80"
-                disabled={isSubmitting}
-              />
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="rounded-lg bg-[#00FF41] px-6 text-sm font-semibold text-black transition hover:bg-[#00FF41]/90 disabled:opacity-60"
-              >
-                {isSubmitting ? "Enviando..." : "Suscribir"}
-              </button>
-            </form>
-          </div>
-        </div>
-      </div>
-
       {/* Contenido principal */}
-      <div className="mx-auto max-w-(--container) px-4 py-12 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="mb-8 grid grid-cols-1 gap-8 md:grid-cols-4">
           {/* Sobre nosotros */}
           <div>
@@ -234,7 +179,6 @@ export default function Footer() {
               Síguenos
             </h4>
             <div className="flex gap-3">
-              {/* X (Twitter) */}
               <a
                 href="https://twitter.com/GTA_Verso"
                 target="_blank"
@@ -244,8 +188,6 @@ export default function Footer() {
               >
                 <XIcon className="h-5 w-5" />
               </a>
-
-              {/* Instagram */}
               <a
                 href="https://instagram.com/GTA_Verso"
                 target="_blank"
@@ -255,8 +197,6 @@ export default function Footer() {
               >
                 <Instagram className="h-5 w-5" />
               </a>
-
-              {/* TikTok */}
               <a
                 href="https://tiktok.com/@gta.verso"
                 target="_blank"
@@ -266,8 +206,6 @@ export default function Footer() {
               >
                 <TikTokIcon className="h-5 w-5" />
               </a>
-
-              {/* RSS Feed */}
               <a
                 href="/feed.xml"
                 target="_blank"
@@ -277,8 +215,6 @@ export default function Footer() {
               >
                 <RSSIcon className="h-5 w-5" />
               </a>
-
-              {/* Email */}
               <a
                 href="mailto:contacto@gtaverso.com"
                 className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-900 text-gray-400 transition-colors hover:bg-[#00FF41]/10 hover:text-[#00FF41]"

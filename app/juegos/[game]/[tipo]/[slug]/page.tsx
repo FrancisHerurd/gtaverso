@@ -65,7 +65,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: post.seo.title,
       description: post.seo.metaDesc,
       alternates: {
-        canonical: post.seo.canonical || `https://www.gtaverso.com/juegos/${game}/${tipo}/${slug}`,
+        canonical: post.seo.canonical || `https://gtaverso.com/juegos/${game}/${tipo}/${slug}`,
       },
       openGraph: {
         title: post.seo.opengraphTitle || post.seo.title,
@@ -76,7 +76,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         type: 'article',
         publishedTime: post.date,
         modifiedTime: post.modified,
-        url: `https://www.gtaverso.com/juegos/${game}/${tipo}/${slug}`,
+        url: `https://gtaverso.com/juegos/${game}/${tipo}/${slug}`,
       },
       twitter: {
         card: 'summary_large_image',
@@ -94,7 +94,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: `${post.title} | ${gameLabel} ${tipoLabel} | GTAVerso`,
     description: post.excerpt.replace(/<[^>]*>/g, '').substring(0, 160),
     alternates: {
-      canonical: `https://www.gtaverso.com/juegos/${game}/${tipo}/${slug}`,
+      canonical: `https://gtaverso.com/juegos/${game}/${tipo}/${slug}`,
     },
   };
 }
@@ -174,7 +174,7 @@ export default async function PostPage({ params }: Props) {
 
               {/* Botones de compartir (arriba) */}
               <ShareButtons 
-                url={`https://www.gtaverso.com/juegos/${game}/${tipo}/${slug}`}
+                url={`https://gtaverso.com/juegos/${game}/${tipo}/${slug}`}
                 title={post.title}
                 className="mb-8"
               />
@@ -204,7 +204,7 @@ export default async function PostPage({ params }: Props) {
 
               {/* Botones de compartir (abajo) */}
               <ShareButtons 
-                url={`https://www.gtaverso.com/juegos/${game}/${tipo}/${slug}`}
+                url={`https://gtaverso.com/juegos/${game}/${tipo}/${slug}`}
                 title={post.title}
                 className="mt-12 pt-8 border-t border-gray-800"
               />

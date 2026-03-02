@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ScrollTopButton from "@/components/ScrollTopButton";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
+import CookieConsent from "@/components/CookieConsent";
 
 export const metadata: Metadata = {
   title: {
@@ -31,7 +32,7 @@ export default function RootLayout({
           rel="alternate" 
           type="application/rss+xml" 
           title="GTAVerso RSS Feed" 
-          href="https://www.gtaverso.com/feed.xml" 
+          href="https://gtaverso.com/feed.xml" 
         />
       </head>
       <body className="min-h-screen bg-gray-950 text-white antialiased">
@@ -39,6 +40,7 @@ export default function RootLayout({
         <main>{children}</main>
         <Footer />
         <ScrollTopButton />
+        <CookieConsent />
         
         {/* Google Analytics */}
         {gaId && <GoogleAnalytics gaId={gaId} />}

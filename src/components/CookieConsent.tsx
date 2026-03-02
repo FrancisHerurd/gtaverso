@@ -1,8 +1,10 @@
+// src/components/CookieConsent.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
 import { X, Cookie } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
 
 export default function CookieConsent() {
   const [showConsent, setShowConsent] = useState(false);
@@ -49,17 +51,17 @@ export default function CookieConsent() {
                   </h3>
                   <p className="text-gray-300 text-sm leading-relaxed">
                     Usamos cookies para mejorar tu experiencia, análisis y anuncios. 
-                    <a 
-                      href="/privacidad" 
+                    <Link 
+                      href="/politica-de-cookies" 
                       className="text-[var(--gta-green)] hover:underline font-medium ml-1"
                     >
                       Más info
-                    </a>
+                    </Link>
                   </p>
                 </div>
               </div>
 
-              {/* ✅ BOTONES NATIVOS (sin shadcn) */}
+              {/* Botones */}
               <div className="flex items-center gap-2 w-full lg:w-auto">
                 <button
                   onClick={handleReject}
@@ -75,7 +77,8 @@ export default function CookieConsent() {
                 </button>
                 <button
                   onClick={handleReject}
-                  className="lg:hidden -ml-2 h-9 w-9 p-0 text-gray-400 hover:text-white hover:bg-gray-800/50 rounded-lg transition-all duration-200"
+                  className="lg:hidden -ml-2 h-9 w-9 p-0 text-gray-400 hover:text-white hover:bg-gray-800/50 rounded-lg transition-all duration-200 flex items-center justify-center"
+                  aria-label="Cerrar"
                 >
                   <X className="h-4 w-4" />
                 </button>

@@ -54,11 +54,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${tipoLabel} de ${gameLabel} | GTAVerso`,
     description: `Todas las ${tipoLabel.toLowerCase()} de ${gameLabel}.`,
-    alternates: { canonical: `https://www.gtaverso.com/juegos/${game}/${tipo}` },
+    alternates: { canonical: `https://gtaverso.com/juegos/${game}/${tipo}` },
     openGraph: {
       title: `${tipoLabel} de ${gameLabel} | GTAVerso`,
       description: `Todas las ${tipoLabel.toLowerCase()} de ${gameLabel}.`,
-      url: `https://www.gtaverso.com/juegos/${game}/${tipo}`,
+      url: `https://gtaverso.com/juegos/${game}/${tipo}`,
       type: 'website',
     },
   };
