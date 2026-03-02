@@ -8,6 +8,9 @@ import YoastSEO from '@/components/YoastSEO';
 import JuegoBadge from '@/components/JuegoBadge';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import ShareButtons from '@/components/ShareButtons';
+import TableOfContents from '@/components/TableOfContents';
+import ReadingTime from '@/components/ReadingTime';
+import LatestNewsSidebar from '@/components/LatestNewsSidebar';
 
 interface Props {
   params: Promise<{ game: string; tipo: string; slug: string }>;
@@ -122,67 +125,106 @@ export default async function PostPage({ params }: Props) {
       <YoastSEO seo={post.seo} />
 
       <article className="min-h-screen bg-[#050508] pt-24 pb-20">
-        <div className="mx-auto max-w-4xl px-4">
-          <Breadcrumbs items={breadcrumbs} />
+        <div className="mx-auto max-w-7xl px-4">
+          {/* Layout con grid: contenido principal + sidebar */}
+          <div className="lg:grid lg:grid-cols-12 lg:gap-8">
+            
+            {/* COLUMNA PRINCIPAL - Contenido del artículo */}
+            <div className="lg:col-span-8">
+              <Breadcrumbs items={breadcrumbs} />
 
-          {/* Badges de Juegos */}
-          {post.juegos && post.juegos.nodes.length > 0 && (
-            <JuegoBadge juegos={post.juegos.nodes} className="mb-4 mt-6" />
-          )}
+              {/* Badges de Juegos */}
+              {post.juegos && post.juegos.nodes.length > 0 && (
+                <JuegoBadge juegos={post.juegos.nodes} className="mb-4 mt-6" />
+              )}
 
-          {/* Título */}
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-            {post.title}
-          </h1>
+              {/* Título */}
+              <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+                {post.title}
+              </h1>
 
-          {/* Metadata */}
-          <div className="flex items-center gap-4 text-gray-500 text-sm mb-6">
-            <time>
-              {new Date(post.date).toLocaleDateString('es-ES', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-              })}
-            </time>
-            {post.author && (
-              <>
+              {/* Metadata (fecha + tiempo de lectura) */}
+              <div className="flex flex-wrap items-center gap-3 text-gray-500 text-sm mb-6">
+                <time>
+                  {new Date(post.date).toLocaleDateString('es-ES', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })}
+                </time>
+                
                 <span>•</span>
-                <span>Por {post.author.node.name}</span>
-              </>
-            )}
-          </div>
+                
+                {/* Tiempo de lectura */}
+                <ReadingTime content={post.content} />
+              </div>
 
-          {/* Imagen destacada */}
-          {post.featuredImage && (
-            <div className="relative w-full h-96 mb-8 rounded-lg overflow-hidden">
-              <Image
-                src={post.featuredImage.node.sourceUrl}
-                alt={post.featuredImage.node.altText || post.title}
-                fill
-                className="object-cover"
-                priority
+              {/* Imagen destacada */}
+              {post.featuredImage && (
+                <div className="relative w-full h-96 mb-8 rounded-lg overflow-hidden">
+                  <Image
+                    src={post.featuredImage.node.sourceUrl}
+                    alt={post.featuredImage.node.altText || post.title}
+                    fill
+                    className="object-cover"
+                    priority
+                  />
+                </div>
+              )}
+
+              {/* Botones de compartir (arriba) */}
+              <ShareButtons 
+                url={`https://www.gtaverso.com/juegos/${game}/${tipo}/${slug}`}
+                title={post.title}
+                className="mb-8"
               />
+
+              {/* TOC móvil */}
+              <div className="lg:hidden mt-8 mb-8">
+                <TableOfContents content={post.content} />
+              </div>
+
+              {/* Contenido del artículo */}
+              <div
+                id="article-content"
+                className="prose prose-invert prose-lg max-w-none
+                  prose-headings:text-white prose-headings:scroll-mt-24
+                  prose-h2:text-3xl prose-h2:mt-12 prose-h2:mb-4
+                  prose-h3:text-2xl prose-h3:mt-8 prose-h3:mb-3
+                  prose-p:text-gray-300 prose-p:leading-relaxed
+                  prose-a:text-[#00FF41] hover:prose-a:text-[#00cc34] prose-a:no-underline hover:prose-a:underline
+                  prose-strong:text-white prose-strong:font-semibold
+                  prose-ul:text-gray-300 prose-ol:text-gray-300
+                  prose-li:marker:text-[#00FF41]
+                  prose-img:rounded-lg prose-img:my-8
+                  prose-blockquote:border-l-4 prose-blockquote:border-[#00FF41] 
+                  prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-gray-400"
+                dangerouslySetInnerHTML={{ __html: post.content }}
+              />
+
+              {/* Botones de compartir (abajo) */}
+              <ShareButtons 
+                url={`https://www.gtaverso.com/juegos/${game}/${tipo}/${slug}`}
+                title={post.title}
+                className="mt-12 pt-8 border-t border-gray-800"
+              />
+
+              {/* Últimas Noticias - MÓVIL (después del contenido) */}
+              <div className="lg:hidden mt-12">
+                <LatestNewsSidebar currentSlug={slug} limit={5} />
+              </div>
             </div>
-          )}
 
-          {/* Botones de compartir */}
-          <ShareButtons 
-            url={`https://www.gtaverso.com/juegos/${game}/${tipo}/${slug}`}
-            title={post.title}
-          />
+            {/* SIDEBAR - Desktop only */}
+            <aside className="hidden lg:block lg:col-span-4 space-y-8">
+              {/* Table of Contents */}
+              <TableOfContents content={post.content} />
+              
+              {/* Últimas Noticias - DESKTOP */}
+              <LatestNewsSidebar currentSlug={slug} limit={5} />
+            </aside>
 
-          {/* Contenido */}
-          <div
-            className="prose prose-invert prose-lg max-w-none mt-8
-              prose-headings:text-white 
-              prose-p:text-gray-300 
-              prose-a:text-orange-500 
-              prose-strong:text-white
-              prose-img:rounded-lg
-              prose-ul:text-gray-300
-              prose-ol:text-gray-300"
-            dangerouslySetInnerHTML={{ __html: post.content }}
-          />
+          </div>
         </div>
       </article>
     </>
