@@ -5,10 +5,28 @@ import { getAllPosts } from "@/lib/api";
 export const revalidate = 1800; // Revalidar cada 30 minutos
 
 /**
- * News Sitemap específico para Google News
+ * News Sitemap específico para Google News 2026
  * Solo incluye noticias de las últimas 48 horas
  * Formato: Google News Sitemap Protocol
  */
+
+// Tipo para los posts
+type Post = {
+  slug: string;
+  title: string;
+  date: string;
+  juegos?: {
+    nodes?: Array<{
+      slug?: string;
+    }>;
+  };
+  tipos?: {
+    nodes?: Array<{
+      slug?: string;
+    }>;
+  };
+};
+
 export async function GET() {
   try {
     const posts = await getAllPosts();
@@ -17,7 +35,7 @@ export async function GET() {
     const twoDaysAgo = new Date();
     twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
     
-    const recentNews = posts.filter((post) => {
+    const recentNews = posts.filter((post: Post) => {
       const postDate = new Date(post.date);
       const isRecent = postDate >= twoDaysAgo;
       const isNews = post.tipos?.nodes?.[0]?.slug === 'noticias';
@@ -45,7 +63,7 @@ export async function GET() {
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
 ${recentNews
-  .map((post) => {
+  .map((post: Post) => {
     const gameSlug = post.juegos?.nodes?.[0]?.slug || 'gta-6';
     const typeSlug = post.tipos?.nodes?.[0]?.slug || 'noticias';
     const url = `https://gtaverso.com/juegos/${gameSlug}/${typeSlug}/${post.slug}`;
