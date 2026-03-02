@@ -10,6 +10,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ['/api/', '/admin/'],
       },
     ],
-    sitemap: 'https://www.gtaverso.com/sitemap.xml',
+    sitemap: 'https://gtaverso.com/sitemap.xml',
   };
 }

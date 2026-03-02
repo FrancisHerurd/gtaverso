@@ -33,7 +33,7 @@ async function getAllPosts(): Promise<PostNode[]> {
 export const revalidate = 3600 // Revalidar cada hora
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://www.gtaverso.com'
+  const baseUrl = 'https://gtaverso.com'
   const now = new Date().toISOString()
   
   // Obtener posts (con fallback si falla)
