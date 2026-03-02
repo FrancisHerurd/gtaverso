@@ -11,28 +11,35 @@ type PostNode = {
 const GAMES = ['gta-6', 'gta-5', 'gta-4', 'gta-san-andreas', 'gta-vice-city', 'gta-3']
 
 async function getAllPosts(): Promise<PostNode[]> {
-  const data = await fetchAPI(`
-    query AllPostsForSitemap {
-      posts(first: 1000, where: { orderby: { field: DATE, order: DESC } }) {
-        nodes {
-          slug
-          modified
-          juegos { nodes { slug } }
+  try {
+    const data = await fetchAPI(`
+      query AllPostsForSitemap {
+        posts(first: 1000, where: { orderby: { field: DATE, order: DESC } }) {
+          nodes {
+            slug
+            modified
+            juegos { nodes { slug } }
+          }
         }
       }
-    }
-  `)
-  return (data?.posts?.nodes ?? []) as PostNode[]
+    `)
+    return (data?.posts?.nodes ?? []) as PostNode[]
+  } catch (error) {
+    console.error('Error fetching posts for sitemap:', error)
+    return [] // Devolver array vacío si falla
+  }
 }
 
 export const revalidate = 3600 // Revalidar cada hora
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://www.gtaverso.com'
-  const posts = await getAllPosts()
   const now = new Date().toISOString()
+  
+  // Obtener posts (con fallback si falla)
+  const posts = await getAllPosts()
 
-  // Páginas estáticas
+  // Páginas estáticas (SIEMPRE se generan)
   const staticPages: MetadataRoute.Sitemap = [
     {
       url: baseUrl,
@@ -47,7 +54,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     },
     {
-      url: `${baseUrl}/juegos`, // ← AÑADIDO
+      url: `${baseUrl}/juegos`,
       lastModified: now,
       changeFrequency: 'weekly',
       priority: 0.9,
@@ -76,7 +83,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }))
 
-  // Posts individuales
+  // Posts individuales (solo si se obtuvieron correctamente)
   const postPages: MetadataRoute.Sitemap = posts.map(post => {
     const gameSlug = post.juegos?.nodes?.[0]?.slug || 'gta-6'
     return {
@@ -87,7 +94,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   })
 
-  // Páginas legales
+  // Páginas legales (OPCIONAL: quitar si quieres excluirlas del sitemap)
   const legalPages: MetadataRoute.Sitemap = [
     {
       url: `${baseUrl}/aviso-legal`,
