@@ -131,10 +131,3 @@ export default function ShareButtons({ url, title, className = '' }: ShareButton
     </div>
   );
 }
-
-// Declaración de tipos para TypeScript
-declare global {
-  interface Window {
-    gtag?: (...args: any[]) => void;
-  }
-}
