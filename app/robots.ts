@@ -9,7 +9,15 @@ export default function robots(): MetadataRoute.Robots {
         allow: '/',
         disallow: ['/api/', '/admin/'],
       },
+      {
+        userAgent: 'Googlebot-News',
+        allow: '/juegos/*/noticias/',
+        disallow: [],
+      },
     ],
-    sitemap: 'https://gtaverso.com/sitemap.xml',
+    sitemap: [
+      'https://gtaverso.com/sitemap.xml',
+      'https://gtaverso.com/news-sitemap.xml',
+    ],
   };
 }

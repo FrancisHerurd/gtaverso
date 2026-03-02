@@ -4,6 +4,7 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { getPostBySlug, getAllPosts } from '@/lib/api';
+import { generateNewsArticleSchema, generateBreadcrumbSchema } from '@/lib/seo';
 import YoastSEO from '@/components/YoastSEO';
 import JuegoBadge from '@/components/JuegoBadge';
 import Breadcrumbs from '@/components/Breadcrumbs';
@@ -86,6 +87,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
           ? [post.seo.opengraphImage.sourceUrl]
           : [],
       },
+      // Meta keywords para Google News
+      other: {
+        'news_keywords': post.tags?.nodes?.map((t: any) => t.name).join(', ') || 'GTA, Grand Theft Auto, Rockstar Games',
+      },
     };
   }
 
@@ -119,10 +124,39 @@ export default async function PostPage({ params }: Props) {
     { label: post.title, href: `/juegos/${game}/${tipo}/${slug}` },
   ];
 
+  // Generar schemas JSON-LD para Google News
+  const articleSchema = generateNewsArticleSchema({
+    title: post.title,
+    description: post.excerpt.replace(/<[^>]+>/g, '').substring(0, 200),
+    image: post.featuredImage?.node?.sourceUrl || 'https://gtaverso.com/og-default.webp',
+    url: `/juegos/${game}/${tipo}/${slug}`,
+    publishedTime: post.date,
+    modifiedTime: post.modified || post.date,
+    author: 'Equipo GTAVerso',
+    game: gameLabel,
+    category: tipoLabel,
+  });
+
+  const breadcrumbSchema = generateBreadcrumbSchema(
+    breadcrumbs.map(b => ({ name: b.label, url: b.href }))
+  );
+
   return (
     <>
-      {/* Yoast SEO fullHead (solo para JSON-LD) */}
+      {/* Yoast SEO fullHead (solo para JSON-LD adicional de Yoast) */}
       <YoastSEO seo={post.seo} />
+
+      {/* NewsArticle Schema para Google News 2026 */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+      />
+
+      {/* Breadcrumb Schema */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
 
       <article className="min-h-screen bg-[#050508] pt-24 pb-20">
         <div className="mx-auto max-w-7xl px-4">
@@ -145,7 +179,7 @@ export default async function PostPage({ params }: Props) {
 
               {/* Metadata (fecha + tiempo de lectura) */}
               <div className="flex flex-wrap items-center gap-3 text-gray-500 text-sm mb-6">
-                <time>
+                <time dateTime={new Date(post.date).toISOString()}>
                   {new Date(post.date).toLocaleDateString('es-ES', {
                     year: 'numeric',
                     month: 'long',

@@ -57,6 +57,12 @@ export default function Footer() {
               Portal independiente dedicado a noticias, guías, análisis y trucos
               de la saga Grand Theft Auto. Enfoque en GTA 6, GTA 5 y clásicos de la saga.
             </p>
+            <Link
+              href="/sobre-nosotros"
+              className="mt-3 inline-block text-sm text-[#00FF41] hover:underline"
+            >
+              Leer más →
+            </Link>
           </div>
 
           {/* Juegos */}
@@ -130,6 +136,14 @@ export default function Footer() {
               Legal
             </h4>
             <ul className="space-y-2 text-sm">
+              <li>
+                <Link
+                  href="/sobre-nosotros"
+                  className="text-gray-400 transition-colors hover:text-[#00FF41]"
+                >
+                  Sobre Nosotros
+                </Link>
+              </li>
               <li>
                 <Link
                   href="/aviso-legal"

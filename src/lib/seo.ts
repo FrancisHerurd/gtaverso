@@ -15,7 +15,7 @@ type SEOProps = {
 }
 
 const SITE_NAME = 'GTAVerso'
-const SITE_URL = 'https://www.gtaverso.com'
+const SITE_URL = 'https://gtaverso.com'
 const DEFAULT_TITLE = 'GTAVerso - Noticias, Guías y Trucos de GTA'
 const DEFAULT_DESCRIPTION = 'Tu fuente definitiva de noticias, guías, trucos y análisis de Grand Theft Auto: GTA 6, GTA 5, GTA 4, San Andreas y toda la saga.'
 const DEFAULT_IMAGE = `${SITE_URL}/og-default.webp`
@@ -85,6 +85,11 @@ export function generateSEO({
     alternates: {
       canonical: fullUrl,
     },
+
+    // Meta keywords para Google News (opcional pero ayuda)
+    other: {
+      'news_keywords': tags.join(', '),
+    },
   }
 
   // Open Graph adicional para artículos
@@ -94,7 +99,8 @@ export function generateSEO({
       type: 'article',
       publishedTime,
       modifiedTime,
-      authors: author ? [author] : undefined,
+      authors: author ? [author] : ['GTAVerso'],
+      section: 'Videojuegos',
       tags,
     }
   }
@@ -102,7 +108,98 @@ export function generateSEO({
   return metadata
 }
 
-// Generar JSON-LD para structured data
+/**
+ * Genera NewsArticle Schema COMPLETO para Google News 2026
+ * Incluye TODOS los campos requeridos y recomendados
+ */
+export function generateNewsArticleSchema({
+  title,
+  description,
+  image,
+  url,
+  publishedTime,
+  modifiedTime,
+  author = 'Equipo GTAVerso',
+  game,
+  category,
+}: {
+  title: string
+  description: string
+  image: string
+  url: string
+  publishedTime: string
+  modifiedTime: string
+  author?: string
+  game?: string
+  category?: string
+}) {
+  // Normalizar fechas a ISO 8601
+  const normalizeDate = (dateStr: string) => {
+    try {
+      return new Date(dateStr).toISOString();
+    } catch {
+      return new Date().toISOString();
+    }
+  };
+
+  const fullUrl = url.startsWith('http') ? url : `${SITE_URL}${url}`;
+  const fullImage = image.startsWith('http') ? image : `${SITE_URL}${image}`;
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'NewsArticle',
+    
+    // Campos REQUERIDOS
+    headline: title.substring(0, 110), // Max 110 caracteres
+    image: [fullImage],
+    datePublished: normalizeDate(publishedTime),
+    dateModified: normalizeDate(modifiedTime || publishedTime),
+    
+    // Autor (persona u organización)
+    author: {
+      '@type': 'Organization',
+      name: author,
+      url: SITE_URL,
+    },
+    
+    // Publisher REQUERIDO con logo
+    publisher: {
+      '@type': 'Organization',
+      name: SITE_NAME,
+      url: SITE_URL,
+      logo: {
+        '@type': 'ImageObject',
+        url: `${SITE_URL}/images/logo-header.png`,
+        width: 300,
+        height: 80,
+      },
+    },
+    
+    // URL canónica
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': fullUrl,
+    },
+    
+    // Campos RECOMENDADOS para Google News
+    description: description.substring(0, 200),
+    articleSection: category || 'Videojuegos',
+    about: {
+      '@type': 'Thing',
+      name: game || 'Grand Theft Auto',
+    },
+    
+    // Indica que es contenido original
+    isAccessibleForFree: true,
+    
+    // Idioma del artículo
+    inLanguage: 'es-ES',
+  }
+}
+
+/**
+ * ALTERNATIVA: ArticleSchema genérico (para guías, tutoriales no-noticia)
+ */
 export function generateArticleSchema({
   title,
   description,
@@ -120,14 +217,25 @@ export function generateArticleSchema({
   modifiedTime: string
   author?: string
 }) {
+  const normalizeDate = (dateStr: string) => {
+    try {
+      return new Date(dateStr).toISOString();
+    } catch {
+      return new Date().toISOString();
+    }
+  };
+
+  const fullUrl = url.startsWith('http') ? url : `${SITE_URL}${url}`;
+  const fullImage = image.startsWith('http') ? image : `${SITE_URL}${image}`;
+
   return {
     '@context': 'https://schema.org',
-    '@type': 'NewsArticle',
+    '@type': 'Article',
     headline: title,
     description,
-    image: [image],
-    datePublished: publishedTime,
-    dateModified: modifiedTime,
+    image: [fullImage],
+    datePublished: normalizeDate(publishedTime),
+    dateModified: normalizeDate(modifiedTime || publishedTime),
     author: {
       '@type': 'Organization',
       name: author,
@@ -136,14 +244,15 @@ export function generateArticleSchema({
     publisher: {
       '@type': 'Organization',
       name: SITE_NAME,
+      url: SITE_URL,
       logo: {
         '@type': 'ImageObject',
-        url: `${SITE_URL}/logo.png`,
+        url: `${SITE_URL}/images/logo-header.png`,
       },
     },
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': url,
+      '@id': fullUrl,
     },
   }
 }
@@ -156,7 +265,7 @@ export function generateBreadcrumbSchema(items: Array<{ name: string; url: strin
       '@type': 'ListItem',
       position: index + 1,
       name: item.name,
-      item: item.url,
+      item: item.url.startsWith('http') ? item.url : `${SITE_URL}${item.url}`,
     })),
   }
 }
@@ -175,6 +284,31 @@ export function generateWebsiteSchema() {
         urlTemplate: `${SITE_URL}/buscar?q={search_term_string}`,
       },
       'query-input': 'required name=search_term_string',
+    },
+    inLanguage: 'es-ES',
+  }
+}
+
+/**
+ * Schema de Organización para la página principal
+ */
+export function generateOrganizationSchema() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: SITE_NAME,
+    url: SITE_URL,
+    logo: `${SITE_URL}/images/logo-header.png`,
+    description: DEFAULT_DESCRIPTION,
+    sameAs: [
+      'https://twitter.com/GTA_Verso',
+      'https://instagram.com/GTA_Verso',
+      'https://tiktok.com/@gta.verso',
+    ],
+    contactPoint: {
+      '@type': 'ContactPoint',
+      contactType: 'Customer Service',
+      url: `${SITE_URL}/contacto`,
     },
   }
 }
