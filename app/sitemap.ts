@@ -10,6 +10,27 @@ type PostNode = {
 
 const GAMES = ['gta-6', 'gta-5', 'gta-4', 'gta-san-andreas', 'gta-vice-city', 'gta-3']
 
+/**
+ * Normaliza cualquier fecha a formato ISO 8601 válido
+ * Soluciona errores "Fecha no válida" en Google Search Console
+ */
+function normalizeDate(dateString: string): string {
+  try {
+    const date = new Date(dateString);
+    
+    // Verificar si la fecha es válida
+    if (isNaN(date.getTime())) {
+      console.warn(`Invalid date: ${dateString}, using current date`);
+      return new Date().toISOString();
+    }
+    
+    return date.toISOString();
+  } catch (error) {
+    console.error(`Error parsing date: ${dateString}`, error);
+    return new Date().toISOString();
+  }
+}
+
 async function getAllPosts(): Promise<PostNode[]> {
   try {
     const data = await fetchAPI(`
@@ -26,7 +47,7 @@ async function getAllPosts(): Promise<PostNode[]> {
     return (data?.posts?.nodes ?? []) as PostNode[]
   } catch (error) {
     console.error('Error fetching posts for sitemap:', error)
-    return [] // Devolver array vacío si falla
+    return []
   }
 }
 
@@ -39,7 +60,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Obtener posts (con fallback si falla)
   const posts = await getAllPosts()
 
-  // Páginas estáticas (SIEMPRE se generan)
+  // Páginas estáticas
   const staticPages: MetadataRoute.Sitemap = [
     {
       url: baseUrl,
@@ -83,18 +104,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }))
 
-  // Posts individuales (solo si se obtuvieron correctamente)
+  // Posts individuales con fechas normalizadas
   const postPages: MetadataRoute.Sitemap = posts.map(post => {
     const gameSlug = post.juegos?.nodes?.[0]?.slug || 'gta-6'
     return {
       url: `${baseUrl}/juegos/${gameSlug}/noticias/${post.slug}`,
-      lastModified: post.modified,
+      lastModified: normalizeDate(post.modified), // ✅ FECHA NORMALIZADA
       changeFrequency: 'weekly' as const,
       priority: 0.6,
     }
   })
 
-  // Páginas legales (OPCIONAL: quitar si quieres excluirlas del sitemap)
+  // Páginas legales
   const legalPages: MetadataRoute.Sitemap = [
     {
       url: `${baseUrl}/aviso-legal`,
