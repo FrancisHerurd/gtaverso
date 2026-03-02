@@ -6,7 +6,7 @@ export const revalidate = 1800; // Revalidar cada 30 minutos
 
 /**
  * News Sitemap específico para Google News 2026
- * Incluye noticias de los últimos 7 días (ampliado para evitar sitemap vacío)
+ * Incluye noticias de los últimos 30 días
  * Formato: Google News Sitemap Protocol
  */
 
@@ -30,20 +30,64 @@ export async function GET() {
   try {
     const posts = await getAllPosts();
     
-    // Noticias de los últimos 7 días (ampliado desde 2 días)
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    if (!posts || posts.length === 0) {
+      console.log('No posts found from getAllPosts()');
+      return new Response(
+        `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
+  <!-- No se encontraron posts en WordPress -->
+</urlset>`,
+        {
+          headers: {
+            'Content-Type': 'application/xml; charset=utf-8',
+            'Cache-Control': 'public, max-age=1800, s-maxage=1800',
+          },
+        }
+      );
+    }
+    
+    // Noticias de los últimos 30 días (ampliado para testing)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     
     const recentNews = posts.filter((post: Post) => {
       try {
         const postDate = new Date(post.date);
-        const isRecent = postDate >= sevenDaysAgo;
-        const isNews = post.tipos?.nodes?.[0]?.slug === 'noticias';
+        const isRecent = postDate >= thirtyDaysAgo;
+        const tipoSlug = post.tipos?.nodes?.[0]?.slug;
+        const isNews = tipoSlug === 'noticias';
+        
+        // Log para debugging
+        if (!isNews) {
+          console.log(`Post "${post.slug}" skipped - tipo: ${tipoSlug}`);
+        }
+        
         return isRecent && isNews;
-      } catch {
+      } catch (error) {
+        console.error('Error filtering post:', post.slug, error);
         return false;
       }
     });
+
+    console.log(`Found ${recentNews.length} recent news from ${posts.length} total posts`);
+
+    // Si no hay noticias recientes, devolver XML válido con comentario
+    if (recentNews.length === 0) {
+      return new Response(
+        `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
+  <!-- No hay noticias en los últimos 30 días. Total posts: ${posts.length} -->
+</urlset>`,
+        {
+          headers: {
+            'Content-Type': 'application/xml; charset=utf-8',
+            'Cache-Control': 'public, max-age=1800, s-maxage=1800',
+          },
+        }
+      );
+    }
 
     // Generar URLs
     const urlEntries: string = recentNews
@@ -88,7 +132,7 @@ export async function GET() {
     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
-${urlEntries || '  <!-- No hay noticias recientes en los últimos 7 días -->'}
+${urlEntries}
 </urlset>`;
 
     return new Response(sitemap, {
