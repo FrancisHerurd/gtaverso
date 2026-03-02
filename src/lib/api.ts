@@ -1,4 +1,4 @@
-// lib/api.ts - VERSIÓN COMPATIBLE CON WPGRAPHQL
+// lib/api.ts - VERSIÓN COMPATIBLE CON WPGRAPHQL + TAGS
 
 const WORDPRESS_API_URL = process.env.NEXT_PUBLIC_WORDPRESS_API_URL;
 
@@ -6,7 +6,6 @@ if (!WORDPRESS_API_URL) {
   throw new Error('NEXT_PUBLIC_WORDPRESS_API_URL no está definida');
 }
 
-// ✅ DESPUÉS:
 export async function fetchAPI(query: string, variables = {}) {
   if (!query || query.trim() === '') {
     console.error('❌ Query GraphQL vacía');
@@ -65,6 +64,12 @@ export async function getAllPosts() {
             }
           }
           tipos {
+            nodes {
+              name
+              slug
+            }
+          }
+          tags {
             nodes {
               name
               slug
@@ -132,6 +137,12 @@ export async function getPostBySlug(slug: string) {
             slug
           }
         }
+        tags {
+          nodes {
+            name
+            slug
+          }
+        }
         seo {
           title
           metaDesc
@@ -171,7 +182,7 @@ export async function getAllJuegos() {
   return data?.juegos?.nodes || [];
 }
 
-// ✅ NUEVA FUNCIÓN: Obtener posts por juego (sin taxQuery)
+// Obtener posts por juego (sin taxQuery)
 export async function getPostsByGame(gameSlug: string) {
   // Obtener TODOS los posts y filtrar en el cliente
   const allPosts = await getAllPosts();
@@ -185,7 +196,7 @@ export async function getPostsByGame(gameSlug: string) {
   );
 }
 
-// ✅ NUEVA FUNCIÓN: Obtener posts por juego Y tipo
+// Obtener posts por juego Y tipo
 export async function getPostsByGameAndType(gameSlug: string, tipoSlug: string) {
   // Obtener TODOS los posts y filtrar en el cliente
   const allPosts = await getAllPosts();

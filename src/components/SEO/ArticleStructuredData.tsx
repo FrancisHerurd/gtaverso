@@ -34,7 +34,7 @@ export function ArticleStructuredData({
       "name": "GTAVerso",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://gtaverso.com/images/logo-gtaverso.png" // Cambia por tu logo
+        "url": "https://gtaverso.com/images/logo-header.png" // Cambia por tu logo
       }
     },
     "mainEntityOfPage": {

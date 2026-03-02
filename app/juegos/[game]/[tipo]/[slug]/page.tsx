@@ -7,6 +7,7 @@ import { getPostBySlug, getAllPosts } from '@/lib/api';
 import { generateNewsArticleSchema, generateBreadcrumbSchema } from '@/lib/seo';
 import YoastSEO from '@/components/YoastSEO';
 import JuegoBadge from '@/components/JuegoBadge';
+import { NewsBadges } from '@/components/NewsBadge'; // ✅ NUEVO
 import Breadcrumbs from '@/components/Breadcrumbs';
 import ShareButtons from '@/components/ShareButtons';
 import TableOfContents from '@/components/TableOfContents';
@@ -143,7 +144,7 @@ export default async function PostPage({ params }: Props) {
 
   return (
     <>
-      {/* Yoast SEO fullHead (solo para JSON-LD adicional de Yoast) */}
+      {/* Yoast SEO fullHead */}
       <YoastSEO seo={post.seo} />
 
       {/* NewsArticle Schema para Google News 2026 */}
@@ -171,6 +172,9 @@ export default async function PostPage({ params }: Props) {
               {post.juegos && post.juegos.nodes.length > 0 && (
                 <JuegoBadge juegos={post.juegos.nodes} className="mb-4 mt-6" />
               )}
+
+              {/* ✅ NUEVO: Badges de tipo de noticia (Oficial/Rumor/Actualización) */}
+              <NewsBadges tags={post.tags?.nodes} className="mb-4" />
 
               {/* Título */}
               <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
@@ -243,7 +247,7 @@ export default async function PostPage({ params }: Props) {
                 className="mt-12 pt-8 border-t border-gray-800"
               />
 
-              {/* Últimas Noticias - MÓVIL (después del contenido) */}
+              {/* Últimas Noticias - MÓVIL */}
               <div className="lg:hidden mt-12">
                 <LatestNewsSidebar currentSlug={slug} limit={5} />
               </div>
