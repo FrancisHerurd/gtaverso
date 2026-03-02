@@ -6,8 +6,19 @@ import { useState } from 'react';
 interface ShareButtonsProps {
   url: string;
   title: string;
-  className?: string; // ← AÑADIR esta línea
+  className?: string;
 }
+
+// Función helper para enviar eventos a GA
+const trackShare = (platform: string) => {
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', 'share', {
+      method: platform,
+      content_type: 'article',
+      item_id: window.location.pathname,
+    });
+  }
+};
 
 export default function ShareButtons({ url, title, className = '' }: ShareButtonsProps) {
   const [copied, setCopied] = useState(false);
@@ -28,6 +39,9 @@ export default function ShareButtons({ url, title, className = '' }: ShareButton
       await navigator.clipboard.writeText(url);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+      
+      // Track copy link
+      trackShare('copy_link');
     } catch (err) {
       console.error('Error al copiar:', err);
     }
@@ -42,6 +56,7 @@ export default function ShareButtons({ url, title, className = '' }: ShareButton
         href={shareLinks.twitter}
         target="_blank"
         rel="noopener noreferrer"
+        onClick={() => trackShare('twitter')}
         className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-800 hover:bg-[#1DA1F2] transition-colors"
         aria-label="Compartir en Twitter"
       >
@@ -55,6 +70,7 @@ export default function ShareButtons({ url, title, className = '' }: ShareButton
         href={shareLinks.facebook}
         target="_blank"
         rel="noopener noreferrer"
+        onClick={() => trackShare('facebook')}
         className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-800 hover:bg-[#1877F2] transition-colors"
         aria-label="Compartir en Facebook"
       >
@@ -68,6 +84,7 @@ export default function ShareButtons({ url, title, className = '' }: ShareButton
         href={shareLinks.whatsapp}
         target="_blank"
         rel="noopener noreferrer"
+        onClick={() => trackShare('whatsapp')}
         className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-800 hover:bg-[#25D366] transition-colors"
         aria-label="Compartir en WhatsApp"
       >
@@ -81,6 +98,7 @@ export default function ShareButtons({ url, title, className = '' }: ShareButton
         href={shareLinks.telegram}
         target="_blank"
         rel="noopener noreferrer"
+        onClick={() => trackShare('telegram')}
         className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-800 hover:bg-[#0088cc] transition-colors"
         aria-label="Compartir en Telegram"
       >
@@ -112,4 +130,11 @@ export default function ShareButtons({ url, title, className = '' }: ShareButton
       </button>
     </div>
   );
+}
+
+// Declaración de tipos para TypeScript
+declare global {
+  interface Window {
+    gtag?: (...args: any[]) => void;
+  }
 }

@@ -5,6 +5,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ScrollTopButton from "@/components/ScrollTopButton";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
 
 export const metadata: Metadata = {
   title: {
@@ -20,6 +21,8 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const gaId = process.env.NEXT_PUBLIC_GA_ID;
+
   return (
     <html lang="es" className="dark" suppressHydrationWarning>
       <head>
@@ -36,6 +39,9 @@ export default function RootLayout({
         <main>{children}</main>
         <Footer />
         <ScrollTopButton />
+        
+        {/* Google Analytics */}
+        {gaId && <GoogleAnalytics gaId={gaId} />}
       </body>
     </html>
   );
