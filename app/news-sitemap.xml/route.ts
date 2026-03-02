@@ -46,8 +46,8 @@ export async function GET() {
     });
 
     // Generar URLs
-    const urlEntries = recentNews
-      .map((post: Post) => {
+    const urlEntries: string = recentNews
+      .map((post: Post): string => {
         try {
           const gameSlug = post.juegos?.nodes?.[0]?.slug || 'gta-6';
           const typeSlug = post.tipos?.nodes?.[0]?.slug || 'noticias';
@@ -81,7 +81,7 @@ export async function GET() {
           return '';
         }
       })
-      .filter(entry => entry !== '')
+      .filter((entry: string) => entry !== '')
       .join('\n');
 
     // Generar sitemap completo
@@ -108,7 +108,7 @@ ${urlEntries || '  <!-- No hay noticias recientes en los últimos 7 días -->'}
   <!-- Error al generar sitemap: ${error instanceof Error ? error.message : 'Unknown error'} -->
 </urlset>`,
       {
-        status: 200, // ✅ Cambiado a 200 para evitar error en Search Console
+        status: 200,
         headers: {
           'Content-Type': 'application/xml; charset=utf-8',
         },
