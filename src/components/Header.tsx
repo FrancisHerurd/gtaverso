@@ -141,8 +141,11 @@ export default function Header() {
             />
           </Link>
 
-          {/* ✅ NAVEGACIÓN DESKTOP - Con Poppins */}
-          <nav className="hidden md:flex items-center space-x-6 font-poppins">
+          {/* ✅ NAVEGACIÓN DESKTOP - Con Poppins inline */}
+          <nav 
+            className="hidden md:flex items-center space-x-6"
+            style={{ fontFamily: 'var(--font-poppins), -apple-system, sans-serif' }}
+          >
             <Link
               href="/"
               className={`text-sm uppercase font-semibold tracking-wide transition-colors ${
@@ -286,10 +289,13 @@ export default function Header() {
         )}
       </div>
 
-      {/* ✅ MENÚ MÓVIL DESPLEGABLE - Con Poppins */}
+      {/* ✅ MENÚ MÓVIL DESPLEGABLE - Con Poppins inline */}
       {mobileMenuOpen && (
         <div className="bg-black/98 border-t border-[#00FF41]/20 md:hidden animate-in fade-in slide-in-from-top-2">
-          <nav className="flex flex-col space-y-1 px-4 py-4 font-poppins">
+          <nav 
+            className="flex flex-col space-y-1 px-4 py-4"
+            style={{ fontFamily: 'var(--font-poppins), -apple-system, sans-serif' }}
+          >
             <Link
               href="/"
               className="block rounded-lg px-4 py-3 text-sm font-semibold tracking-wide text-gray-300 hover:bg-[#00FF41]/10 hover:text-[#00FF41] uppercase transition-colors"

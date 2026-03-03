@@ -44,7 +44,10 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-black border-t border-[#00FF41]/20 font-poppins">
+    <footer 
+      className="bg-black border-t border-[#00FF41]/20"
+      style={{ fontFamily: 'var(--font-poppins), -apple-system, sans-serif' }}
+    >
       {/* Contenido principal */}
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="mb-8 grid grid-cols-1 gap-8 md:grid-cols-4">
