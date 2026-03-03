@@ -20,6 +20,8 @@ const config: Config = {
       },
       fontFamily: {
         sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        poppins: ['var(--font-poppins)', 'ui-sans-serif', 'sans-serif'], // ✅ NUEVO
+        montserrat: ['var(--font-montserrat)', 'ui-sans-serif', 'sans-serif'], // ✅ NUEVO
       },
       maxWidth: {
         '(--container)': '1216px',

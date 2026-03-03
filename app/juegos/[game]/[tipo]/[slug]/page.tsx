@@ -7,7 +7,7 @@ import { getPostBySlug, getAllPosts } from '@/lib/api';
 import { generateNewsArticleSchema, generateBreadcrumbSchema } from '@/lib/seo';
 import YoastSEO from '@/components/YoastSEO';
 import JuegoBadge from '@/components/JuegoBadge';
-import { NewsBadges } from '@/components/NewsBadge'; // ✅ NUEVO
+import { NewsBadges } from '@/components/NewsBadge';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import ShareButtons from '@/components/ShareButtons';
 import TableOfContents from '@/components/TableOfContents';
@@ -125,7 +125,7 @@ export default async function PostPage({ params }: Props) {
     { label: post.title, href: `/juegos/${game}/${tipo}/${slug}` },
   ];
 
-  // Generar schemas JSON-LD para Google News
+  // ✅ MODIFICADO: Autor en el schema
   const articleSchema = generateNewsArticleSchema({
     title: post.title,
     description: post.excerpt.replace(/<[^>]+>/g, '').substring(0, 200),
@@ -133,7 +133,7 @@ export default async function PostPage({ params }: Props) {
     url: `/juegos/${game}/${tipo}/${slug}`,
     publishedTime: post.date,
     modifiedTime: post.modified || post.date,
-    author: 'Equipo GTAVerso',
+    author: post.author?.node?.name || 'GTA Verso', // ✅ Usar autor de WordPress
     game: gameLabel,
     category: tipoLabel,
   });
@@ -173,7 +173,7 @@ export default async function PostPage({ params }: Props) {
                 <JuegoBadge juegos={post.juegos.nodes} className="mb-4 mt-6" />
               )}
 
-              {/* ✅ NUEVO: Badges de tipo de noticia (Oficial/Rumor/Actualización) */}
+              {/* Badges de tipo de noticia (Oficial/Rumor/Actualización) */}
               <NewsBadges tags={post.tags?.nodes} className="mb-4" />
 
               {/* Título */}
@@ -181,7 +181,7 @@ export default async function PostPage({ params }: Props) {
                 {post.title}
               </h1>
 
-              {/* Metadata (fecha + tiempo de lectura) */}
+              {/* ✅ MODIFICADO: Metadata con autor */}
               <div className="flex flex-wrap items-center gap-3 text-gray-500 text-sm mb-6">
                 <time dateTime={new Date(post.date).toISOString()}>
                   {new Date(post.date).toLocaleDateString('es-ES', {
@@ -193,8 +193,13 @@ export default async function PostPage({ params }: Props) {
                 
                 <span>•</span>
                 
-                {/* Tiempo de lectura */}
-                <ReadingTime content={post.content} />
+                {/* Tipo de contenido */}
+                <span className="text-[#00FF41]">{tipoLabel}</span>
+                
+                <span>•</span>
+                
+                {/* ✅ NUEVO: Autor */}
+                <span>{post.author?.node?.name || 'GTA Verso'}</span>
               </div>
 
               {/* Imagen destacada */}

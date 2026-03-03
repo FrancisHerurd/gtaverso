@@ -141,8 +141,8 @@ export default function Header() {
             />
           </Link>
 
-          {/* NAVEGACIÓN DESKTOP */}
-          <nav className="hidden md:flex items-center space-x-6">
+          {/* ✅ NAVEGACIÓN DESKTOP - Con Poppins */}
+          <nav className="hidden md:flex items-center space-x-6 font-poppins">
             <Link
               href="/"
               className={`text-sm uppercase font-semibold tracking-wide transition-colors ${
@@ -286,10 +286,10 @@ export default function Header() {
         )}
       </div>
 
-      {/* MENÚ MÓVIL DESPLEGABLE */}
+      {/* ✅ MENÚ MÓVIL DESPLEGABLE - Con Poppins */}
       {mobileMenuOpen && (
         <div className="bg-black/98 border-t border-[#00FF41]/20 md:hidden animate-in fade-in slide-in-from-top-2">
-          <nav className="flex flex-col space-y-1 px-4 py-4">
+          <nav className="flex flex-col space-y-1 px-4 py-4 font-poppins">
             <Link
               href="/"
               className="block rounded-lg px-4 py-3 text-sm font-semibold tracking-wide text-gray-300 hover:bg-[#00FF41]/10 hover:text-[#00FF41] uppercase transition-colors"

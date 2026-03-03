@@ -1,8 +1,6 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
-
-
 /* Variables GTA */
 :root {
   --font-size: 16px;
@@ -17,6 +15,10 @@
   --border: rgba(0, 255, 65, 0.2);
   --ring: rgba(0, 255, 65, 0.5);
   --radius: 0.625rem;
+  
+  /* ✅ NUEVO: Variables de fuentes */
+  --font-poppins: var(--font-poppins), -apple-system, sans-serif;
+  --font-montserrat: var(--font-montserrat), var(--font-poppins), sans-serif;
 }
 
 /* Dark mode forzado */
@@ -37,6 +39,13 @@ body {
   font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* ✅ NUEVO: Encabezados con Montserrat */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-montserrat);
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 /* Container Figma 1216px */

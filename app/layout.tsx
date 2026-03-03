@@ -1,5 +1,6 @@
 // app/layout.tsx
 import type { Metadata } from "next";
+import { Poppins, Montserrat } from "next/font/google";
 import "./globals.css";
 
 import Header from "@/components/Header";
@@ -7,6 +8,22 @@ import Footer from "@/components/Footer";
 import ScrollTopButton from "@/components/ScrollTopButton";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import CookieConsent from "@/components/CookieConsent";
+
+// ✅ Poppins para menús (Header/Footer)
+const poppins = Poppins({
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+  variable: '--font-poppins',
+  display: 'swap',
+});
+
+// ✅ Montserrat para encabezados (H1-H6)
+const montserrat = Montserrat({
+  subsets: ['latin'],
+  weight: ['700', '800'],
+  variable: '--font-montserrat',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: {
@@ -25,7 +42,11 @@ export default function RootLayout({
   const gaId = process.env.NEXT_PUBLIC_GA_ID;
 
   return (
-    <html lang="es" className="dark" suppressHydrationWarning>
+    <html 
+      lang="es" 
+      className={`dark ${poppins.variable} ${montserrat.variable}`} 
+      suppressHydrationWarning
+    >
       <head>
         {/* RSS Autodiscovery */}
         <link 
