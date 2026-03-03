@@ -15,10 +15,6 @@
   --border: rgba(0, 255, 65, 0.2);
   --ring: rgba(0, 255, 65, 0.5);
   --radius: 0.625rem;
-  
-  /* ✅ NUEVO: Variables de fuentes */
-  --font-poppins: var(--font-poppins), -apple-system, sans-serif;
-  --font-montserrat: var(--font-montserrat), var(--font-poppins), sans-serif;
 }
 
 /* Dark mode forzado */
@@ -41,9 +37,9 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ✅ NUEVO: Encabezados con Montserrat */
+/* ✅ Encabezados con Montserrat */
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-montserrat);
+  font-family: var(--font-montserrat), Inter, -apple-system, sans-serif;
   font-weight: 700;
   letter-spacing: -0.02em;
 }
