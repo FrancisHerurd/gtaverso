@@ -6,7 +6,7 @@ export const revalidate = 1800; // Revalidar cada 30 minutos
 
 /**
  * News Sitemap específico para Google News 2026
- * Incluye noticias de los últimos 2 días (Google News prefiere contenido muy reciente)
+ * Incluye noticias de los últimos 2 días
  * Formato: Google News Sitemap Protocol
  */
 
@@ -35,7 +35,7 @@ export async function GET() {
       return new Response('No posts available', { status: 404 });
     }
     
-    // ✅ CAMBIO: Google News prefiere últimos 2 días (no 30)
+    // ✅ Google News prefiere últimos 2 días (no 30)
     const twoDaysAgo = new Date();
     twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
     
@@ -47,7 +47,6 @@ export async function GET() {
         const isRecent = postDate >= twoDaysAgo;
         const isNews = tipoSlug === 'noticias';
         
-        // Log detallado
         if (isNews && !isRecent) {
           console.log(`[news-sitemap] Post "${post.slug}" is news but too old (${post.date})`);
         }
@@ -61,7 +60,7 @@ export async function GET() {
 
     console.log(`[news-sitemap] Found ${recentNews.length} recent news from ${posts.length} total posts (last 2 days)`);
 
-    // ✅ CAMBIO: Si no hay noticias recientes, devolver 404 en lugar de XML vacío
+    // ✅ Si no hay noticias recientes, devolver 404
     if (recentNews.length === 0) {
       console.warn('[news-sitemap] No recent news found - returning 404');
       return new Response(
@@ -72,7 +71,7 @@ export async function GET() {
 
     // Generar URLs
     const urlEntries = recentNews
-      .map((post: Post) => {
+      .map((post: Post): string => {
         try {
           const gameSlug = post.juegos?.nodes?.[0]?.slug || 'gta-6';
           const typeSlug = post.tipos?.nodes?.[0]?.slug || 'noticias';
@@ -105,10 +104,10 @@ export async function GET() {
           return '';
         }
       })
-      .filter(entry => entry !== '')
+      .filter((entry: string): entry is string => entry !== '') // ✅ Type guard explícito
       .join('\n');
 
-    // ✅ VERIFICACIÓN FINAL: Asegurar que hay contenido
+    // ✅ Verificación final
     if (!urlEntries || urlEntries.trim() === '') {
       console.error('[news-sitemap] No valid URL entries generated');
       return new Response('No valid news entries', { status: 404 });
