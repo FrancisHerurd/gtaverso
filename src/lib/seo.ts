@@ -1,5 +1,6 @@
 // lib/seo.ts
 import { Metadata } from 'next'
+import { normalizeImageUrl, toAbsoluteUrl } from './utils'
 
 type SEOProps = {
   title?: string
@@ -35,6 +36,7 @@ export function generateSEO({
 }: SEOProps = {}): Metadata {
   const fullTitle = title ? `${title} | ${SITE_NAME}` : DEFAULT_TITLE
   const fullUrl = url.startsWith('http') ? url : `${SITE_URL}${url}`
+  const normalizedImage = toAbsoluteUrl(normalizeImageUrl(image)) // ✅ Absoluta para metadatos
 
   const metadata: Metadata = {
     metadataBase: new URL(SITE_URL),
@@ -51,7 +53,7 @@ export function generateSEO({
       description,
       images: [
         {
-          url: image,
+          url: normalizedImage,
           width: 1200,
           height: 630,
           alt: title || DEFAULT_TITLE,
@@ -66,7 +68,7 @@ export function generateSEO({
       creator: TWITTER_HANDLE,
       title: fullTitle,
       description,
-      images: [image],
+      images: [normalizedImage],
     },
 
     // Robots
@@ -119,7 +121,7 @@ export function generateNewsArticleSchema({
   url,
   publishedTime,
   modifiedTime,
-  author = 'Equipo GTAVerso',
+  author = 'GTAVerso',
   game,
   category,
 }: {
@@ -143,22 +145,34 @@ export function generateNewsArticleSchema({
   };
 
   const fullUrl = url.startsWith('http') ? url : `${SITE_URL}${url}`;
-  const fullImage = image.startsWith('http') ? image : `${SITE_URL}${image}`;
+  const fullImage = toAbsoluteUrl(normalizeImageUrl(image)); // ✅ Absoluta para schema
+
+  // Detectar si es autor personal o de organización
+  const isPersonalAuthor = author && author !== 'GTAVerso' && author !== 'Equipo GTAVerso' && author !== 'GTA Verso';
 
   return {
     '@context': 'https://schema.org',
     '@type': 'NewsArticle',
     
     // Campos REQUERIDOS
-    headline: title.substring(0, 110), // Max 110 caracteres
-    image: [fullImage],
+    headline: title.substring(0, 110),
+    image: {
+      '@type': 'ImageObject',
+      url: fullImage,
+      width: 1200,
+      height: 630,
+    },
     datePublished: normalizeDate(publishedTime),
     dateModified: normalizeDate(modifiedTime || publishedTime),
     
-    // Autor (persona u organización)
-    author: {
-      '@type': 'Organization',
+    // Autor dinámico (Person u Organization)
+    author: isPersonalAuthor ? {
+      '@type': 'Person',
       name: author,
+      url: SITE_URL,
+    } : {
+      '@type': 'Organization',
+      name: author || 'GTAVerso',
       url: SITE_URL,
     },
     
@@ -185,7 +199,7 @@ export function generateNewsArticleSchema({
     description: description.substring(0, 200),
     articleSection: category || 'Videojuegos',
     about: {
-      '@type': 'Thing',
+      '@type': 'VideoGame',
       name: game || 'Grand Theft Auto',
     },
     
@@ -194,6 +208,9 @@ export function generateNewsArticleSchema({
     
     // Idioma del artículo
     inLanguage: 'es-ES',
+    
+    // Keywords para Google News
+    keywords: game ? `${game}, Grand Theft Auto, Rockstar Games, ${category || 'noticias'}` : 'Grand Theft Auto, Rockstar Games',
   }
 }
 
@@ -207,7 +224,7 @@ export function generateArticleSchema({
   url,
   publishedTime,
   modifiedTime,
-  author = 'Equipo GTAVerso',
+  author = 'GTAVerso',
 }: {
   title: string
   description: string
@@ -226,19 +243,30 @@ export function generateArticleSchema({
   };
 
   const fullUrl = url.startsWith('http') ? url : `${SITE_URL}${url}`;
-  const fullImage = image.startsWith('http') ? image : `${SITE_URL}${image}`;
+  const fullImage = toAbsoluteUrl(normalizeImageUrl(image)); // ✅ Absoluta para schema
+
+  const isPersonalAuthor = author && author !== 'GTAVerso' && author !== 'Equipo GTAVerso' && author !== 'GTA Verso';
 
   return {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: title,
     description,
-    image: [fullImage],
+    image: {
+      '@type': 'ImageObject',
+      url: fullImage,
+      width: 1200,
+      height: 630,
+    },
     datePublished: normalizeDate(publishedTime),
     dateModified: normalizeDate(modifiedTime || publishedTime),
-    author: {
-      '@type': 'Organization',
+    author: isPersonalAuthor ? {
+      '@type': 'Person',
       name: author,
+      url: SITE_URL,
+    } : {
+      '@type': 'Organization',
+      name: author || 'GTAVerso',
       url: SITE_URL,
     },
     publisher: {
@@ -248,6 +276,8 @@ export function generateArticleSchema({
       logo: {
         '@type': 'ImageObject',
         url: `${SITE_URL}/images/logo-header.png`,
+        width: 300,
+        height: 80,
       },
     },
     mainEntityOfPage: {

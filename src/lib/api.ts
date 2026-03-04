@@ -1,9 +1,65 @@
-// lib/api.ts - VERSIÓN COMPATIBLE CON WPGRAPHQL + TAGS
+// lib/api.ts - VERSIÓN COMPATIBLE CON WPGRAPHQL + TAGS + PROXY DE IMÁGENES
 
 const WORDPRESS_API_URL = process.env.NEXT_PUBLIC_WORDPRESS_API_URL;
 
 if (!WORDPRESS_API_URL) {
   throw new Error('NEXT_PUBLIC_WORDPRESS_API_URL no está definida');
+}
+
+// ✅ FUNCIÓN: Normalizar URLs de imágenes de WordPress a rutas relativas
+function normalizeImageUrl(url: string | null | undefined): string {
+  if (!url) return '/og-default.webp';
+  
+  // Si ya es una ruta relativa de gtaverso.com, retornar sin cambios
+  if (url.startsWith('/wp-images/') || url.startsWith('/images/')) return url;
+  
+  // Convertir URLs de WordPress a ruta relativa del proxy
+  if (url.includes('csm.gtaverso.com/wp-content/uploads')) {
+    return url.replace(
+      /https?:\/\/csm\.gtaverso\.com\/wp-content\/uploads/,
+      '/wp-images'
+    );
+  }
+  
+  // Si ya es gtaverso.com, convertir a ruta relativa
+  if (url.includes('gtaverso.com/wp-images')) {
+    return url.replace(/https?:\/\/gtaverso\.com/, '');
+  }
+  
+  // Si es ruta relativa, retornar tal cual
+  if (url.startsWith('/')) {
+    return url;
+  }
+  
+  // Fallback: retornar sin cambios
+  return url;
+}
+
+// ✅ FUNCIÓN: Normalizar post (aplicar a imágenes)
+function normalizePost(post: any) {
+  if (!post) return null;
+  
+  return {
+    ...post,
+    featuredImage: post.featuredImage?.node 
+      ? {
+          node: {
+            ...post.featuredImage.node,
+            sourceUrl: normalizeImageUrl(post.featuredImage.node.sourceUrl),
+          }
+        }
+      : null,
+    seo: post.seo
+      ? {
+          ...post.seo,
+          opengraphImage: post.seo.opengraphImage?.sourceUrl
+            ? {
+                sourceUrl: normalizeImageUrl(post.seo.opengraphImage.sourceUrl),
+              }
+            : undefined,
+        }
+      : undefined,
+  };
 }
 
 export async function fetchAPI(query: string, variables = {}) {
@@ -98,7 +154,8 @@ export async function getAllPosts() {
     return [];
   }
 
-  return data.posts.nodes;
+  // ✅ Normalizar URLs de imágenes en todos los posts
+  return data.posts.nodes.map(normalizePost);
 }
 
 export async function getPostBySlug(slug: string) {
@@ -162,7 +219,8 @@ export async function getPostBySlug(slug: string) {
     { slug }
   );
 
-  return data?.post;
+  // ✅ Normalizar URLs de imágenes en el post individual
+  return normalizePost(data?.post);
 }
 
 export async function getAllJuegos() {
