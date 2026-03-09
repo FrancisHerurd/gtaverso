@@ -1,7 +1,7 @@
 // app/juegos/[game]/page.tsx
 import type { Metadata } from 'next';
 import GameHub from '@/components/GameHub';
-import { Newspaper } from 'lucide-react';
+import { Newspaper, Users } from 'lucide-react';
 import { notFound } from 'next/navigation';
 
 const siteUrl = 'https://gtaverso.com';
@@ -35,6 +35,7 @@ const gameDataDictionary: Record<string, any> = {
         notes: 'Lanzamiento Previsto',
       },
     ],
+    hasCharacters: true,
   },
   'gta-5': {
     title: 'Grand Theft Auto V',
@@ -74,6 +75,7 @@ const gameDataDictionary: Record<string, any> = {
         notes: 'Versión Next-Gen',
       },
     ],
+    hasCharacters: false,
   },
   'gta-4': {
     title: 'Grand Theft Auto IV',
@@ -105,6 +107,7 @@ const gameDataDictionary: Record<string, any> = {
         notes: 'Lanzamiento en PC',
       },
     ],
+    hasCharacters: false,
   },
   'gta-san-andreas': {
     title: 'GTA: San Andreas',
@@ -133,6 +136,7 @@ const gameDataDictionary: Record<string, any> = {
         notes: 'The Definitive Edition',
       },
     ],
+    hasCharacters: false,
   },
   'gta-vice-city': {
     title: 'GTA: Vice City',
@@ -161,6 +165,7 @@ const gameDataDictionary: Record<string, any> = {
         notes: 'The Definitive Edition',
       },
     ],
+    hasCharacters: false,
   },
   'gta-3': {
     title: 'Grand Theft Auto III',
@@ -189,6 +194,7 @@ const gameDataDictionary: Record<string, any> = {
         notes: 'The Definitive Edition',
       },
     ],
+    hasCharacters: false,
   },
 };
 
@@ -267,6 +273,17 @@ export default async function GamePage({
       icon: Newspaper,
       image: `/images/${prefix}-news.webp`,
     },
+    ...(gameData.hasCharacters
+      ? [
+          {
+            title: 'Personajes',
+            description: `Fichas de los protagonistas y personajes de ${gameData.title}.`,
+            href: `/juegos/${game}/personajes`,
+            icon: Users,
+            image: `/images/${prefix}-characters.webp`,
+          },
+        ]
+      : []),
   ];
 
   return (

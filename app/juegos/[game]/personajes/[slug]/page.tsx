@@ -13,15 +13,71 @@ interface Props {
   params: Promise<{ game: string; slug: string }>;
 }
 
+type CharacterGroup = 'principal' | 'secundario' | 'otros';
+
+const SITE_URL = 'https://gtaverso.com';
+
 const GAME_LABELS: Record<string, string> = {
   'gta-6': 'GTA 6',
   'gta-5': 'GTA 5',
   'gta-4': 'GTA 4',
   'gta-san-andreas': 'GTA San Andreas',
-  'vice-city': 'GTA Vice City',
   'gta-vice-city': 'GTA Vice City',
+  'vice-city': 'GTA Vice City',
   'gta-3': 'GTA 3',
 };
+
+const CHARACTER_UI_META: Record<
+  string,
+  {
+    actor?: string;
+    role?: string;
+    group: CharacterGroup;
+    order?: number;
+  }
+> = {
+  'jason-duval': {
+    actor: 'Pendiente de definir',
+    role: 'Protagonista',
+    group: 'principal',
+    order: 1,
+  },
+  'lucia-caminos': {
+    actor: 'Pendiente de definir',
+    role: 'Protagonista',
+    group: 'principal',
+    order: 2,
+  },
+};
+
+function stripHtml(html?: string) {
+  return (html || '').replace(/<[^>]*>/g, '').trim();
+}
+
+function getCharacterMeta(slug: string) {
+  return (
+    CHARACTER_UI_META[slug] || {
+      actor: undefined,
+      role: undefined,
+      group: 'otros' as CharacterGroup,
+      order: 999,
+    }
+  );
+}
+
+function sortCharacters(characters: any[]) {
+  return [...characters].sort((a, b) => {
+    const metaA = getCharacterMeta(a.slug);
+    const metaB = getCharacterMeta(b.slug);
+
+    const orderA = metaA.order ?? 999;
+    const orderB = metaB.order ?? 999;
+
+    if (orderA !== orderB) return orderA - orderB;
+
+    return String(a.title).localeCompare(String(b.title), 'es');
+  });
+}
 
 export async function generateStaticParams() {
   const juegos = await getAllJuegos();
@@ -57,14 +113,30 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
-  const description =
-    character.excerpt?.replace(/<[^>]*>/g, '').trim() ||
-    `Ficha del personaje ${character.title} en ${gameLabel}.`;
+  const belongsToGame = character.juegos?.nodes?.some(
+    (juego: any) => juego.slug === game
+  );
 
-  const canonical = `https://gtaverso.com/juegos/${game}/personajes/${slug}`;
+  if (!belongsToGame) {
+    return {
+      title: 'Personaje no encontrado | GTAVerso',
+      robots: {
+        index: false,
+        follow: false,
+      },
+    };
+  }
+
+  const description =
+    stripHtml(character.excerpt) ||
+    `Descubre a ${character.title}, personaje de ${gameLabel}, en GTAVerso.`;
+
+  const canonical = `${SITE_URL}/juegos/${game}/personajes/${slug}`;
+  const image = character.featuredImage?.node?.sourceUrl || `${SITE_URL}/og-default.webp`;
+  const imageAlt = character.featuredImage?.node?.altText || character.title;
 
   return {
-    title: `${character.title} | Personajes de ${gameLabel} | GTAVerso`,
+    title: `${character.title} | Personajes de ${gameLabel}`,
     description,
     alternates: {
       canonical,
@@ -74,14 +146,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description,
       url: canonical,
       type: 'article',
-      images: character.featuredImage?.node?.sourceUrl
-        ? [
-            {
-              url: character.featuredImage.node.sourceUrl,
-              alt: character.featuredImage.node.altText || character.title,
-            },
-          ]
-        : [],
+      images: [
+        {
+          url: image,
+          alt: imageAlt,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${character.title} | Personajes de ${gameLabel} | GTAVerso`,
+      description,
+      images: [image],
     },
   };
 }
@@ -96,6 +172,27 @@ export default async function CharacterDetailPage({ params }: Props) {
     notFound();
   }
 
+  const belongsToGame = character.juegos?.nodes?.some(
+    (juego: any) => juego.slug === game
+  );
+
+  if (!belongsToGame) {
+    notFound();
+  }
+
+  const meta = getCharacterMeta(slug);
+  const allCharacters = await getCharactersByGame(game);
+  const relatedCharacters = sortCharacters(
+    allCharacters.filter((item: any) => item.slug !== slug)
+  ).slice(0, 6);
+
+  const canonical = `${SITE_URL}/juegos/${game}/personajes/${slug}`;
+  const image = character.featuredImage?.node?.sourceUrl || `${SITE_URL}/og-default.webp`;
+  const imageAlt = character.featuredImage?.node?.altText || character.title;
+  const excerpt =
+    stripHtml(character.excerpt) ||
+    `Descubre a ${character.title}, personaje de ${gameLabel}, en GTAVerso.`;
+
   const breadcrumbs = [
     { label: 'Inicio', href: '/' },
     { label: 'Juegos', href: '/juegos' },
@@ -104,68 +201,197 @@ export default async function CharacterDetailPage({ params }: Props) {
     { label: character.title, href: `/juegos/${game}/personajes/${slug}` },
   ];
 
-  const excerpt =
-    character.excerpt?.replace(/<[^>]*>/g, '').trim() ||
-    `Ficha del personaje ${character.title} en GTAVerso.`;
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: breadcrumbs.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.label,
+      item: `${SITE_URL}${item.href}`,
+    })),
+  };
+
+  const personSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    name: character.title,
+    description: excerpt,
+    image,
+    url: canonical,
+    jobTitle: meta.role || 'Personaje de videojuego',
+  };
 
   return (
-    <article className="min-h-screen bg-[#050508] pt-24 pb-20">
-      <div className="mx-auto max-w-7xl px-4">
-        <Breadcrumbs items={breadcrumbs} />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }}
+      />
 
-        <div className="mt-6 mb-8">
-          <Link
-            href={`/juegos/${game}/personajes`}
-            className="inline-block text-orange-500 transition hover:underline"
-          >
-            ← Volver a personajes de {gameLabel}
-          </Link>
-        </div>
+      <article className="min-h-screen bg-[#050508] pt-24 pb-20 text-gray-200">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <Breadcrumbs items={breadcrumbs} />
 
-        <header className="mb-10">
-          <h1 className="mb-4 text-4xl font-bold text-white md:text-5xl">
-            {character.title}
-          </h1>
-
-          <p className="max-w-3xl text-lg leading-8 text-gray-300">
-            {excerpt}
-          </p>
-        </header>
-
-        {character.featuredImage?.node?.sourceUrl && (
-          <div className="relative mb-10 h-[320px] overflow-hidden rounded-2xl border border-white/10 bg-[#0a0b14] md:h-[440px]">
-            <Image
-              src={character.featuredImage.node.sourceUrl}
-              alt={character.featuredImage.node.altText || character.title}
-              fill
-              priority
-              className="object-cover"
-              sizes="100vw"
-            />
+          <div className="mt-6 mb-8">
+            <Link
+              href={`/juegos/${game}/personajes`}
+              className="inline-block text-orange-500 transition hover:underline"
+            >
+              ← Volver a personajes de {gameLabel}
+            </Link>
           </div>
-        )}
 
-        <section aria-labelledby="contenido-personaje" className="max-w-4xl">
-          <h2
-            id="contenido-personaje"
-            className="mb-6 text-2xl font-bold text-white"
-          >
-            Quién es {character.title}
-          </h2>
+          <header className="mb-10">
+            <div className="mb-4 flex flex-wrap gap-2">
+              {meta.role && (
+                <span className="inline-flex rounded-full bg-[#FF00FF] px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-black">
+                  {meta.role}
+                </span>
+              )}
+              <span className="inline-flex rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-gray-300">
+                {gameLabel}
+              </span>
+            </div>
 
-          <div
-            className="prose prose-invert prose-lg max-w-none
-              prose-headings:text-white
-              prose-p:text-gray-300 prose-p:leading-relaxed
-              prose-a:text-[#00FF41] hover:prose-a:text-[#00cc34]
-              prose-strong:text-white
-              prose-ul:text-gray-300 prose-ol:text-gray-300
-              prose-li:marker:text-[#00FF41]
-              prose-img:rounded-lg prose-img:my-8"
-            dangerouslySetInnerHTML={{ __html: character.content || '' }}
-          />
-        </section>
-      </div>
-    </article>
+            <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl md:text-6xl">
+              {character.title}
+            </h1>
+
+            {meta.actor && (
+              <p className="mt-4 text-sm font-semibold uppercase tracking-[0.18em] text-gray-400">
+                Intérprete / actor:{' '}
+                <span className="normal-case tracking-normal text-white">
+                  {meta.actor}
+                </span>
+              </p>
+            )}
+          </header>
+
+          <div className="grid gap-10 lg:grid-cols-12">
+            <div className="lg:col-span-8">
+              <div className="relative mb-10 overflow-hidden rounded-2xl border border-white/10 bg-[#0a0b14]">
+                <div className="relative aspect-video w-full">
+                  <Image
+                    src={image}
+                    alt={imageAlt}
+                    fill
+                    priority
+                    className="object-cover"
+                    sizes="(max-width: 1024px) 100vw, 66vw"
+                  />
+                </div>
+              </div>
+
+              <div
+                className="prose prose-invert prose-lg max-w-none
+                  prose-headings:text-white prose-headings:scroll-mt-24
+                  prose-h2:text-3xl prose-h2:mt-12 prose-h2:mb-4
+                  prose-h3:text-2xl prose-h3:mt-8 prose-h3:mb-3
+                  prose-p:text-gray-300 prose-p:leading-relaxed
+                  prose-a:text-[#00FF41] hover:prose-a:text-[#00cc34]
+                  prose-a:no-underline hover:prose-a:underline
+                  prose-strong:text-white prose-strong:font-semibold
+                  prose-ul:text-gray-300 prose-ol:text-gray-300
+                  prose-li:marker:text-[#00FF41]
+                  prose-img:rounded-lg prose-img:my-8
+                  prose-blockquote:border-l-4 prose-blockquote:border-[#00FF41]
+                  prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-gray-400"
+                dangerouslySetInnerHTML={{ __html: character.content || '' }}
+              />
+            </div>
+
+            <aside className="lg:col-span-4">
+              <div className="sticky top-28 space-y-6">
+                <section
+                  aria-labelledby="ficha-rapida"
+                  className="rounded-2xl border border-white/10 bg-[#0a0b14] p-6"
+                >
+                  <h2
+                    id="ficha-rapida"
+                    className="mb-5 text-lg font-bold uppercase tracking-[0.16em] text-white"
+                  >
+                    Ficha rápida
+                  </h2>
+
+                  <dl className="space-y-4 text-sm">
+                    <div className="border-b border-white/5 pb-4">
+                      <dt className="mb-1 text-gray-400">Nombre</dt>
+                      <dd className="font-semibold text-white">{character.title}</dd>
+                    </div>
+
+                    <div className="border-b border-white/5 pb-4">
+                      <dt className="mb-1 text-gray-400">Juego</dt>
+                      <dd className="font-semibold text-white">{gameLabel}</dd>
+                    </div>
+
+                    <div className="border-b border-white/5 pb-4">
+                      <dt className="mb-1 text-gray-400">Rol</dt>
+                      <dd className="font-semibold text-white">
+                        {meta.role || 'Personaje'}
+                      </dd>
+                    </div>
+
+                    <div>
+                      <dt className="mb-1 text-gray-400">Intérprete / actor</dt>
+                      <dd className="font-semibold text-white">
+                        {meta.actor || 'Pendiente de confirmar'}
+                      </dd>
+                    </div>
+                  </dl>
+                </section>
+
+                {relatedCharacters.length > 0 && (
+                  <section
+                    aria-labelledby="otros-personajes"
+                    className="rounded-2xl border border-white/10 bg-[#0a0b14] p-6"
+                  >
+                    <h2
+                      id="otros-personajes"
+                      className="mb-5 text-lg font-bold uppercase tracking-[0.16em] text-white"
+                    >
+                      Otros personajes de {gameLabel}
+                    </h2>
+
+                    <div className="space-y-4">
+                      {relatedCharacters.map((item: any) => (
+                        <Link
+                          key={item.slug}
+                          href={`/juegos/${game}/personajes/${item.slug}`}
+                          className="group flex items-center gap-4 rounded-xl border border-white/5 bg-white/[0.02] p-3 transition hover:border-orange-500/40 hover:bg-white/[0.04]"
+                        >
+                          <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-[#050508]">
+                            <Image
+                              src={item.featuredImage?.node?.sourceUrl || '/og-default.webp'}
+                              alt={item.featuredImage?.node?.altText || item.title}
+                              fill
+                              className="object-cover"
+                              sizes="80px"
+                            />
+                          </div>
+
+                          <div className="min-w-0">
+                            <h3 className="truncate text-base font-bold text-white group-hover:text-orange-500">
+                              {item.title}
+                            </h3>
+                            <p className="mt-1 line-clamp-2 text-sm leading-6 text-gray-400">
+                              {stripHtml(item.excerpt) || `Ficha de ${item.title} en GTAVerso.`}
+                            </p>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  </section>
+                )}
+              </div>
+            </aside>
+          </div>
+        </div>
+      </article>
+    </>
   );
 }
