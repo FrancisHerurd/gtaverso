@@ -1,7 +1,10 @@
 // app/juegos/[game]/page.tsx
+import type { Metadata } from 'next';
 import GameHub from '@/components/GameHub';
 import { Newspaper } from 'lucide-react';
 import { notFound } from 'next/navigation';
+
+const siteUrl = 'https://gtaverso.com';
 
 const gameDataDictionary: Record<string, any> = {
   'gta-6': {
@@ -23,8 +26,15 @@ const gameDataDictionary: Record<string, any> = {
     },
     releaseTimeline: [
       { date: '4 Dic 2023', platforms: [], notes: 'Tráiler 1 Oficial' },
-      { date: 'Otoño 2025', platforms: [{ name: 'PS5', color: 'blue' }, { name: 'Xbox Series X|S', color: 'green' }], notes: 'Lanzamiento Previsto' }
-    ]
+      {
+        date: 'Otoño 2025',
+        platforms: [
+          { name: 'PS5', color: 'blue' },
+          { name: 'Xbox Series X|S', color: 'green' },
+        ],
+        notes: 'Lanzamiento Previsto',
+      },
+    ],
   },
   'gta-5': {
     title: 'Grand Theft Auto V',
@@ -42,10 +52,28 @@ const gameDataDictionary: Record<string, any> = {
       platforms: 'PS3, PS4, PS5, Xbox, PC',
     },
     releaseTimeline: [
-      { date: '17 Sept 2013', platforms: [{ name: 'PS3', color: 'blue' }, { name: 'Xbox 360', color: 'green' }], notes: 'Lanzamiento Original' },
-      { date: '14 Abr 2015', platforms: [{ name: 'PC', color: 'dark' }], notes: 'Lanzamiento en PC' },
-      { date: '15 Mar 2022', platforms: [{ name: 'PS5', color: 'blue' }, { name: 'Xbox Series X|S', color: 'green' }], notes: 'Versión Next-Gen' }
-    ]
+      {
+        date: '17 Sept 2013',
+        platforms: [
+          { name: 'PS3', color: 'blue' },
+          { name: 'Xbox 360', color: 'green' },
+        ],
+        notes: 'Lanzamiento Original',
+      },
+      {
+        date: '14 Abr 2015',
+        platforms: [{ name: 'PC', color: 'dark' }],
+        notes: 'Lanzamiento en PC',
+      },
+      {
+        date: '15 Mar 2022',
+        platforms: [
+          { name: 'PS5', color: 'blue' },
+          { name: 'Xbox Series X|S', color: 'green' },
+        ],
+        notes: 'Versión Next-Gen',
+      },
+    ],
   },
   'gta-4': {
     title: 'Grand Theft Auto IV',
@@ -57,11 +85,26 @@ const gameDataDictionary: Record<string, any> = {
         <p>Niko Bellic llega a Liberty City para escapar de su pasado, pero descubre que el sueño americano es solo una pesadilla de codicia.</p>
       </div>
     ),
-    gameInfo: { developer: 'Rockstar North', releaseDate: '29 Abr 2008', platforms: 'PS3, Xbox 360, PC' },
+    gameInfo: {
+      developer: 'Rockstar North',
+      releaseDate: '29 Abr 2008',
+      platforms: 'PS3, Xbox 360, PC',
+    },
     releaseTimeline: [
-      { date: '29 Abr 2008', platforms: [{ name: 'PS3', color: 'blue' }, { name: 'Xbox 360', color: 'green' }], notes: 'Lanzamiento Original' },
-      { date: '2 Dic 2008', platforms: [{ name: 'PC', color: 'dark' }], notes: 'Lanzamiento en PC' }
-    ]
+      {
+        date: '29 Abr 2008',
+        platforms: [
+          { name: 'PS3', color: 'blue' },
+          { name: 'Xbox 360', color: 'green' },
+        ],
+        notes: 'Lanzamiento Original',
+      },
+      {
+        date: '2 Dic 2008',
+        platforms: [{ name: 'PC', color: 'dark' }],
+        notes: 'Lanzamiento en PC',
+      },
+    ],
   },
   'gta-san-andreas': {
     title: 'GTA: San Andreas',
@@ -73,11 +116,23 @@ const gameDataDictionary: Record<string, any> = {
         <p>Hace cinco años, Carl Johnson escapó de la presión de Los Santos. Ahora vuelve a casa para encontrar a su familia destrozada.</p>
       </div>
     ),
-    gameInfo: { developer: 'Rockstar North', releaseDate: '26 Oct 2004', platforms: 'PS2, Xbox, PC, Móvil' },
+    gameInfo: {
+      developer: 'Rockstar North',
+      releaseDate: '26 Oct 2004',
+      platforms: 'PS2, Xbox, PC, Móvil',
+    },
     releaseTimeline: [
-      { date: '26 Oct 2004', platforms: [{ name: 'PS2', color: 'blue' }], notes: 'Lanzamiento Original' },
-      { date: '11 Nov 2021', platforms: [{ name: 'Consolas Modernas', color: 'dark' }], notes: 'The Definitive Edition' }
-    ]
+      {
+        date: '26 Oct 2004',
+        platforms: [{ name: 'PS2', color: 'blue' }],
+        notes: 'Lanzamiento Original',
+      },
+      {
+        date: '11 Nov 2021',
+        platforms: [{ name: 'Consolas Modernas', color: 'dark' }],
+        notes: 'The Definitive Edition',
+      },
+    ],
   },
   'gta-vice-city': {
     title: 'GTA: Vice City',
@@ -89,11 +144,23 @@ const gameDataDictionary: Record<string, any> = {
         <p>Bienvenido a los años 80. La historia del ascenso de Tommy Vercetti a la cima del mundo criminal con pelos cardados y trajes pastel.</p>
       </div>
     ),
-    gameInfo: { developer: 'Rockstar North', releaseDate: '29 Oct 2002', platforms: 'PS2, Xbox, PC, Móvil' },
+    gameInfo: {
+      developer: 'Rockstar North',
+      releaseDate: '29 Oct 2002',
+      platforms: 'PS2, Xbox, PC, Móvil',
+    },
     releaseTimeline: [
-      { date: '29 Oct 2002', platforms: [{ name: 'PS2', color: 'blue' }], notes: 'Lanzamiento Original' },
-      { date: '11 Nov 2021', platforms: [{ name: 'Consolas Modernas', color: 'dark' }], notes: 'The Definitive Edition' }
-    ]
+      {
+        date: '29 Oct 2002',
+        platforms: [{ name: 'PS2', color: 'blue' }],
+        notes: 'Lanzamiento Original',
+      },
+      {
+        date: '11 Nov 2021',
+        platforms: [{ name: 'Consolas Modernas', color: 'dark' }],
+        notes: 'The Definitive Edition',
+      },
+    ],
   },
   'gta-3': {
     title: 'Grand Theft Auto III',
@@ -105,11 +172,23 @@ const gameDataDictionary: Record<string, any> = {
         <p>Todo empieza en Liberty City. El juego que definió el género de mundo abierto y nos enseñó que el crimen paga.</p>
       </div>
     ),
-    gameInfo: { developer: 'DMA Design', releaseDate: '22 Oct 2001', platforms: 'PS2, Xbox, PC, Móvil' },
+    gameInfo: {
+      developer: 'DMA Design',
+      releaseDate: '22 Oct 2001',
+      platforms: 'PS2, Xbox, PC, Móvil',
+    },
     releaseTimeline: [
-      { date: '22 Oct 2001', platforms: [{ name: 'PS2', color: 'blue' }], notes: 'Lanzamiento Original' },
-      { date: '11 Nov 2021', platforms: [{ name: 'Consolas Modernas', color: 'dark' }], notes: 'The Definitive Edition' }
-    ]
+      {
+        date: '22 Oct 2001',
+        platforms: [{ name: 'PS2', color: 'blue' }],
+        notes: 'Lanzamiento Original',
+      },
+      {
+        date: '11 Nov 2021',
+        platforms: [{ name: 'Consolas Modernas', color: 'dark' }],
+        notes: 'The Definitive Edition',
+      },
+    ],
   },
 };
 
@@ -119,7 +198,60 @@ export function generateStaticParams() {
   }));
 }
 
-export default async function GamePage({ params }: { params: Promise<{ game: string }> }) {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ game: string }>;
+}): Promise<Metadata> {
+  const { game } = await params;
+  const gameData = gameDataDictionary[game];
+
+  if (!gameData) {
+    return {
+      title: 'Juego no encontrado | GTAVerso',
+      robots: {
+        index: false,
+        follow: false,
+      },
+    };
+  }
+
+  const canonicalPath = `/juegos/${game}`;
+
+  return {
+    title: gameData.title,
+    description: `Todo sobre ${gameData.title} en GTAVerso: noticias, guías, lanzamientos y novedades de la saga GTA.`,
+    alternates: {
+      canonical: canonicalPath,
+    },
+    openGraph: {
+      type: 'website',
+      url: `${siteUrl}${canonicalPath}`,
+      title: `${gameData.title} | GTAVerso`,
+      description: `Todo sobre ${gameData.title} en GTAVerso: noticias, guías, lanzamientos y novedades de la saga GTA.`,
+      siteName: 'GTAVerso',
+      locale: 'es_ES',
+      images: [
+        {
+          url: gameData.heroImage,
+          alt: gameData.title,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${gameData.title} | GTAVerso`,
+      description: `Todo sobre ${gameData.title} en GTAVerso: noticias, guías, lanzamientos y novedades de la saga GTA.`,
+      images: [gameData.heroImage],
+    },
+  };
+}
+
+export default async function GamePage({
+  params,
+}: {
+  params: Promise<{ game: string }>;
+}) {
   const { game } = await params;
   const gameData = gameDataDictionary[game];
 
@@ -127,7 +259,6 @@ export default async function GamePage({ params }: { params: Promise<{ game: str
 
   const prefix = gameData.assetPrefix;
 
-  // Solo mostramos la sección de Noticias para todos los juegos
   const sections = [
     {
       title: 'Noticias',
