@@ -7,11 +7,17 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/api/', '/admin/'],
+        disallow: [
+          '/api/',
+          '/admin/',
+        ],
       },
       {
         userAgent: 'Googlebot-News',
-        allow: '/juegos/*/noticias/',
+        allow: [
+          '/juegos/*/noticias/',
+          '/juegos/*/noticias/*',
+        ],
         disallow: [],
       },
     ],
@@ -19,5 +25,6 @@ export default function robots(): MetadataRoute.Robots {
       'https://gtaverso.com/sitemap.xml',
       'https://gtaverso.com/news-sitemap.xml',
     ],
+    host: 'https://gtaverso.com',
   };
 }

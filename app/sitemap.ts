@@ -8,6 +8,12 @@ type PostNode = {
   juegos?: { nodes?: Array<{ slug?: string }> }
 }
 
+type CharacterNode = {
+  slug: string
+  modified: string
+  juegos?: { nodes?: Array<{ slug?: string }> }
+}
+
 const GAMES = ['gta-6', 'gta-5', 'gta-4', 'gta-san-andreas', 'gta-vice-city', 'gta-3']
 
 /**
@@ -16,18 +22,17 @@ const GAMES = ['gta-6', 'gta-5', 'gta-4', 'gta-san-andreas', 'gta-vice-city', 'g
  */
 function normalizeDate(dateString: string): string {
   try {
-    const date = new Date(dateString);
+    const date = new Date(dateString)
     
-    // Verificar si la fecha es válida
     if (isNaN(date.getTime())) {
-      console.warn(`Invalid date: ${dateString}, using current date`);
-      return new Date().toISOString();
+      console.warn(`Invalid date: ${dateString}, using current date`)
+      return new Date().toISOString()
     }
     
-    return date.toISOString();
+    return date.toISOString()
   } catch (error) {
-    console.error(`Error parsing date: ${dateString}`, error);
-    return new Date().toISOString();
+    console.error(`Error parsing date: ${dateString}`, error)
+    return new Date().toISOString()
   }
 }
 
@@ -44,9 +49,31 @@ async function getAllPosts(): Promise<PostNode[]> {
         }
       }
     `)
+
     return (data?.posts?.nodes ?? []) as PostNode[]
   } catch (error) {
     console.error('Error fetching posts for sitemap:', error)
+    return []
+  }
+}
+
+async function getAllCharacters(): Promise<CharacterNode[]> {
+  try {
+    const data = await fetchAPI(`
+      query AllCharactersForSitemap {
+        personajes(first: 1000, where: { orderby: { field: DATE, order: DESC } }) {
+          nodes {
+            slug
+            modified
+            juegos { nodes { slug } }
+          }
+        }
+      }
+    `)
+
+    return (data?.personajes?.nodes ?? []) as CharacterNode[]
+  } catch (error) {
+    console.error('Error fetching characters for sitemap:', error)
     return []
   }
 }
@@ -57,10 +84,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://gtaverso.com'
   const now = new Date().toISOString()
   
-  // Obtener posts (con fallback si falla)
   const posts = await getAllPosts()
+  const characters = await getAllCharacters()
 
-  // Páginas estáticas
   const staticPages: MetadataRoute.Sitemap = [
     {
       url: baseUrl,
@@ -88,34 +114,51 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ]
 
-  // Páginas de juegos (hubs)
-  const gamePages: MetadataRoute.Sitemap = GAMES.map(game => ({
+  const gamePages: MetadataRoute.Sitemap = GAMES.map((game) => ({
     url: `${baseUrl}/juegos/${game}`,
     lastModified: now,
     changeFrequency: 'weekly' as const,
     priority: 0.8,
   }))
 
-  // Páginas de noticias por juego
-  const gameNewsPages: MetadataRoute.Sitemap = GAMES.map(game => ({
+  const gameNewsPages: MetadataRoute.Sitemap = GAMES.map((game) => ({
     url: `${baseUrl}/juegos/${game}/noticias`,
     lastModified: now,
     changeFrequency: 'daily' as const,
     priority: 0.7,
   }))
 
-  // Posts individuales con fechas normalizadas
-  const postPages: MetadataRoute.Sitemap = posts.map(post => {
+  const gameCharacterPages: MetadataRoute.Sitemap = GAMES.map((game) => ({
+    url: `${baseUrl}/juegos/${game}/personajes`,
+    lastModified: now,
+    changeFrequency: 'weekly' as const,
+    priority: 0.7,
+  }))
+
+  const postPages: MetadataRoute.Sitemap = posts.map((post) => {
     const gameSlug = post.juegos?.nodes?.[0]?.slug || 'gta-6'
+
     return {
       url: `${baseUrl}/juegos/${gameSlug}/noticias/${post.slug}`,
-      lastModified: normalizeDate(post.modified), // ✅ FECHA NORMALIZADA
+      lastModified: normalizeDate(post.modified),
       changeFrequency: 'weekly' as const,
       priority: 0.6,
     }
   })
 
-  // Páginas legales
+  const characterPages: MetadataRoute.Sitemap = characters
+    .filter((character) => character.slug)
+    .map((character) => {
+      const gameSlug = character.juegos?.nodes?.[0]?.slug || 'gta-6'
+
+      return {
+        url: `${baseUrl}/juegos/${gameSlug}/personajes/${character.slug}`,
+        lastModified: normalizeDate(character.modified),
+        changeFrequency: 'weekly' as const,
+        priority: 0.6,
+      }
+    })
+
   const legalPages: MetadataRoute.Sitemap = [
     {
       url: `${baseUrl}/aviso-legal`,
@@ -153,7 +196,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...staticPages,
     ...gamePages,
     ...gameNewsPages,
+    ...gameCharacterPages,
     ...postPages,
+    ...characterPages,
     ...legalPages,
   ]
 }

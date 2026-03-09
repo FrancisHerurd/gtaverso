@@ -55,8 +55,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const post = await getPostBySlug(slug);
 
   if (!post) {
-    return { title: 'Post no encontrado | GTAVerso' };
-  }
+  return {
+    title: 'Post no encontrado | GTAVerso',
+    robots: {
+      index: false,
+      follow: false,
+    },
+  };
+}
 
   const gameLabel = GAME_LABELS[game] || game.toUpperCase();
   const tipoLabel = TIPO_LABELS[tipo] || tipo;

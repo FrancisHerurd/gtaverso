@@ -62,6 +62,23 @@ function normalizePost(post: any) {
   };
 }
 
+// ✅ FUNCIÓN: Normalizar personaje (aplicar a imágenes)
+function normalizeCharacter(character: any) {
+  if (!character) return null;
+
+  return {
+    ...character,
+    featuredImage: character.featuredImage?.node
+      ? {
+          node: {
+            ...character.featuredImage.node,
+            sourceUrl: normalizeImageUrl(character.featuredImage.node.sourceUrl),
+          },
+        }
+      : null,
+  };
+}
+
 export async function fetchAPI(query: string, variables = {}) {
   if (!query || query.trim() === '') {
     console.error('❌ Query GraphQL vacía');
@@ -238,6 +255,91 @@ export async function getAllJuegos() {
   `);
 
   return data?.juegos?.nodes || [];
+}
+
+// ✅ NUEVO: Obtener todos los personajes
+export async function getAllCharacters() {
+  const data = await fetchAPI(`
+    query AllCharacters {
+      personajes(first: 100, where: { orderby: { field: DATE, order: DESC } }) {
+        nodes {
+          id
+          title
+          slug
+          date
+          modified
+          excerpt
+          content
+          featuredImage {
+            node {
+              sourceUrl
+              altText
+            }
+          }
+          juegos {
+            nodes {
+              name
+              slug
+            }
+          }
+        }
+      }
+    }
+  `);
+
+  if (!data?.personajes?.nodes) {
+    console.log('No characters from WordPress');
+    return [];
+  }
+
+  return data.personajes.nodes.map(normalizeCharacter);
+}
+
+// ✅ NUEVO: Obtener personaje por slug
+export async function getCharacterBySlug(slug: string) {
+  const data = await fetchAPI(
+    `
+    query CharacterBySlug($slug: ID!) {
+      personaje(id: $slug, idType: SLUG) {
+        id
+        title
+        slug
+        date
+        modified
+        excerpt
+        content
+        featuredImage {
+          node {
+            sourceUrl
+            altText
+          }
+        }
+        juegos {
+          nodes {
+            name
+            slug
+          }
+        }
+      }
+    }
+    `,
+    { slug }
+  );
+
+  return normalizeCharacter(data?.personaje);
+}
+
+// ✅ NUEVO: Obtener personajes por juego
+export async function getCharactersByGame(gameSlug: string) {
+  const allCharacters = await getAllCharacters();
+
+  if (!allCharacters || allCharacters.length === 0) {
+    return [];
+  }
+
+  return allCharacters.filter((character: any) =>
+    character.juegos?.nodes?.some((juego: any) => juego.slug === gameSlug)
+  );
 }
 
 // Obtener posts por juego (sin taxQuery)
