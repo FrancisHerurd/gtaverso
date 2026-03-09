@@ -104,7 +104,7 @@ export async function GET() {
     </news:news>
   </url>`;
       })
-      .filter((entry): entry is string => entry !== '')
+      .filter((entry: string): entry is string => entry !== '')
       .join('\n');
 
     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
