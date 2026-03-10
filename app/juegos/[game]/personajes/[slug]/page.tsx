@@ -27,14 +27,7 @@ const GAME_LABELS: Record<string, string> = {
   'gta-3': 'GTA 3',
 };
 
-const CHARACTER_UI_META: Record<
-  string,
-  {
-    role?: string;
-    group: CharacterGroup;
-    order?: number;
-  }
-> = {
+const CHARACTER_UI_META: Record<string, { role?: string; group: CharacterGroup; order?: number }> = {
   'jason-duval': { role: 'Protagonista', group: 'principal', order: 1 },
   'lucia-caminos': { role: 'Protagonista', group: 'principal', order: 2 },
 };
@@ -44,13 +37,7 @@ function stripHtml(html?: string) {
 }
 
 function getCharacterMeta(slug: string) {
-  return (
-    CHARACTER_UI_META[slug] || {
-      role: undefined,
-      group: 'otros' as CharacterGroup,
-      order: 999,
-    }
-  );
+  return CHARACTER_UI_META[slug] || { role: undefined, group: 'otros' as CharacterGroup, order: 999 };
 }
 
 function sortCharacters(characters: any[]) {
@@ -62,48 +49,34 @@ function sortCharacters(characters: any[]) {
   });
 }
 
-// ✅ CORREGIDO: usa getAllCharacters en lugar de getAllJuegos
 export async function generateStaticParams() {
   const characters = await getAllCharacters();
   const params: Array<{ game: string; slug: string }> = [];
-
   for (const character of characters) {
     for (const juego of character.juegos?.nodes || []) {
       params.push({ game: juego.slug, slug: character.slug });
     }
   }
-
   return params;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { game, slug } = await params;
-
   const gameLabel = GAME_LABELS[game];
   const character = await getCharacterBySlug(slug);
 
   if (!gameLabel || !character) {
-    return {
-      title: 'Personaje no encontrado | GTAVerso',
-      robots: { index: false, follow: false },
-    };
+    return { title: 'Personaje no encontrado | GTAVerso', robots: { index: false, follow: false } };
   }
 
-  const belongsToGame = character.juegos?.nodes?.some(
-    (juego: any) => juego.slug === game
-  );
-
+  const belongsToGame = character.juegos?.nodes?.some((juego: any) => juego.slug === game);
   if (!belongsToGame) {
-    return {
-      title: 'Personaje no encontrado | GTAVerso',
-      robots: { index: false, follow: false },
-    };
+    return { title: 'Personaje no encontrado | GTAVerso', robots: { index: false, follow: false } };
   }
 
   const description =
     stripHtml(character.excerpt) ||
     `Descubre a ${character.title}, personaje de ${gameLabel}, en GTAVerso.`;
-
   const canonical = `${SITE_URL}/juegos/${game}/personajes/${slug}`;
   const image = character.featuredImage?.node?.sourceUrl || `${SITE_URL}/og-default.webp`;
 
@@ -135,10 +108,7 @@ export default async function CharacterDetailPage({ params }: Props) {
 
   if (!gameLabel || !character) notFound();
 
-  const belongsToGame = character.juegos?.nodes?.some(
-    (juego: any) => juego.slug === game
-  );
-
+  const belongsToGame = character.juegos?.nodes?.some((juego: any) => juego.slug === game);
   if (!belongsToGame) notFound();
 
   const meta = getCharacterMeta(slug);
@@ -209,7 +179,7 @@ export default async function CharacterDetailPage({ params }: Props) {
             </Link>
           </div>
 
-          {/* HEADER */}
+          {/* ✅ HEADER con ficha inline */}
           <header className="mb-10">
             <div className="mb-4 flex flex-wrap gap-2">
               {meta.role && (
@@ -226,16 +196,54 @@ export default async function CharacterDetailPage({ params }: Props) {
               {character.title}
             </h1>
 
-            {fields?.actor && (
-              <p className="mt-4 text-sm font-semibold uppercase tracking-[0.18em] text-gray-400">
-                Intérprete / actor:{' '}
-                <span className="normal-case tracking-normal text-white">
-                  {fields.actor}
-                </span>
-              </p>
+            {/* ✅ FICHA INLINE — grid de stats sin título */}
+            {fields && (
+              <dl className="mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-white/10 sm:grid-cols-3 lg:grid-cols-4">
+                {fields.actor && (
+                  <div className="flex flex-col gap-1 bg-white/[0.03] px-5 py-4">
+                    <dt className="text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-500">
+                      Actor
+                    </dt>
+                    <dd className="text-sm font-bold text-white">{fields.actor}</dd>
+                  </div>
+                )}
+                {fields.genero && (
+                  <div className="flex flex-col gap-1 bg-white/[0.03] px-5 py-4">
+                    <dt className="text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-500">
+                      Género
+                    </dt>
+                    <dd className="text-sm font-bold text-white">{fields.genero}</dd>
+                  </div>
+                )}
+                {fields.ubicacion && (
+                  <div className="flex flex-col gap-1 bg-white/[0.03] px-5 py-4">
+                    <dt className="text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-500">
+                      Ubicación
+                    </dt>
+                    <dd className="text-sm font-bold text-white">{fields.ubicacion}</dd>
+                  </div>
+                )}
+                {fields.ocupacion && (
+                  <div className="flex flex-col gap-1 bg-white/[0.03] px-5 py-4">
+                    <dt className="text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-500">
+                      Ocupación
+                    </dt>
+                    <dd className="text-sm font-bold text-white">{fields.ocupacion}</dd>
+                  </div>
+                )}
+                {fields.afiliaciones && (
+                  <div className="col-span-2 flex flex-col gap-1 bg-white/[0.03] px-5 py-4 sm:col-span-3 lg:col-span-4">
+                    <dt className="text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-500">
+                      Afiliaciones
+                    </dt>
+                    <dd className="text-sm font-bold text-white">{fields.afiliaciones}</dd>
+                  </div>
+                )}
+              </dl>
             )}
           </header>
 
+          {/* ✅ GRID: contenido ocupa más, sidebar solo con personajes relacionados */}
           <div className="grid gap-10 lg:grid-cols-12">
 
             {/* COLUMNA PRINCIPAL */}
@@ -327,92 +335,17 @@ export default async function CharacterDetailPage({ params }: Props) {
               )}
             </div>
 
-            {/* SIDEBAR */}
-            <aside className="lg:col-span-4">
-              <div className="sticky top-28 space-y-6">
-
-                {/* Ficha rápida */}
-                <section
-                  aria-labelledby="ficha-rapida"
-                  className="rounded-2xl border border-white/10 bg-[#0a0b14] p-6"
-                >
-                  <h2
-                    id="ficha-rapida"
-                    className="mb-5 text-lg font-bold uppercase tracking-[0.16em] text-white"
-                  >
-                    Ficha rápida
-                  </h2>
-
-                  <dl className="space-y-4 text-sm">
-                    <div className="border-b border-white/5 pb-4">
-                      <dt className="mb-1 text-gray-400">Nombre</dt>
-                      <dd className="font-semibold text-white">{character.title}</dd>
-                    </div>
-
-                    <div className="border-b border-white/5 pb-4">
-                      <dt className="mb-1 text-gray-400">Juego</dt>
-                      <dd className="font-semibold text-white">{gameLabel}</dd>
-                    </div>
-
-                    {meta.role && (
-                      <div className="border-b border-white/5 pb-4">
-                        <dt className="mb-1 text-gray-400">Rol</dt>
-                        <dd className="font-semibold text-white">{meta.role}</dd>
-                      </div>
-                    )}
-
-                    {fields?.actor && (
-                      <div className="border-b border-white/5 pb-4">
-                        <dt className="mb-1 text-gray-400">Intérprete / actor</dt>
-                        <dd className="font-semibold text-white">{fields.actor}</dd>
-                      </div>
-                    )}
-
-                    {fields?.genero && (
-                      <div className="border-b border-white/5 pb-4">
-                        <dt className="mb-1 text-gray-400">Género</dt>
-                        <dd className="font-semibold text-white">{fields.genero}</dd>
-                      </div>
-                    )}
-
-                    {fields?.ubicacion && (
-                      <div className="border-b border-white/5 pb-4">
-                        <dt className="mb-1 text-gray-400">Ubicación</dt>
-                        <dd className="font-semibold text-white">{fields.ubicacion}</dd>
-                      </div>
-                    )}
-
-                    {fields?.ocupacion && (
-                      <div className="border-b border-white/5 pb-4">
-                        <dt className="mb-1 text-gray-400">Ocupación</dt>
-                        <dd className="font-semibold text-white">{fields.ocupacion}</dd>
-                      </div>
-                    )}
-
-                    {fields?.afiliaciones && (
-                      <div>
-                        <dt className="mb-1 text-gray-400">Afiliaciones</dt>
-                        <dd className="font-semibold text-white leading-relaxed">
-                          {fields.afiliaciones}
-                        </dd>
-                      </div>
-                    )}
-                  </dl>
-                </section>
-
-                {/* Otros personajes */}
-                {relatedCharacters.length > 0 && (
-                  <section
-                    aria-labelledby="otros-personajes"
-                    className="rounded-2xl border border-white/10 bg-[#0a0b14] p-6"
-                  >
+            {/* ✅ SIDEBAR — solo personajes relacionados */}
+            {relatedCharacters.length > 0 && (
+              <aside className="lg:col-span-4">
+                <div className="sticky top-28">
+                  <section aria-labelledby="otros-personajes" className="rounded-2xl border border-white/10 bg-[#0a0b14] p-6">
                     <h2
                       id="otros-personajes"
                       className="mb-5 text-lg font-bold uppercase tracking-[0.16em] text-white"
                     >
                       Otros personajes de {gameLabel}
                     </h2>
-
                     <div className="space-y-4">
                       {relatedCharacters.map((item: any) => (
                         <Link
@@ -429,7 +362,6 @@ export default async function CharacterDetailPage({ params }: Props) {
                               sizes="80px"
                             />
                           </div>
-
                           <div className="min-w-0">
                             <h3 className="truncate text-base font-bold text-white group-hover:text-orange-500">
                               {item.title}
@@ -442,10 +374,9 @@ export default async function CharacterDetailPage({ params }: Props) {
                       ))}
                     </div>
                   </section>
-                )}
-
-              </div>
-            </aside>
+                </div>
+              </aside>
+            )}
           </div>
         </div>
       </article>
