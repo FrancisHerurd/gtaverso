@@ -1,5 +1,3 @@
-// app/juegos/[game]/[tipo]/[slug]/page.tsx
-
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
@@ -33,41 +31,36 @@ const TIPO_LABELS: Record<string, string> = {
   'trucos': 'Trucos',
 };
 
-// Generar rutas estáticas
 export async function generateStaticParams() {
   const posts = await getAllPosts();
-  
+
   return posts.map((post: any) => {
     const gameSlug = post.juegos?.nodes?.[0]?.slug || 'gta-6';
     const tipoSlug = post.tipos?.nodes?.[0]?.slug || 'noticias';
-    
-    return {
-      game: gameSlug,
-      tipo: tipoSlug,
-      slug: post.slug,
-    };
+    return { game: gameSlug, tipo: tipoSlug, slug: post.slug };
   });
 }
 
-// Metadata dinámica con Yoast SEO
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { game, tipo, slug } = await params;
+
+  // ✅ NUEVO: evita que [tipo]/[slug] capture /personajes/jason-duval
+  if (tipo === 'personajes') {
+    return { robots: { index: false, follow: false } };
+  }
+
   const post = await getPostBySlug(slug);
 
   if (!post) {
-  return {
-    title: 'Post no encontrado | GTAVerso',
-    robots: {
-      index: false,
-      follow: false,
-    },
-  };
-}
+    return {
+      title: 'Post no encontrado | GTAVerso',
+      robots: { index: false, follow: false },
+    };
+  }
 
   const gameLabel = GAME_LABELS[game] || game.toUpperCase();
   const tipoLabel = TIPO_LABELS[tipo] || tipo;
 
-  // Si existe SEO de Yoast, úsalo
   if (post.seo) {
     return {
       title: post.seo.title,
@@ -94,16 +87,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
           ? [post.seo.opengraphImage.sourceUrl]
           : [],
       },
-      // Meta keywords para Google News
       other: {
-        'news_keywords': post.tags?.nodes?.map((t: any) => t.name).join(', ') || 'GTA, Grand Theft Auto, Rockstar Games',
+        news_keywords:
+          post.tags?.nodes?.map((t: any) => t.name).join(', ') ||
+          'GTA, Grand Theft Auto, Rockstar Games',
       },
     };
   }
 
-  // Fallback si no hay Yoast SEO
   return {
-    title: `${post.title} | ${gameLabel} ${tipoLabel} | GTAVerso`,
+    title: `${post.title} | ${gameLabel} ${TIPO_LABELS[tipo] || tipo} | GTAVerso`,
     description: post.excerpt.replace(/<[^>]*>/g, '').substring(0, 160),
     alternates: {
       canonical: `https://gtaverso.com/juegos/${game}/${tipo}/${slug}`,
@@ -113,16 +106,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function PostPage({ params }: Props) {
   const { game, tipo, slug } = await params;
+
+  // ✅ NUEVO: cede el control a personajes/[slug]/page.tsx
+  if (tipo === 'personajes') notFound();
+
   const post = await getPostBySlug(slug);
 
-  if (!post) {
-    notFound();
-  }
+  if (!post) notFound();
 
   const gameLabel = GAME_LABELS[game] || game.toUpperCase();
   const tipoLabel = TIPO_LABELS[tipo] || tipo;
 
-  // Breadcrumbs
   const breadcrumbs = [
     { label: 'Inicio', href: '/' },
     { label: 'Juegos', href: '/juegos' },
@@ -131,7 +125,6 @@ export default async function PostPage({ params }: Props) {
     { label: post.title, href: `/juegos/${game}/${tipo}/${slug}` },
   ];
 
-  // ✅ MODIFICADO: Autor en el schema
   const articleSchema = generateNewsArticleSchema({
     title: post.title,
     description: post.excerpt.replace(/<[^>]+>/g, '').substring(0, 200),
@@ -139,27 +132,23 @@ export default async function PostPage({ params }: Props) {
     url: `/juegos/${game}/${tipo}/${slug}`,
     publishedTime: post.date,
     modifiedTime: post.modified || post.date,
-    author: post.author?.node?.name || 'GTA Verso', // ✅ Usar autor de WordPress
+    author: post.author?.node?.name || 'GTA Verso',
     game: gameLabel,
     category: tipoLabel,
   });
 
   const breadcrumbSchema = generateBreadcrumbSchema(
-    breadcrumbs.map(b => ({ name: b.label, url: b.href }))
+    breadcrumbs.map((b) => ({ name: b.label, url: b.href }))
   );
 
   return (
     <>
-      {/* Yoast SEO fullHead */}
       <YoastSEO seo={post.seo} />
 
-      {/* NewsArticle Schema para Google News 2026 */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
       />
-
-      {/* Breadcrumb Schema */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
@@ -167,27 +156,21 @@ export default async function PostPage({ params }: Props) {
 
       <article className="min-h-screen bg-[#050508] pt-24 pb-20">
         <div className="mx-auto max-w-7xl px-4">
-          {/* Layout con grid: contenido principal + sidebar */}
           <div className="lg:grid lg:grid-cols-12 lg:gap-8">
-            
-            {/* COLUMNA PRINCIPAL - Contenido del artículo */}
+
             <div className="lg:col-span-8">
               <Breadcrumbs items={breadcrumbs} />
 
-              {/* Badges de Juegos */}
               {post.juegos && post.juegos.nodes.length > 0 && (
                 <JuegoBadge juegos={post.juegos.nodes} className="mb-4 mt-6" />
               )}
 
-              {/* Badges de tipo de noticia (Oficial/Rumor/Actualización) */}
               <NewsBadges tags={post.tags?.nodes} className="mb-4" />
 
-              {/* Título */}
               <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
                 {post.title}
               </h1>
 
-              {/* ✅ MODIFICADO: Metadata con autor */}
               <div className="flex flex-wrap items-center gap-3 text-gray-500 text-sm mb-6">
                 <time dateTime={new Date(post.date).toISOString()}>
                   {new Date(post.date).toLocaleDateString('es-ES', {
@@ -196,19 +179,12 @@ export default async function PostPage({ params }: Props) {
                     day: 'numeric',
                   })}
                 </time>
-                
                 <span>•</span>
-                
-                {/* Tipo de contenido */}
                 <span className="text-[#00FF41]">{tipoLabel}</span>
-                
                 <span>•</span>
-                
-                {/* ✅ NUEVO: Autor */}
                 <span>{post.author?.node?.name || 'GTA Verso'}</span>
               </div>
 
-              {/* Imagen destacada */}
               {post.featuredImage && (
                 <div className="relative w-full h-96 mb-8 rounded-lg overflow-hidden">
                   <Image
@@ -221,19 +197,16 @@ export default async function PostPage({ params }: Props) {
                 </div>
               )}
 
-              {/* Botones de compartir (arriba) */}
-              <ShareButtons 
+              <ShareButtons
                 url={`https://gtaverso.com/juegos/${game}/${tipo}/${slug}`}
                 title={post.title}
                 className="mb-8"
               />
 
-              {/* TOC móvil */}
               <div className="lg:hidden mt-8 mb-8">
                 <TableOfContents content={post.content} />
               </div>
 
-              {/* Contenido del artículo */}
               <div
                 id="article-content"
                 className="prose prose-invert prose-lg max-w-none
@@ -246,30 +219,24 @@ export default async function PostPage({ params }: Props) {
                   prose-ul:text-gray-300 prose-ol:text-gray-300
                   prose-li:marker:text-[#00FF41]
                   prose-img:rounded-lg prose-img:my-8
-                  prose-blockquote:border-l-4 prose-blockquote:border-[#00FF41] 
+                  prose-blockquote:border-l-4 prose-blockquote:border-[#00FF41]
                   prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-gray-400"
                 dangerouslySetInnerHTML={{ __html: post.content }}
               />
 
-              {/* Botones de compartir (abajo) */}
-              <ShareButtons 
+              <ShareButtons
                 url={`https://gtaverso.com/juegos/${game}/${tipo}/${slug}`}
                 title={post.title}
                 className="mt-12 pt-8 border-t border-gray-800"
               />
 
-              {/* Últimas Noticias - MÓVIL */}
               <div className="lg:hidden mt-12">
                 <LatestNewsSidebar currentSlug={slug} limit={5} />
               </div>
             </div>
 
-            {/* SIDEBAR - Desktop only */}
             <aside className="hidden lg:block lg:col-span-4 space-y-8">
-              {/* Table of Contents */}
               <TableOfContents content={post.content} />
-              
-              {/* Últimas Noticias - DESKTOP */}
               <LatestNewsSidebar currentSlug={slug} limit={5} />
             </aside>
 

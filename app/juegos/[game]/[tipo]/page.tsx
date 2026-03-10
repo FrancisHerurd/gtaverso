@@ -1,8 +1,7 @@
-// app/juegos/[game]/[tipo]/page.tsx
-
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
+import { notFound } from 'next/navigation';
 import { getPostsByGameAndType, getAllJuegos } from '@/lib/api';
 import Breadcrumbs from '@/components/Breadcrumbs';
 
@@ -27,30 +26,31 @@ const TIPO_LABELS: Record<string, string> = {
   'trucos': 'Trucos',
 };
 
-// Generar rutas estáticas
 export async function generateStaticParams() {
   const juegos = await getAllJuegos();
   const tipos = ['noticias', 'guias', 'trucos'];
-  
+
   const params = [];
   for (const juego of juegos) {
     for (const tipo of tipos) {
-      params.push({
-        game: juego.slug,
-        tipo: tipo,
-      });
+      params.push({ game: juego.slug, tipo });
     }
   }
-  
+
   return params;
 }
 
-// Metadata dinámica
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { game, tipo } = await params;
+
+  // ✅ NUEVO: evita que [tipo] capture la ruta de personajes
+  if (tipo === 'personajes') {
+    return { robots: { index: false, follow: false } };
+  }
+
   const gameLabel = GAME_LABELS[game] || game.toUpperCase();
   const tipoLabel = TIPO_LABELS[tipo] || tipo;
-  
+
   return {
     title: `${tipoLabel} de ${gameLabel} | GTAVerso`,
     description: `Todas las ${tipoLabel.toLowerCase()} de ${gameLabel}.`,
@@ -66,11 +66,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function GameTipoPage({ params }: Props) {
   const { game, tipo } = await params;
+
+  // ✅ NUEVO: cede el control a app/juegos/[game]/personajes/page.tsx
+  if (tipo === 'personajes') notFound();
+
   const posts = await getPostsByGameAndType(game, tipo);
   const gameLabel = GAME_LABELS[game] || game.toUpperCase();
   const tipoLabel = TIPO_LABELS[tipo] || tipo;
 
-  // Breadcrumbs
   const breadcrumbs = [
     { label: 'Inicio', href: '/' },
     { label: 'Juegos', href: '/juegos' },
@@ -83,7 +86,6 @@ export default async function GameTipoPage({ params }: Props) {
       <div className="min-h-screen bg-[#050508] pt-24 pb-20">
         <div className="mx-auto max-w-7xl px-4">
           <Breadcrumbs items={breadcrumbs} />
-          
           <h1 className="text-4xl font-bold text-white mb-4 mt-6">
             No hay {tipoLabel.toLowerCase()} disponibles para {gameLabel}
           </h1>
@@ -99,12 +101,9 @@ export default async function GameTipoPage({ params }: Props) {
     <div className="min-h-screen bg-[#050508] pt-24 pb-20">
       <div className="mx-auto max-w-7xl px-4">
         <Breadcrumbs items={breadcrumbs} />
-        
+
         <div className="mb-8 mt-6">
-          <Link 
-            href={`/juegos/${game}`}
-            className="text-orange-500 hover:underline mb-4 inline-block"
-          >
+          <Link href={`/juegos/${game}`} className="text-orange-500 hover:underline mb-4 inline-block">
             ← Volver
           </Link>
           <h1 className="text-4xl font-bold text-white">
@@ -114,11 +113,7 @@ export default async function GameTipoPage({ params }: Props) {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {posts.map((post: any) => (
-            <Link
-              key={post.slug}
-              href={`/juegos/${game}/${tipo}/${post.slug}`}
-              className="group"
-            >
+            <Link key={post.slug} href={`/juegos/${game}/${tipo}/${post.slug}`} className="group">
               <article className="bg-[#0a0b14] rounded-lg overflow-hidden border border-white/10 hover:border-orange-500/50 transition-all h-full flex flex-col">
                 {post.featuredImage && (
                   <div className="relative aspect-video overflow-hidden">
@@ -131,7 +126,6 @@ export default async function GameTipoPage({ params }: Props) {
                     />
                   </div>
                 )}
-
                 <div className="p-5 flex-1 flex flex-col">
                   <time className="text-xs text-gray-500 block mb-2">
                     {new Date(post.date).toLocaleDateString('es-ES', {
