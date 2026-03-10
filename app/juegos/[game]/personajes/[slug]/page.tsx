@@ -179,7 +179,7 @@ export default async function CharacterDetailPage({ params }: Props) {
             </Link>
           </div>
 
-          {/* ✅ HEADER con ficha inline */}
+          {/* HEADER */}
           <header className="mb-10">
             <div className="mb-4 flex flex-wrap gap-2">
               {meta.role && (
@@ -195,59 +195,12 @@ export default async function CharacterDetailPage({ params }: Props) {
             <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl md:text-6xl">
               {character.title}
             </h1>
-
-            {/* ✅ FICHA INLINE — grid de stats sin título */}
-            {fields && (
-              <dl className="mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-white/10 sm:grid-cols-3 lg:grid-cols-4">
-                {fields.actor && (
-                  <div className="flex flex-col gap-1 bg-white/[0.03] px-5 py-4">
-                    <dt className="text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-500">
-                      Actor
-                    </dt>
-                    <dd className="text-sm font-bold text-white">{fields.actor}</dd>
-                  </div>
-                )}
-                {fields.genero && (
-                  <div className="flex flex-col gap-1 bg-white/[0.03] px-5 py-4">
-                    <dt className="text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-500">
-                      Género
-                    </dt>
-                    <dd className="text-sm font-bold text-white">{fields.genero}</dd>
-                  </div>
-                )}
-                {fields.ubicacion && (
-                  <div className="flex flex-col gap-1 bg-white/[0.03] px-5 py-4">
-                    <dt className="text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-500">
-                      Ubicación
-                    </dt>
-                    <dd className="text-sm font-bold text-white">{fields.ubicacion}</dd>
-                  </div>
-                )}
-                {fields.ocupacion && (
-                  <div className="flex flex-col gap-1 bg-white/[0.03] px-5 py-4">
-                    <dt className="text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-500">
-                      Ocupación
-                    </dt>
-                    <dd className="text-sm font-bold text-white">{fields.ocupacion}</dd>
-                  </div>
-                )}
-                {fields.afiliaciones && (
-                  <div className="col-span-2 flex flex-col gap-1 bg-white/[0.03] px-5 py-4 sm:col-span-3 lg:col-span-4">
-                    <dt className="text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-500">
-                      Afiliaciones
-                    </dt>
-                    <dd className="text-sm font-bold text-white">{fields.afiliaciones}</dd>
-                  </div>
-                )}
-              </dl>
-            )}
           </header>
 
-          {/* ✅ GRID: contenido ocupa más, sidebar solo con personajes relacionados */}
           <div className="grid gap-10 lg:grid-cols-12">
 
             {/* COLUMNA PRINCIPAL */}
-            <div className="lg:col-span-8 space-y-10">
+            <div className="lg:col-span-8 space-y-12">
 
               {/* Imagen destacada */}
               <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#0a0b14]">
@@ -288,9 +241,9 @@ export default async function CharacterDetailPage({ params }: Props) {
                 <section aria-labelledby="video-personaje">
                   <h2
                     id="video-personaje"
-                    className="mb-5 flex items-center gap-3 text-xl font-bold text-white"
+                    className="mb-5 flex items-center gap-3 text-2xl font-bold text-white"
                   >
-                    <span className="h-5 w-1 rounded-full bg-[#FF00FF]" />
+                    <span className="h-6 w-1 rounded-full bg-[#FF00FF]" />
                     Vídeo
                   </h2>
                   <div className="relative aspect-video overflow-hidden rounded-2xl border border-white/10">
@@ -305,14 +258,77 @@ export default async function CharacterDetailPage({ params }: Props) {
                 </section>
               )}
 
-              {/* Galería */}
+              {/* ✅ FICHA — justo encima de Galería, con h2 grande */}
+              {fields && (
+                <section aria-labelledby="info-personaje">
+                  <h2
+                    id="info-personaje"
+                    className="mb-6 flex items-center gap-3 text-2xl font-bold text-white"
+                  >
+                    <span className="h-6 w-1 rounded-full bg-[#FF00FF]" />
+                    Información del personaje
+                  </h2>
+                  <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-white/10 sm:grid-cols-3">
+                    {fields.actor && (
+                      <div className="flex flex-col gap-1 bg-white/[0.03] px-5 py-4">
+                        <dt className="text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-500">
+                          Actor
+                        </dt>
+                        <dd className="text-sm font-bold text-white">{fields.actor}</dd>
+                      </div>
+                    )}
+                    {fields.genero && (
+                      <div className="flex flex-col gap-1 bg-white/[0.03] px-5 py-4">
+                        <dt className="text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-500">
+                          Género
+                        </dt>
+                        <dd className="text-sm font-bold text-white">{fields.genero}</dd>
+                      </div>
+                    )}
+                    {fields.ubicacion && (
+                      <div className="flex flex-col gap-1 bg-white/[0.03] px-5 py-4">
+                        <dt className="text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-500">
+                          Ubicación
+                        </dt>
+                        <dd className="text-sm font-bold text-white">{fields.ubicacion}</dd>
+                      </div>
+                    )}
+                    {fields.ocupacion && (
+                      <div className="flex flex-col gap-1 bg-white/[0.03] px-5 py-4">
+                        <dt className="text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-500">
+                          Ocupación
+                        </dt>
+                        <dd className="text-sm font-bold text-white">{fields.ocupacion}</dd>
+                      </div>
+                    )}
+                    {meta.role && (
+                      <div className="flex flex-col gap-1 bg-white/[0.03] px-5 py-4">
+                        <dt className="text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-500">
+                          Rol
+                        </dt>
+                        <dd className="text-sm font-bold text-white">{meta.role}</dd>
+                      </div>
+                    )}
+                    {fields.afiliaciones && (
+                      <div className="col-span-2 flex flex-col gap-1 bg-white/[0.03] px-5 py-4 sm:col-span-3">
+                        <dt className="text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-500">
+                          Afiliaciones
+                        </dt>
+                        <dd className="text-sm font-bold text-white">{fields.afiliaciones}</dd>
+                      </div>
+                    )}
+                  </dl>
+                </section>
+              )}
+
+              {/* ✅ GALERÍA — h2 grande, debajo de la ficha */}
               {galleryImages.length > 0 && (
                 <section aria-labelledby="galeria-personaje">
                   <h2
                     id="galeria-personaje"
-                    className="mb-5 flex items-center gap-3 text-xl font-bold text-white"
+                    className="mb-6 flex items-center gap-3 text-2xl font-bold text-white"
                   >
-                    <span className="h-5 w-1 rounded-full bg-[#FF00FF]" />
+                    <span className="h-6 w-1 rounded-full bg-[#FF00FF]" />
                     Galería
                   </h2>
                   <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -335,11 +351,14 @@ export default async function CharacterDetailPage({ params }: Props) {
               )}
             </div>
 
-            {/* ✅ SIDEBAR — solo personajes relacionados */}
+            {/* SIDEBAR — solo personajes relacionados */}
             {relatedCharacters.length > 0 && (
               <aside className="lg:col-span-4">
                 <div className="sticky top-28">
-                  <section aria-labelledby="otros-personajes" className="rounded-2xl border border-white/10 bg-[#0a0b14] p-6">
+                  <section
+                    aria-labelledby="otros-personajes"
+                    className="rounded-2xl border border-white/10 bg-[#0a0b14] p-6"
+                  >
                     <h2
                       id="otros-personajes"
                       className="mb-5 text-lg font-bold uppercase tracking-[0.16em] text-white"
