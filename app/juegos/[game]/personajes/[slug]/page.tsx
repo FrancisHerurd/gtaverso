@@ -124,6 +124,8 @@ export default async function CharacterDetailPage({ params }: Props) {
   const imageAlt = character.featuredImage?.node?.altText || character.title;
   const excerpt = stripHtml(character.excerpt) || '';
 
+  const afiliaciones: any[] = fields?.afiliaciones || [];
+
   const breadcrumbs = [
     { label: 'Inicio', href: '/' },
     { label: 'Juegos', href: '/juegos' },
@@ -258,7 +260,7 @@ export default async function CharacterDetailPage({ params }: Props) {
                 </section>
               )}
 
-              {/* ✅ FICHA — justo encima de Galería, con h2 grande */}
+              {/* FICHA — Información del personaje */}
               {fields && (
                 <section aria-labelledby="info-personaje">
                   <h2
@@ -268,60 +270,121 @@ export default async function CharacterDetailPage({ params }: Props) {
                     <span className="h-6 w-1 rounded-full bg-[#FF00FF]" />
                     Información del personaje
                   </h2>
-                  <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-white/10 sm:grid-cols-3">
-                    {fields.actor && (
-                      <div className="flex flex-col gap-1 bg-white/[0.03] px-5 py-4">
-                        <dt className="text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-500">
-                          Actor
-                        </dt>
-                        <dd className="text-sm font-bold text-white">{fields.actor}</dd>
+
+                  <dl className="overflow-hidden rounded-2xl border border-white/10">
+
+                    {/* Fila 1: Actor · Género · Ubicación */}
+                    <div className="grid grid-cols-1 divide-y divide-white/8 sm:grid-cols-3 sm:divide-x sm:divide-y-0 border-b border-white/10">
+                      {fields.actor && (
+                        <div className="flex flex-col gap-2 px-6 py-5 bg-white/[0.03]">
+                          <dt className="text-xs font-bold uppercase tracking-widest text-[#FF00FF]">
+                            Actor
+                          </dt>
+                          <dd className="text-base font-semibold text-white leading-snug">
+                            {fields.actor}
+                          </dd>
+                        </div>
+                      )}
+                      {fields.genero && (
+                        <div className="flex flex-col gap-2 px-6 py-5 bg-white/[0.03]">
+                          <dt className="text-xs font-bold uppercase tracking-widest text-[#FF00FF]">
+                            Género
+                          </dt>
+                          <dd className="text-base font-semibold text-white leading-snug">
+                            {fields.genero}
+                          </dd>
+                        </div>
+                      )}
+                      {fields.ubicacion && (
+                        <div className="flex flex-col gap-2 px-6 py-5 bg-white/[0.03]">
+                          <dt className="text-xs font-bold uppercase tracking-widest text-[#FF00FF]">
+                            Ubicación
+                          </dt>
+                          <dd className="text-base font-semibold text-white leading-snug">
+                            {fields.ubicacion}
+                          </dd>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Fila 2: Ocupación · Rol */}
+                    {(fields.ocupacion || meta.role) && (
+                      <div className="grid grid-cols-1 divide-y divide-white/8 sm:grid-cols-3 sm:divide-x sm:divide-y-0 border-b border-white/10 last:border-b-0">
+                        {fields.ocupacion && (
+                          <div className="flex flex-col gap-2 px-6 py-5 bg-[#050508]">
+                            <dt className="text-xs font-bold uppercase tracking-widest text-[#FF00FF]">
+                              Ocupación
+                            </dt>
+                            <dd className="text-base font-semibold text-white leading-snug">
+                              {fields.ocupacion}
+                            </dd>
+                          </div>
+                        )}
+                        {meta.role && (
+                          <div className="flex flex-col gap-2 px-6 py-5 bg-[#050508]">
+                            <dt className="text-xs font-bold uppercase tracking-widest text-[#FF00FF]">
+                              Rol
+                            </dt>
+                            <dd className="text-base font-semibold text-white leading-snug">
+                              {meta.role}
+                            </dd>
+                          </div>
+                        )}
                       </div>
                     )}
-                    {fields.genero && (
-                      <div className="flex flex-col gap-1 bg-white/[0.03] px-5 py-4">
-                        <dt className="text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-500">
-                          Género
+
+                    {/* Fila 3: Vínculos — avatar + nombre + enlace */}
+                    {afiliaciones.length > 0 && (
+                      <div className="flex flex-col gap-4 px-6 py-5 bg-white/[0.03]">
+                        <dt className="text-xs font-bold uppercase tracking-widest text-[#FF00FF]">
+                          Vínculos
                         </dt>
-                        <dd className="text-sm font-bold text-white">{fields.genero}</dd>
-                      </div>
-                    )}
-                    {fields.ubicacion && (
-                      <div className="flex flex-col gap-1 bg-white/[0.03] px-5 py-4">
-                        <dt className="text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-500">
-                          Ubicación
-                        </dt>
-                        <dd className="text-sm font-bold text-white">{fields.ubicacion}</dd>
-                      </div>
-                    )}
-                    {fields.ocupacion && (
-                      <div className="flex flex-col gap-1 bg-white/[0.03] px-5 py-4">
-                        <dt className="text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-500">
-                          Ocupación
-                        </dt>
-                        <dd className="text-sm font-bold text-white">{fields.ocupacion}</dd>
-                      </div>
-                    )}
-                    {meta.role && (
-                      <div className="flex flex-col gap-1 bg-white/[0.03] px-5 py-4">
-                        <dt className="text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-500">
-                          Rol
-                        </dt>
-                        <dd className="text-sm font-bold text-white">{meta.role}</dd>
-                      </div>
-                    )}
-                    {fields.afiliaciones && (
-                      <div className="col-span-2 flex flex-col gap-1 bg-white/[0.03] px-5 py-4 sm:col-span-3">
-                        <dt className="text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-500">
-                          Afiliaciones
-                        </dt>
-                        <dd className="text-sm font-bold text-white">{fields.afiliaciones}</dd>
+                        <dd>
+                          <ul className="flex flex-wrap gap-3" role="list">
+                            {afiliaciones.map((person: any) => {
+                              const personGame = person.juegos?.nodes?.[0]?.slug || game;
+                              const href = `/juegos/${personGame}/personajes/${person.slug}`;
+                              // ✅ CORREGIDO: avatar como Image Object (.node.sourceUrl)
+                              const avatar =
+                                person.characterFields?.avatar?.node?.sourceUrl ||
+                                person.featuredImage?.node?.sourceUrl ||
+                                '/og-default.webp';
+                              const avatarAlt =
+                                person.characterFields?.avatar?.node?.altText ||
+                                person.featuredImage?.node?.altText ||
+                                person.title;
+
+                              return (
+                                <li key={person.slug}>
+                                  <Link
+                                    href={href}
+                                    className="group flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 transition hover:border-[#FF00FF]/40 hover:bg-white/10"
+                                  >
+                                    <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full border border-white/20">
+                                      <Image
+                                        src={avatar}
+                                        alt={avatarAlt}
+                                        fill
+                                        className="object-cover"
+                                        sizes="40px"
+                                      />
+                                    </div>
+                                    <span className="text-sm font-semibold text-white group-hover:text-[#FF00FF] transition-colors">
+                                      {person.title}
+                                    </span>
+                                  </Link>
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        </dd>
                       </div>
                     )}
                   </dl>
                 </section>
               )}
 
-              {/* ✅ GALERÍA — h2 grande, debajo de la ficha */}
+              {/* GALERÍA */}
               {galleryImages.length > 0 && (
                 <section aria-labelledby="galeria-personaje">
                   <h2
@@ -351,7 +414,7 @@ export default async function CharacterDetailPage({ params }: Props) {
               )}
             </div>
 
-            {/* SIDEBAR — solo personajes relacionados */}
+            {/* SIDEBAR — personajes relacionados */}
             {relatedCharacters.length > 0 && (
               <aside className="lg:col-span-4">
                 <div className="sticky top-28">

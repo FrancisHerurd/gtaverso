@@ -161,7 +161,7 @@ export async function getAllCharacters() {
   return data.personajes.nodes.map(normalizeCharacter);
 }
 
-// ✅ ACTUALIZADO: con campos ACF
+// ✅ ACTUALIZADO: avatar como AcfMediaItemConnectionEdge (Image Object)
 export async function getCharacterBySlug(slug: string) {
   const data = await fetchAPI(
     `
@@ -172,11 +172,34 @@ export async function getCharacterBySlug(slug: string) {
         juegos { nodes { name slug } }
         characterFields {
           actor
+          avatar {
+            node {
+              sourceUrl
+              altText
+            }
+          }
           genero
           ubicacion
           ocupacion
-          afiliaciones
           videoUrl
+          afiliaciones {
+            nodes {
+              ... on Personaje {
+                title
+                slug
+                juegos { nodes { slug } }
+                featuredImage { node { sourceUrl altText } }
+                characterFields {
+                  avatar {
+                    node {
+                      sourceUrl
+                      altText
+                    }
+                  }
+                }
+              }
+            }
+          }
           galeria {
             nodes { sourceUrl altText id }
           }
@@ -190,11 +213,48 @@ export async function getCharacterBySlug(slug: string) {
   const character = data?.personaje;
   if (!character) return null;
 
+  // Normalizar afiliaciones
+  const afiliacionesNormalizadas = (
+    character.characterFields?.afiliaciones?.nodes || []
+  ).map((p: any) => ({
+    ...p,
+    characterFields: p.characterFields
+      ? {
+          ...p.characterFields,
+          avatar: p.characterFields.avatar?.node
+            ? {
+                node: {
+                  ...p.characterFields.avatar.node,
+                  sourceUrl: normalizeImageUrl(p.characterFields.avatar.node.sourceUrl),
+                },
+              }
+            : null,
+        }
+      : null,
+    featuredImage: p.featuredImage?.node
+      ? {
+          node: {
+            ...p.featuredImage.node,
+            sourceUrl: normalizeImageUrl(p.featuredImage.node.sourceUrl),
+          },
+        }
+      : null,
+  }));
+
   return {
     ...normalizeCharacter(character),
     characterFields: character.characterFields
       ? {
           ...character.characterFields,
+          avatar: character.characterFields.avatar?.node
+            ? {
+                node: {
+                  ...character.characterFields.avatar.node,
+                  sourceUrl: normalizeImageUrl(character.characterFields.avatar.node.sourceUrl),
+                },
+              }
+            : null,
+          afiliaciones: afiliacionesNormalizadas,
           galeria: {
             nodes: (character.characterFields.galeria?.nodes || []).map(
               (img: any) => ({
