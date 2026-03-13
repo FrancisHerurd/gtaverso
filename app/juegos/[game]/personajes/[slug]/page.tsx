@@ -128,7 +128,7 @@ function FichaFilaGrid({
   );
 }
 
-// ✅ Imagen más grande (h-12 w-12 = 48px)
+// ✅ width/height explícitos para nitidez en Retina
 function RelationshipCard({ node, game }: { node: any; game: string }) {
   const avatar    = node.featuredImage?.node?.sourceUrl || '/og-default.webp';
   const avatarAlt = node.featuredImage?.node?.altText   || node.title || '';
@@ -136,21 +136,24 @@ function RelationshipCard({ node, game }: { node: any; game: string }) {
   const juegosSlug = node.juegos?.nodes?.[0]?.slug || game;
   const href = `/juegos/${juegosSlug}/personajes/${node.slug}`;
 
-  const content = (
-    <div className="flex items-center gap-3">
-      <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg border border-white/10">
-        <Image src={avatar} alt={avatarAlt} fill className="object-cover" sizes="48px" />
-      </div>
-      <span className="text-sm font-medium text-orange-500 group-hover:underline">
-        {node.title}
-      </span>
-    </div>
-  );
-
   return (
     <li>
       <Link href={href} className="group transition">
-        {content}
+        <div className="flex items-center gap-3">
+          <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg border border-white/10">
+            <Image
+              src={avatar}
+              alt={avatarAlt}
+              width={96}
+              height={96}
+              className="h-full w-full object-cover"
+              quality={85}
+            />
+          </div>
+          <span className="text-sm font-medium text-orange-500 group-hover:underline">
+            {node.title}
+          </span>
+        </div>
       </Link>
     </li>
   );
@@ -174,10 +177,6 @@ export default async function CharacterDetailPage({ params }: Props) {
   const familia: any[] = cf?.familia?.nodes || [];
   const banda:   any[] = cf?.banda?.nodes   || [];
   const galeria: any[] = cf?.galeria?.nodes || [];
-
-  const juegosLabel = character.juegos?.nodes
-    ?.map((j: any) => GAME_LABELS[j.slug] || j.slug)
-    .join(', ') || gameLabel;
 
   const allCharacters = await getCharactersByGame(game);
   const relatedChars  = allCharacters
@@ -300,10 +299,30 @@ export default async function CharacterDetailPage({ params }: Props) {
                       left={{ label: 'Rol',       value: cf?.rol }}
                       right={{ label: 'Actividad', value: cf?.actividad }}
                     />
-                    <FichaFilaGrid
-                      left={{ label: 'Actor de voz',            value: cf?.actor }}
-                      right={{ label: 'Juego(s) donde aparece', value: cf?.actor ? juegosLabel : null }}
-                    />
+
+                    {cf?.actor && (
+                      <FichaFila label="Actor de voz" value={cf.actor} />
+                    )}
+
+                    {/* ✅ Juego(s) donde aparece — con enlaces */}
+                    {character.juegos?.nodes?.length > 0 && (
+                      <div className="flex flex-col gap-1 px-6 py-4 bg-white/[0.03]">
+                        <dt className="text-xs font-bold uppercase tracking-widest text-[#FF00FF]">
+                          Juego(s) donde aparece
+                        </dt>
+                        <dd className="flex flex-wrap gap-2 mt-1">
+                          {character.juegos.nodes.map((j: any) => (
+                            <Link
+                              key={j.slug}
+                              href={`/juegos/${j.slug}`}
+                              className="text-base font-semibold text-orange-500 hover:underline"
+                            >
+                              {GAME_LABELS[j.slug] || j.slug}
+                            </Link>
+                          ))}
+                        </dd>
+                      </div>
+                    )}
 
                     {/* ✅ Familia desde relationship */}
                     {familia.length > 0 && (
