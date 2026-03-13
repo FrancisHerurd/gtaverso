@@ -58,7 +58,7 @@ function normalizeRepeaterWithImage(items: any[]) {
           altText:   item.imagen.node.altText || '',
         }
       : null,
-    enlace: item.enlace?.url || null,
+    enlace: (typeof item.enlace === 'string' ? item.enlace : item.enlace?.url) || null,
   }));
 }
 
