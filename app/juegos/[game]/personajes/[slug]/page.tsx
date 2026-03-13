@@ -128,19 +128,18 @@ function FichaFilaGrid({
   );
 }
 
-// ✅ Ahora recibe un nodo de personaje del relationship
+// ✅ Imagen más grande (h-12 w-12 = 48px)
 function RelationshipCard({ node, game }: { node: any; game: string }) {
   const avatar    = node.featuredImage?.node?.sourceUrl || '/og-default.webp';
   const avatarAlt = node.featuredImage?.node?.altText   || node.title || '';
 
-  // Construye la URL: usa el primer juego del personaje o el juego actual
   const juegosSlug = node.juegos?.nodes?.[0]?.slug || game;
   const href = `/juegos/${juegosSlug}/personajes/${node.slug}`;
 
   const content = (
     <div className="flex items-center gap-3">
-      <div className="relative h-8 w-8 shrink-0 overflow-hidden rounded-sm border border-white/10">
-        <Image src={avatar} alt={avatarAlt} fill className="object-cover" sizes="32px" />
+      <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg border border-white/10">
+        <Image src={avatar} alt={avatarAlt} fill className="object-cover" sizes="48px" />
       </div>
       <span className="text-sm font-medium text-orange-500 group-hover:underline">
         {node.title}
