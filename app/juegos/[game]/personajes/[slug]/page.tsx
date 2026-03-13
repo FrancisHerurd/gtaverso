@@ -114,8 +114,8 @@ function FichaFilaGrid({
   if (!hasLeft || !hasRight) {
     return (
       <FichaFila
-        label={hasLeft ? left.label  : right.label}
-        value={hasLeft ? left.value  : right.value}
+        label={hasLeft ? left.label : right.label}
+        value={hasLeft ? left.value : right.value}
       />
     );
   }
@@ -128,9 +128,14 @@ function FichaFilaGrid({
   );
 }
 
-function RepeaterCard({ item }: { item: any }) {
-  const avatar    = item.imagen?.sourceUrl || '/og-default.webp';
-  const avatarAlt = item.imagen?.altText   || item.nombre || '';
+// ✅ Ahora recibe un nodo de personaje del relationship
+function RelationshipCard({ node, game }: { node: any; game: string }) {
+  const avatar    = node.featuredImage?.node?.sourceUrl || '/og-default.webp';
+  const avatarAlt = node.featuredImage?.node?.altText   || node.title || '';
+
+  // Construye la URL: usa el primer juego del personaje o el juego actual
+  const juegosSlug = node.juegos?.nodes?.[0]?.slug || game;
+  const href = `/juegos/${juegosSlug}/personajes/${node.slug}`;
 
   const content = (
     <div className="flex items-center gap-3">
@@ -138,20 +143,16 @@ function RepeaterCard({ item }: { item: any }) {
         <Image src={avatar} alt={avatarAlt} fill className="object-cover" sizes="32px" />
       </div>
       <span className="text-sm font-medium text-orange-500 group-hover:underline">
-        {item.nombre}
+        {node.title}
       </span>
     </div>
   );
 
   return (
     <li>
-      {item.enlace ? (
-        <Link href={item.enlace} className="group transition">
-          {content}
-        </Link>
-      ) : (
-        content
-      )}
+      <Link href={href} className="group transition">
+        {content}
+      </Link>
     </li>
   );
 }
@@ -171,9 +172,9 @@ export default async function CharacterDetailPage({ params }: Props) {
 
   const cf = character.characterFields;
 
-  const familiaDestacada: any[] = cf?.familiaDestacada || [];
-  const bandasDestacadas: any[] = cf?.bandasDestacadas || [];
-  const galeria: any[]          = cf?.galeria?.nodes   || [];
+  const familia: any[] = cf?.familia?.nodes || [];
+  const banda:   any[] = cf?.banda?.nodes   || [];
+  const galeria: any[] = cf?.galeria?.nodes || [];
 
   const juegosLabel = character.juegos?.nodes
     ?.map((j: any) => GAME_LABELS[j.slug] || j.slug)
@@ -192,7 +193,7 @@ export default async function CharacterDetailPage({ params }: Props) {
   const hasFicha = cf && (
     cf.nombreCompleto || cf.alias || cf.nacionalidad || cf.genero ||
     cf.fechaDeNacimiento || cf.ubicacion || cf.rol ||
-    familiaDestacada.length > 0 || bandasDestacadas.length > 0 ||
+    familia.length > 0 || banda.length > 0 ||
     cf.actividad || cf.actor
   );
 
@@ -254,7 +255,6 @@ export default async function CharacterDetailPage({ params }: Props) {
                 {gameLabel}
               </span>
             </div>
-            {/* ✅ Solo el nombre del personaje */}
             <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl md:text-6xl">
               {character.title}
             </h1>
@@ -294,38 +294,40 @@ export default async function CharacterDetailPage({ params }: Props) {
                       right={{ label: 'Género',      value: cf?.genero }}
                     />
                     <FichaFilaGrid
-                      left={{ label: 'Fecha de nacimiento',    value: cf?.fechaDeNacimiento }}
+                      left={{ label: 'Fecha de nacimiento',     value: cf?.fechaDeNacimiento }}
                       right={{ label: 'Ubicación / Residencia', value: cf?.ubicacion }}
                     />
                     <FichaFilaGrid
-                      left={{ label: 'Rol',        value: cf?.rol }}
-                      right={{ label: 'Actividad',  value: cf?.actividad }}
+                      left={{ label: 'Rol',       value: cf?.rol }}
+                      right={{ label: 'Actividad', value: cf?.actividad }}
                     />
                     <FichaFilaGrid
                       left={{ label: 'Actor de voz',            value: cf?.actor }}
                       right={{ label: 'Juego(s) donde aparece', value: cf?.actor ? juegosLabel : null }}
                     />
 
-                    {familiaDestacada.length > 0 && (
+                    {/* ✅ Familia desde relationship */}
+                    {familia.length > 0 && (
                       <div className="flex flex-col gap-3 px-6 py-4 bg-white/[0.03]">
                         <dt className="text-xs font-bold uppercase tracking-widest text-[#FF00FF]">Familia</dt>
                         <dd>
                           <ul className="flex flex-col gap-2" role="list">
-                            {familiaDestacada.map((item: any, i: number) => (
-                              <RepeaterCard key={i} item={item} />
+                            {familia.map((node: any) => (
+                              <RelationshipCard key={node.id} node={node} game={game} />
                             ))}
                           </ul>
                         </dd>
                       </div>
                     )}
 
-                    {bandasDestacadas.length > 0 && (
+                    {/* ✅ Banda desde relationship */}
+                    {banda.length > 0 && (
                       <div className="flex flex-col gap-3 px-6 py-4 bg-white/[0.03]">
                         <dt className="text-xs font-bold uppercase tracking-widest text-[#FF00FF]">Banda / Afiliación</dt>
                         <dd>
                           <ul className="flex flex-col gap-2" role="list">
-                            {bandasDestacadas.map((item: any, i: number) => (
-                              <RepeaterCard key={i} item={item} />
+                            {banda.map((node: any) => (
+                              <RelationshipCard key={node.id} node={node} game={game} />
                             ))}
                           </ul>
                         </dd>

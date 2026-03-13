@@ -19,12 +19,6 @@ function normalizeImageUrl(url: string | null | undefined): string {
   return url;
 }
 
-// ✅ Convierte https://csm.gtaverso.com/juegos/... → /juegos/...
-function normalizeEnlace(url: string | null | undefined): string | null {
-  if (!url) return null;
-  return url.replace(/^https?:\/\/csm\.gtaverso\.com/, '');
-}
-
 function normalizePost(post: any) {
   if (!post) return null;
   return {
@@ -53,20 +47,13 @@ function normalizeCharacter(character: any) {
   };
 }
 
-// ✅ imagen viene como { node: { sourceUrl, altText } }
-// ✅ enlace viene como AcfLink { url, title, target } → lo aplanamos y normalizamos
-function normalizeRepeaterWithImage(items: any[]) {
-  return (items || []).map((item: any) => ({
-    ...item,
-    imagen: item.imagen?.node?.sourceUrl
-      ? {
-          sourceUrl: normalizeImageUrl(item.imagen.node.sourceUrl),
-          altText:   item.imagen.node.altText || '',
-        }
+// ✅ Normaliza los nodos de un campo relationship (familia / banda)
+function normalizeRelationshipNodes(nodes: any[]) {
+  return (nodes || []).map((node: any) => ({
+    ...node,
+    featuredImage: node.featuredImage?.node
+      ? { node: { ...node.featuredImage.node, sourceUrl: normalizeImageUrl(node.featuredImage.node.sourceUrl) } }
       : null,
-    enlace: normalizeEnlace(
-      typeof item.enlace === 'string' ? item.enlace : item.enlace?.url
-    ),
   }));
 }
 
@@ -189,32 +176,17 @@ export async function getCharacterBySlug(slug: string) {
             nodes { id sourceUrl altText }
           }
           video
-          familiaDestacada {
-            nombre
-            imagen {
-              node {
-                sourceUrl
-                altText
-              }
-            }
-            enlace {
-              url
-              title
-              target
+          familia {
+            nodes {
+              id title slug
+              juegos { nodes { slug } }
+              featuredImage { node { sourceUrl altText } }
             }
           }
-          bandasDestacadas {
-            nombre
-            imagen {
-              node {
-                sourceUrl
-                altText
-              }
-            }
-            enlace {
-              url
-              title
-              target
+          banda {
+            nodes {
+              id title slug
+              featuredImage { node { sourceUrl altText } }
             }
           }
         }
@@ -238,8 +210,13 @@ export async function getCharacterBySlug(slug: string) {
               sourceUrl: normalizeImageUrl(img.sourceUrl),
             })),
           },
-          familiaDestacada: normalizeRepeaterWithImage(cf.familiaDestacada || []),
-          bandasDestacadas: normalizeRepeaterWithImage(cf.bandasDestacadas || []),
+          // ✅ Relationship: normalizamos imágenes de cada personaje relacionado
+          familia: {
+            nodes: normalizeRelationshipNodes(cf.familia?.nodes || []),
+          },
+          banda: {
+            nodes: normalizeRelationshipNodes(cf.banda?.nodes || []),
+          },
         }
       : null,
   };
