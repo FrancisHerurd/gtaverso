@@ -15,14 +15,26 @@ interface Props {
 
 const SITE_URL = 'https://gtaverso.com';
 
+// ✅ Nombres cortos — se usan en breadcrumbs, badges, sidebar, H1...
 const GAME_LABELS: Record<string, string> = {
-  'gta-6': 'GTA 6',
-  'gta-5': 'GTA 5',
-  'gta-4': 'GTA 4',
+  'gta-6':           'GTA 6',
+  'gta-5':           'GTA 5',
+  'gta-4':           'GTA 4',
   'gta-san-andreas': 'GTA San Andreas',
-  'gta-vice-city': 'GTA Vice City',
-  'vice-city': 'GTA Vice City',
-  'gta-3': 'GTA 3',
+  'gta-vice-city':   'GTA Vice City',
+  'vice-city':       'GTA Vice City',
+  'gta-3':           'GTA 3',
+};
+
+// ✅ Nombres completos — solo para el campo "Juego(s) donde aparece"
+const GAME_FULL_NAMES: Record<string, string> = {
+  'gta-6':           'Grand Theft Auto VI',
+  'gta-5':           'Grand Theft Auto V',
+  'gta-4':           'Grand Theft Auto IV',
+  'gta-san-andreas': 'Grand Theft Auto: San Andreas',
+  'gta-vice-city':   'Grand Theft Auto: Vice City',
+  'vice-city':       'Grand Theft Auto: Vice City',
+  'gta-3':           'Grand Theft Auto III',
 };
 
 function stripHtml(html?: string) {
@@ -128,7 +140,6 @@ function FichaFilaGrid({
   );
 }
 
-// ✅ width/height explícitos para nitidez en Retina
 function RelationshipCard({ node, game }: { node: any; game: string }) {
   const avatar    = node.featuredImage?.node?.sourceUrl || '/og-default.webp';
   const avatarAlt = node.featuredImage?.node?.altText   || node.title || '';
@@ -304,7 +315,7 @@ export default async function CharacterDetailPage({ params }: Props) {
                       <FichaFila label="Actor de voz" value={cf.actor} />
                     )}
 
-                    {/* ✅ Juego(s) donde aparece — con enlaces */}
+                    {/* ✅ Juego(s) donde aparece — nombre completo + enlace */}
                     {character.juegos?.nodes?.length > 0 && (
                       <div className="flex flex-col gap-1 px-6 py-4 bg-white/[0.03]">
                         <dt className="text-xs font-bold uppercase tracking-widest text-[#FF00FF]">
@@ -317,14 +328,14 @@ export default async function CharacterDetailPage({ params }: Props) {
                               href={`/juegos/${j.slug}`}
                               className="text-base font-semibold text-orange-500 hover:underline"
                             >
-                              {GAME_LABELS[j.slug] || j.slug}
+                              {GAME_FULL_NAMES[j.slug] || j.slug}
                             </Link>
                           ))}
                         </dd>
                       </div>
                     )}
 
-                    {/* ✅ Familia desde relationship */}
+                    {/* ✅ Familia */}
                     {familia.length > 0 && (
                       <div className="flex flex-col gap-3 px-6 py-4 bg-white/[0.03]">
                         <dt className="text-xs font-bold uppercase tracking-widest text-[#FF00FF]">Familia</dt>
@@ -338,7 +349,7 @@ export default async function CharacterDetailPage({ params }: Props) {
                       </div>
                     )}
 
-                    {/* ✅ Banda desde relationship */}
+                    {/* ✅ Banda */}
                     {banda.length > 0 && (
                       <div className="flex flex-col gap-3 px-6 py-4 bg-white/[0.03]">
                         <dt className="text-xs font-bold uppercase tracking-widest text-[#FF00FF]">Banda / Afiliación</dt>
