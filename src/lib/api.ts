@@ -19,6 +19,12 @@ function normalizeImageUrl(url: string | null | undefined): string {
   return url;
 }
 
+// ✅ Convierte https://csm.gtaverso.com/juegos/... → /juegos/...
+function normalizeEnlace(url: string | null | undefined): string | null {
+  if (!url) return null;
+  return url.replace(/^https?:\/\/csm\.gtaverso\.com/, '');
+}
+
 function normalizePost(post: any) {
   if (!post) return null;
   return {
@@ -48,7 +54,7 @@ function normalizeCharacter(character: any) {
 }
 
 // ✅ imagen viene como { node: { sourceUrl, altText } }
-// ✅ enlace viene como AcfLink { url, title, target } → lo aplanamos a string
+// ✅ enlace viene como AcfLink { url, title, target } → lo aplanamos y normalizamos
 function normalizeRepeaterWithImage(items: any[]) {
   return (items || []).map((item: any) => ({
     ...item,
@@ -58,7 +64,9 @@ function normalizeRepeaterWithImage(items: any[]) {
           altText:   item.imagen.node.altText || '',
         }
       : null,
-    enlace: (typeof item.enlace === 'string' ? item.enlace : item.enlace?.url) || null,
+    enlace: normalizeEnlace(
+      typeof item.enlace === 'string' ? item.enlace : item.enlace?.url
+    ),
   }));
 }
 
@@ -218,9 +226,6 @@ export async function getCharacterBySlug(slug: string) {
   if (!character) return null;
 
   const cf = character.characterFields;
-
-  // 🔍 DEBUG TEMPORAL — eliminar tras verificar
-  console.log('familiaDestacada raw:', JSON.stringify(cf?.familiaDestacada, null, 2));
 
   return {
     ...normalizeCharacter(character),
