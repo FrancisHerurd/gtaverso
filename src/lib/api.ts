@@ -178,15 +178,19 @@ export async function getCharacterBySlug(slug: string) {
           video
           familia {
             nodes {
-              id title slug
-              juegos { nodes { slug } }
-              featuredImage { node { sourceUrl altText } }
+              ... on Personaje {
+                id title slug
+                juegos { nodes { slug } }
+                featuredImage { node { sourceUrl altText } }
+              }
             }
           }
           banda {
             nodes {
-              id title slug
-              featuredImage { node { sourceUrl altText } }
+              ... on Personaje {
+                id title slug
+                featuredImage { node { sourceUrl altText } }
+              }
             }
           }
         }
