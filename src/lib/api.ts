@@ -1,4 +1,4 @@
-// lib/api.ts - VERSIÓN COMPATIBLE CON WPGRAPHQL + TAGS + PROXY DE IMÁGENES
+// lib/api.ts
 
 const WORDPRESS_API_URL = process.env.NEXT_PUBLIC_WORDPRESS_API_URL;
 
@@ -10,10 +10,7 @@ function normalizeImageUrl(url: string | null | undefined): string {
   if (!url) return '/og-default.webp';
   if (url.startsWith('/wp-images/') || url.startsWith('/images/')) return url;
   if (url.includes('csm.gtaverso.com/wp-content/uploads')) {
-    return url.replace(
-      /https?:\/\/csm\.gtaverso\.com\/wp-content\/uploads/,
-      '/wp-images'
-    );
+    return url.replace(/https?:\/\/csm\.gtaverso\.com\/wp-content\/uploads/, '/wp-images');
   }
   if (url.includes('gtaverso.com/wp-images')) {
     return url.replace(/https?:\/\/gtaverso\.com/, '');
@@ -27,12 +24,7 @@ function normalizePost(post: any) {
   return {
     ...post,
     featuredImage: post.featuredImage?.node
-      ? {
-          node: {
-            ...post.featuredImage.node,
-            sourceUrl: normalizeImageUrl(post.featuredImage.node.sourceUrl),
-          },
-        }
+      ? { node: { ...post.featuredImage.node, sourceUrl: normalizeImageUrl(post.featuredImage.node.sourceUrl) } }
       : null,
     seo: post.seo
       ? {
@@ -50,14 +42,24 @@ function normalizeCharacter(character: any) {
   return {
     ...character,
     featuredImage: character.featuredImage?.node
-      ? {
-          node: {
-            ...character.featuredImage.node,
-            sourceUrl: normalizeImageUrl(character.featuredImage.node.sourceUrl),
-          },
-        }
+      ? { node: { ...character.featuredImage.node, sourceUrl: normalizeImageUrl(character.featuredImage.node.sourceUrl) } }
       : null,
   };
+}
+
+// ✅ imagen viene como { node: { sourceUrl, altText } }
+// ✅ enlace viene como AcfLink { url, title, target } → lo aplanamos a string
+function normalizeRepeaterWithImage(items: any[]) {
+  return (items || []).map((item: any) => ({
+    ...item,
+    imagen: item.imagen?.node?.sourceUrl
+      ? {
+          sourceUrl: normalizeImageUrl(item.imagen.node.sourceUrl),
+          altText:   item.imagen.node.altText || '',
+        }
+      : null,
+    enlace: item.enlace?.url || null,
+  }));
 }
 
 export async function fetchAPI(query: string, variables = {}) {
@@ -110,8 +112,7 @@ export async function getAllPosts() {
 }
 
 export async function getPostBySlug(slug: string) {
-  const data = await fetchAPI(
-    `
+  const data = await fetchAPI(`
     query PostBySlug($slug: ID!) {
       post(id: $slug, idType: SLUG) {
         id title slug date modified content excerpt
@@ -128,9 +129,7 @@ export async function getPostBySlug(slug: string) {
         }
       }
     }
-  `,
-    { slug }
-  );
+  `, { slug });
   return normalizePost(data?.post);
 }
 
@@ -161,108 +160,78 @@ export async function getAllCharacters() {
   return data.personajes.nodes.map(normalizeCharacter);
 }
 
-// ✅ ACTUALIZADO: avatar como AcfMediaItemConnectionEdge (Image Object)
 export async function getCharacterBySlug(slug: string) {
-  const data = await fetchAPI(
-    `
+  const data = await fetchAPI(`
     query CharacterBySlug($slug: ID!) {
       personaje(id: $slug, idType: SLUG) {
         id title slug date modified excerpt content
         featuredImage { node { sourceUrl altText } }
         juegos { nodes { name slug } }
         characterFields {
-          actor
-          avatar {
-            node {
-              sourceUrl
-              altText
-            }
-          }
+          nombreCompleto
+          alias
+          nacionalidad
           genero
+          fechaDeNacimiento
           ubicacion
-          ocupacion
-          videoUrl
-          afiliaciones {
-            nodes {
-              ... on Personaje {
-                title
-                slug
-                juegos { nodes { slug } }
-                featuredImage { node { sourceUrl altText } }
-                characterFields {
-                  avatar {
-                    node {
-                      sourceUrl
-                      altText
-                    }
-                  }
-                }
+          rol
+          actividad
+          actor
+          galeria {
+            nodes { id sourceUrl altText }
+          }
+          video
+          familiaDestacada {
+            nombre
+            imagen {
+              node {
+                sourceUrl
+                altText
               }
             }
+            enlace {
+              url
+              title
+              target
+            }
           }
-          galeria {
-            nodes { sourceUrl altText id }
+          bandasDestacadas {
+            nombre
+            imagen {
+              node {
+                sourceUrl
+                altText
+              }
+            }
+            enlace {
+              url
+              title
+              target
+            }
           }
         }
       }
     }
-    `,
-    { slug }
-  );
+  `, { slug });
 
   const character = data?.personaje;
   if (!character) return null;
 
-  // Normalizar afiliaciones
-  const afiliacionesNormalizadas = (
-    character.characterFields?.afiliaciones?.nodes || []
-  ).map((p: any) => ({
-    ...p,
-    characterFields: p.characterFields
-      ? {
-          ...p.characterFields,
-          avatar: p.characterFields.avatar?.node
-            ? {
-                node: {
-                  ...p.characterFields.avatar.node,
-                  sourceUrl: normalizeImageUrl(p.characterFields.avatar.node.sourceUrl),
-                },
-              }
-            : null,
-        }
-      : null,
-    featuredImage: p.featuredImage?.node
-      ? {
-          node: {
-            ...p.featuredImage.node,
-            sourceUrl: normalizeImageUrl(p.featuredImage.node.sourceUrl),
-          },
-        }
-      : null,
-  }));
+  const cf = character.characterFields;
 
   return {
     ...normalizeCharacter(character),
-    characterFields: character.characterFields
+    characterFields: cf
       ? {
-          ...character.characterFields,
-          avatar: character.characterFields.avatar?.node
-            ? {
-                node: {
-                  ...character.characterFields.avatar.node,
-                  sourceUrl: normalizeImageUrl(character.characterFields.avatar.node.sourceUrl),
-                },
-              }
-            : null,
-          afiliaciones: afiliacionesNormalizadas,
+          ...cf,
           galeria: {
-            nodes: (character.characterFields.galeria?.nodes || []).map(
-              (img: any) => ({
-                ...img,
-                sourceUrl: normalizeImageUrl(img.sourceUrl),
-              })
-            ),
+            nodes: (cf.galeria?.nodes || []).map((img: any) => ({
+              ...img,
+              sourceUrl: normalizeImageUrl(img.sourceUrl),
+            })),
           },
+          familiaDestacada: normalizeRepeaterWithImage(cf.familiaDestacada || []),
+          bandasDestacadas: normalizeRepeaterWithImage(cf.bandasDestacadas || []),
         }
       : null,
   };
