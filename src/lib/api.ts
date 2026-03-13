@@ -219,6 +219,9 @@ export async function getCharacterBySlug(slug: string) {
 
   const cf = character.characterFields;
 
+  // 🔍 DEBUG TEMPORAL — eliminar tras verificar
+  console.log('familiaDestacada raw:', JSON.stringify(cf?.familiaDestacada, null, 2));
+
   return {
     ...normalizeCharacter(character),
     characterFields: cf
